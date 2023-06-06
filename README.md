@@ -1,9 +1,8 @@
-![fzy](http://i.hawth.ca/u/fzy-github.svg)
+**fnf** is a fast, simple fuzzy finder with an advanced scoring algorithm.
 
-**fzy** is a fast, simple fuzzy text selector for the terminal with an advanced scoring algorithm.
+Born as a fork of **fzy** (originaly intended to make fzy work with [the clifm file manager](https://github.com/leo-arch/clifm)), it adds a few new features to the origianl fzy, including basic color support and multi-selection. Consult the manpage for more information.
 
-**Disclaimer**: This fork (originaly intended to make fzy work with [the clifm file manager](https://github.com/leo-arch/clifm)) adds a few new features to the origianl fzy, including basic color support and multi-selection. Consult the manpage for more information.
-
+<!---
 ![](http://i.hawth.ca/u/fzy_animated_demo.svg)
 
 ## Why use this over fzf, pick, selecta, ctrlp, ...?
@@ -19,13 +18,14 @@ A gory comparison of the sorting used by fuzzy finders can be found in [ALGORITH
 
 fzy is designed to be used both as an editor plugin and on the command line.
 Rather than clearing the screen, fzy displays its interface directly below the current cursor position, scrolling the screen if necessary.
+--->
 
 ## Installation
 
 ```sh
 mkdir build && cd build
-git clone https://github.com/leo-arch/fzy
-cd fzy
+git clone https://github.com/leo-arch/fnf
+cd fnf
 make
 sudo make install
 ```
@@ -33,6 +33,7 @@ sudo make install
 The `PREFIX` environment variable can be used to specify the install location,
 the default is `/usr/local`.
 
+<!---
 ## Usage
 
 fzy is a drop in replacement for [selecta](https://github.com/garybernhardt/selecta), and can be used with its [usage examples](https://github.com/garybernhardt/selecta#usage-examples).
@@ -66,6 +67,7 @@ nnoremap <leader>e :call FzyCommand("ag . --silent -l -g ''", ":e")<cr>
 nnoremap <leader>v :call FzyCommand("ag . --silent -l -g ''", ":vs")<cr>
 nnoremap <leader>s :call FzyCommand("ag . --silent -l -g ''", ":sp")<cr>
 ```
+--->
 
 ### Use with [clifm](https://github.com/leo-arch/clifm)
 
