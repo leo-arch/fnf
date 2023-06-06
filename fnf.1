@@ -1,14 +1,14 @@
-.TH FNF 1 "Jun 6, 2023" "fnf 1.1"
+.TH FNF 1 "Jun 6, 2023" "fnf 0.1"
 .SH NAME
 fnf \- A simple fuzzy finder for the terminal.
 .SH SYNOPSIS
 .B fnf
 .IR [OPTION]...
 .SH DESCRIPTION
-.B fnf is a fuzzy finder for the terminal using a search
+\fBFnf\fR is a fuzzy finder for the terminal using a search
 similar to that of TextMate or CmdT.
 
-fnf reads a list of newline-separated items from stdin to be displayed as a
+\fBFnf\fR reads a list of newline-separated items from stdin to be displayed as a
 menu in the terminal.
 Upon pressing ENTER, the currently selected item is printed to stdout.
 
@@ -175,6 +175,7 @@ List running processes, kill the selected process
 .BR "git checkout $(git branch | cut \-c 3\- | fnf)"
 Same as above, but switching git branches.
 .SH AUTHORS
-John Hawthorn <john.hawthorn@gmail.com>
-
-L. Abramovich <leo.clifm@outlook.com>
+.sp
+John Hawthorn <john.hawthorn@gmail.com> 2014-2022
+.sp 0
+L. Abramovich <leo.clifm@outlook.com> 2022-today

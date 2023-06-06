@@ -1,5 +1,5 @@
 
-This document describes the scoring algorithm of fnf as well as the algorithm
+This document describes the scoring algorithm of **fnf** as well as the algorithm
 of other similar projects.
 
 # Matching vs Scoring
