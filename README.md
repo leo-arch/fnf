@@ -1,4 +1,5 @@
-**fnf** is a fast, simple fuzzy finder with an advanced scoring algorithm.
+# FNF
+A fast, simple fuzzy finder with an advanced scoring algorithm.
 
 Born as a fork of **fzy** (originaly intended to make fzy work with [the clifm file manager](https://github.com/leo-arch/clifm)), it adds a few new features to the original fzy, including basic color support and multi-selection. Consult the manpage for more information.
 
