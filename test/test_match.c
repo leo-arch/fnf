@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include "../config.h"
+#include "config.h"
 #include "match.h"
 
 #include "greatest/greatest.h"
