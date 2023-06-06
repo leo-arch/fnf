@@ -29,7 +29,7 @@ main() {
     eval "tmux \
         set-window-option synchronize-panes off \\; \
         set-window-option remain-on-exit off \\; \
-        split-window \"fzy $* < '${PATH_FIFO_IN}' > '${PATH_FIFO_OUT}' 2>&1; echo $? > '${PATH_FIFO_RET}'\""
+        split-window \"fnf $* < '${PATH_FIFO_IN}' > '${PATH_FIFO_OUT}' 2>&1; echo $? > '${PATH_FIFO_RET}'\""
 
     cat <&0 > "${PATH_FIFO_IN}" &
     cat < "${PATH_FIFO_OUT}"

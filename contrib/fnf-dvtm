@@ -35,7 +35,7 @@ main() {
     mkfifo "${PATH_FIFO_IN}" "${PATH_FIFO_OUT}"
 
     _echo \
-        "create 'fzy ${args} < \\'${PATH_FIFO_IN}\\' > \\'${PATH_FIFO_OUT}\\' 2>&1; echo $? > \\'${PATH_FIFO_RET}\\''" \
+        "create 'fnf ${args} < \\'${PATH_FIFO_IN}\\' > \\'${PATH_FIFO_OUT}\\' 2>&1; echo $? > \\'${PATH_FIFO_RET}\\''" \
         > "${DVTM_CMD_FIFO}"
     cat <&0 > "${PATH_FIFO_IN}" &
     cat < "${PATH_FIFO_OUT}"
