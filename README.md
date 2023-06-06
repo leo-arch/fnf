@@ -75,7 +75,7 @@ nnoremap <leader>s :call FzyCommand("ag . --silent -l -g ''", ":sp")<cr>
 Just run clifm as follows:
 
 ```sh
-clifm --fzytab
+clifm --fnftab
 ```
 
 ## Sorting
