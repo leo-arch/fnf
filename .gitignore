@@ -1,5 +1,5 @@
-fzy
-fzytest
+fnf
+fnftest
 *.o
 *.d
 test/acceptance/vendor/bundle
