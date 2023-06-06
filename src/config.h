@@ -37,7 +37,7 @@
 #define DEFAULT_COLORS "b6b1b2b40"
 #define NC "\x1b[0m" /* Reset attributes */
 
-/* Color indices: colors (from FZY_COLORS env var) will be parsed
+/* Color indices: colors (from FNF_COLORS env var) will be parsed
  * exactly in this order. See tty_interface.c */
 #define PROMPT_COLOR 0
 #define POINTER_COLOR 1

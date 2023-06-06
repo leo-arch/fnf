@@ -10,7 +10,7 @@
 
 static const char *usage_str =
     ""
-    "Usage: fzy [OPTION]...\n"
+    "Usage: fnf [OPTION]...\n"
     " -l, --lines=LINES        Specify how many lines of results to show (default 10)\n"
     " -m, --multi              Enable multi-selection\n"
     " -p, --prompt=PROMPT      Input prompt (default '> ')\n"

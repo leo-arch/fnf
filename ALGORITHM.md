@@ -1,5 +1,5 @@
 
-This document describes the scoring algorithm of fzy as well as the algorithm
+This document describes the scoring algorithm of fnf as well as the algorithm
 of other similar projects.
 
 # Matching vs Scoring
@@ -14,16 +14,16 @@ Scoring determines the order in which the results are sorted.
 Since scoring is tasked with finding what the human user intended, there is no
 correct solution. As a result there are large variety in scoring strategies.
 
-# fzy's matching
+# fnf's matching
 
 Generally, more time is taken in matching rather than scoring, so it is
 important that matching be as fast as possible. If this were case sensitive it
 would be a simple loop calling strchr, but since it needs to be case
 insensitive.
 
-# fzy's scoring
+# fnf's scoring
 
-fzy treats scoring as a modified [edit
+fnf treats scoring as a modified [edit
 distance](https://en.wikipedia.org/wiki/Edit_distance) problem of calculating
 the
 [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance).
@@ -33,7 +33,7 @@ sequence alignment](https://en.wikipedia.org/wiki/Sequence_alignment). Fuzzy
 matching is a simpler problem which only accepts insertions, not deletions or
 substitutions.
 
-fzy's scoring is a dynamic programming algorithm similar to
+fnf's scoring is a dynamic programming algorithm similar to
 [Wagner–Fischer](https://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm)
 and
 [Needleman–Wunsch](https://en.wikipedia.org/wiki/Needleman%E2%80%93Wunsch_algorithm).
@@ -41,26 +41,24 @@ and
 Dynamic programming requires the observation that the result is based on the
 result of subproblems.
 
-Fzy borrows heavily from concepts in bioinformatics to performs scoring.
+Fnf borrows heavily from concepts in bioinformatics to performs scoring.
 
-Fzy builds a `n`-by-`m` matrix, where `n` is the length of the search string
+Fnf builds a `n`-by-`m` matrix, where `n` is the length of the search string
 and `m` the length of the candidate string. Each position `(i,j)` in the matrix
 stores the score for matching the first `i` characters of the search with the
 first `j` characters of the candidate.
 
-Fzy calculates an affine gap penalty, this means simply that we assign a
+Fnf calculates an affine gap penalty, this means simply that we assign a
 constant penalty for having a gap and a linear penalty for the length of the
 gap.
 Inspired by the [Gotoh algorithm
-(pdf)](http://www.cs.unibo.it/~dilena/LabBII/Papers/AffineGaps.pdf), fzy
+(pdf)](http://www.cs.unibo.it/~dilena/LabBII/Papers/AffineGaps.pdf), fnf
 computes a second `D` (for diagonal) matrix in parallel with the score matrix.
 The `D` matrix computes the best score which *ends* in a match. This allows
 both computation of the penalty for starting a gap and the score for a
 consecutive match.
 
-Using [this 
-algorithm](https://github.com/jhawthorn/fzy/blob/master/src/match.c#L105) fzy 
-is able to score based on the optimal match.
+Using this algorithm fnf is able to score based on the optimal match.
 
 * Gaps (negative score)
   * at the start of the match
@@ -101,7 +99,7 @@ The wy `last_idx` is suspicious.
 ## Length of shortest first match: fzf
 https://github.com/junegunn/fzf/blob/master/src/algo/algo.go
 
-Fzy scores based on the size of the greedy shortest match. fzf finds its match
+Fnf scores based on the size of the greedy shortest match. fzf finds its match
 by the first match appearing in the candidate string. It has some cleverness to
 find if there is a shorter match contained in that search, but it isn't
 guaranteed to find the shortest match in the string.
@@ -148,11 +146,11 @@ lower scoring but shorter match is what is measured.
 * https://github.com/jeancroy/fuzzaldrin-plus/blob/master/src/scorer.coffee (Smith Waterman)
 
 
-# Possible fzy Algorithm Improvements
+# Possible fnf Algorithm Improvements
 
 ## Case sensitivity
 
-fzy currently treats all searches as case-insensitive. However, scoring prefers
+fnf currently treats all searches as case-insensitive. However, scoring prefers
 matches on uppercase letters to help find CamelCase candidates. It might be
 desirable to support a case sensitive flag or "smart case" searching.
 

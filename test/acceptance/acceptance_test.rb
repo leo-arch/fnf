@@ -3,14 +3,14 @@ require 'minitest'
 require 'minitest/autorun'
 require 'ttytest'
 
-class FzyTest < Minitest::Test
-  FZY_PATH = File.expand_path('../../../fzy', __FILE__)
+class FnfTest < Minitest::Test
+  FNF_PATH = File.expand_path('../../../fnf', __FILE__)
 
   LEFT =  "\e[D"
   RIGHT = "\e[C"
 
   def test_empty_list
-    @tty = interactive_fzy(input: %w[], before: "placeholder")
+    @tty = interactive_fnf(input: %w[], before: "placeholder")
     @tty.assert_cursor_position(y: 1, x: 2)
     @tty.assert_matches <<~TTY
       placeholder
@@ -40,7 +40,7 @@ class FzyTest < Minitest::Test
   end
 
   def test_one_item
-    @tty = interactive_fzy(input: %w[test], before: "placeholder")
+    @tty = interactive_fnf(input: %w[test], before: "placeholder")
     @tty.assert_matches <<~TTY
       placeholder
       >
@@ -72,7 +72,7 @@ class FzyTest < Minitest::Test
   end
 
   def test_two_items
-    @tty = interactive_fzy(input: %w[test foo], before: "placeholder")
+    @tty = interactive_fnf(input: %w[test foo], before: "placeholder")
     @tty.assert_cursor_position(y: 1, x: 2)
     @tty.assert_matches <<~TTY
       placeholder
@@ -109,7 +109,7 @@ class FzyTest < Minitest::Test
   end
 
   def test_editing
-    @tty = interactive_fzy(input: %w[test foo], before: "placeholder")
+    @tty = interactive_fnf(input: %w[test foo], before: "placeholder")
     @tty.assert_cursor_position(y: 1, x: 2)
     @tty.assert_matches <<~TTY
       placeholder
@@ -150,7 +150,7 @@ class FzyTest < Minitest::Test
   end
 
   def test_ctrl_d
-    @tty = interactive_fzy(input: %w[foo bar])
+    @tty = interactive_fnf(input: %w[foo bar])
     @tty.assert_matches ">\nfoo\nbar"
 
     @tty.send_keys('foo')
@@ -162,7 +162,7 @@ class FzyTest < Minitest::Test
   end
 
   def test_ctrl_c
-    @tty = interactive_fzy(input: %w[foo bar])
+    @tty = interactive_fnf(input: %w[foo bar])
     @tty.assert_matches ">\nfoo\nbar"
 
     @tty.send_keys('foo')
@@ -174,25 +174,25 @@ class FzyTest < Minitest::Test
   end
 
   def test_down_arrow
-    @tty = interactive_fzy(input: %w[foo bar])
+    @tty = interactive_fnf(input: %w[foo bar])
     @tty.assert_matches ">\nfoo\nbar"
     @tty.send_keys("\e[A\r")
     @tty.assert_matches "bar"
 
-    @tty = interactive_fzy(input: %w[foo bar])
+    @tty = interactive_fnf(input: %w[foo bar])
     @tty.assert_matches ">\nfoo\nbar"
     @tty.send_keys("\eOA\r")
     @tty.assert_matches "bar"
   end
 
   def test_up_arrow
-    @tty = interactive_fzy(input: %w[foo bar])
+    @tty = interactive_fnf(input: %w[foo bar])
     @tty.assert_matches ">\nfoo\nbar"
     @tty.send_keys("\e[A")   # first down
     @tty.send_keys("\e[B\r") # and back up
     @tty.assert_matches "foo"
 
-    @tty = interactive_fzy(input: %w[foo bar])
+    @tty = interactive_fnf(input: %w[foo bar])
     @tty.assert_matches ">\nfoo\nbar"
     @tty.send_keys("\eOA")   # first down
     @tty.send_keys("\e[B\r") # and back up
@@ -203,51 +203,51 @@ class FzyTest < Minitest::Test
     input10 = (1..10).map(&:to_s)
     input20 = (1..20).map(&:to_s)
 
-    @tty = interactive_fzy(input: input10)
+    @tty = interactive_fnf(input: input10)
     @tty.assert_matches ">\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10"
 
-    @tty = interactive_fzy(input: input20)
+    @tty = interactive_fnf(input: input20)
     @tty.assert_matches ">\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10"
 
-    @tty = interactive_fzy(input: input10, args: "-l 5")
+    @tty = interactive_fnf(input: input10, args: "-l 5")
     @tty.assert_matches ">\n1\n2\n3\n4\n5"
 
-    @tty = interactive_fzy(input: input10, args: "--lines=5")
+    @tty = interactive_fnf(input: input10, args: "--lines=5")
     @tty.assert_matches ">\n1\n2\n3\n4\n5"
   end
 
   def test_prompt
-    @tty = interactive_fzy
+    @tty = interactive_fnf
     @tty.send_keys("foo")
     @tty.assert_matches '> foo'
 
-    @tty = interactive_fzy(args: "-p 'C:\\'")
+    @tty = interactive_fnf(args: "-p 'C:\\'")
     @tty.send_keys("foo")
     @tty.assert_matches 'C:\foo'
 
-    @tty = interactive_fzy(args: "--prompt=\"foo bar \"")
+    @tty = interactive_fnf(args: "--prompt=\"foo bar \"")
     @tty.send_keys("baz")
     @tty.assert_matches "foo bar baz"
   end
 
   def test_show_scores
     expected_score = '(  inf)'
-    @tty = interactive_fzy(input: %w[foo bar], args: "-s")
+    @tty = interactive_fnf(input: %w[foo bar], args: "-s")
     @tty.send_keys('foo')
     @tty.assert_matches "> foo\n#{expected_score} foo"
 
-    @tty = interactive_fzy(input: %w[foo bar], args: "--show-scores")
+    @tty = interactive_fnf(input: %w[foo bar], args: "--show-scores")
     @tty.send_keys('foo')
     @tty.assert_matches "> foo\n#{expected_score} foo"
 
     expected_score = '( 0.89)'
-    @tty = interactive_fzy(input: %w[foo bar], args: "-s")
+    @tty = interactive_fnf(input: %w[foo bar], args: "-s")
     @tty.send_keys('f')
     @tty.assert_matches "> f\n#{expected_score} foo"
   end
 
   def test_large_input
-    @tty = TTYtest.new_terminal(%{seq 100000 | #{FZY_PATH} -l 3})
+    @tty = TTYtest.new_terminal(%{seq 100000 | #{FNF_PATH} -l 3})
     @tty.send_keys('34')
     @tty.assert_matches "> 34\n34\n340\n341"
 
@@ -259,38 +259,38 @@ class FzyTest < Minitest::Test
   end
 
   def test_worker_count
-    @tty = interactive_fzy(input: %w[foo bar], args: "-j1")
+    @tty = interactive_fnf(input: %w[foo bar], args: "-j1")
     @tty.send_keys('foo')
     @tty.assert_matches "> foo\nfoo"
 
-    @tty = TTYtest.new_terminal(%{seq 100000 | #{FZY_PATH} -j1 -l3})
+    @tty = TTYtest.new_terminal(%{seq 100000 | #{FNF_PATH} -j1 -l3})
     @tty.send_keys('34')
     @tty.assert_matches "> 34\n34\n340\n341"
 
-    @tty = TTYtest.new_terminal(%{seq 100000 | #{FZY_PATH} -j200 -l3})
+    @tty = TTYtest.new_terminal(%{seq 100000 | #{FNF_PATH} -j200 -l3})
     @tty.send_keys('34')
     @tty.assert_matches "> 34\n34\n340\n341"
   end
 
   def test_initial_query
-    @tty = interactive_fzy(input: %w[foo bar], args: "-q fo")
+    @tty = interactive_fnf(input: %w[foo bar], args: "-q fo")
     @tty.assert_matches "> fo\nfoo"
     @tty.send_keys("o")
     @tty.assert_matches "> foo\nfoo"
     @tty.send_keys("o")
     @tty.assert_matches "> fooo"
 
-    @tty = interactive_fzy(input: %w[foo bar], args: "-q asdf")
+    @tty = interactive_fnf(input: %w[foo bar], args: "-q asdf")
     @tty.assert_matches "> asdf"
   end
 
   def test_non_interactive
-    @tty = interactive_fzy(input: %w[foo bar], args: "-e foo", before: "before", after: "after")
+    @tty = interactive_fnf(input: %w[foo bar], args: "-e foo", before: "before", after: "after")
     @tty.assert_matches "before\nfoo\nafter"
   end
 
   def test_moving_text_cursor
-    @tty = interactive_fzy(input: %w[foo bar])
+    @tty = interactive_fnf(input: %w[foo bar])
     @tty.send_keys("br")
     @tty.assert_matches "> br\nbar"
     @tty.assert_cursor_position(y: 0, x: 4)
@@ -318,20 +318,20 @@ class FzyTest < Minitest::Test
   end
 
   # More info;
-  # https://github.com/jhawthorn/fzy/issues/42
+  # https://github.com/leo-arch/fnf
   # https://cirw.in/blog/bracketed-paste
   def test_bracketed_paste_characters
-    @tty = interactive_fzy(input: %w[foo bar])
+    @tty = interactive_fnf(input: %w[foo bar])
     @tty.assert_matches ">\nfoo\nbar"
     @tty.send_keys("\e[200~foo\e[201~")
     @tty.assert_matches "> foo\nfoo"
   end
 
-  # https://github.com/jhawthorn/fzy/issues/81
+  # https://github.com/jhawthorn/fnf
   def test_slow_stdin_fast_user
-    @tty = TTYtest.new_terminal(%{(sleep 0.5; echo aa; echo bc; echo bd) | #{FZY_PATH}})
+    @tty = TTYtest.new_terminal(%{(sleep 0.5; echo aa; echo bc; echo bd) | #{FNF_PATH}})
 
-    # Before input has all come in, but wait for fzy to at least start
+    # Before input has all come in, but wait for fnf to at least start
     sleep 0.1
 
     @tty.send_keys("b\r")
@@ -339,7 +339,7 @@ class FzyTest < Minitest::Test
   end
 
   def test_unicode
-    @tty = interactive_fzy(input: %w[English Français 日本語])
+    @tty = interactive_fnf(input: %w[English Français 日本語])
     @tty.assert_matches <<~TTY
       >
       English
@@ -360,7 +360,7 @@ class FzyTest < Minitest::Test
   end
 
   def test_unicode_backspace
-    @tty = interactive_fzy
+    @tty = interactive_fnf
     @tty.send_keys "Français"
     @tty.assert_matches "> Français"
     @tty.assert_cursor_position(y: 0, x: 10)
@@ -376,7 +376,7 @@ class FzyTest < Minitest::Test
     @tty.send_keys('ce')
     @tty.assert_matches "> France"
 
-    @tty = interactive_fzy
+    @tty = interactive_fnf
     @tty.send_keys "日本語"
     @tty.assert_matches "> 日本語"
     @tty.send_keys(ctrl('H'))
@@ -389,7 +389,7 @@ class FzyTest < Minitest::Test
   end
 
   def test_unicode_delete_word
-    @tty = interactive_fzy
+    @tty = interactive_fnf
     @tty.send_keys "Je parle Français"
     @tty.assert_matches "> Je parle Français"
     @tty.assert_cursor_position(y: 0, x: 19)
@@ -398,7 +398,7 @@ class FzyTest < Minitest::Test
     @tty.assert_matches "> Je parle"
     @tty.assert_cursor_position(y: 0, x: 11)
 
-    @tty = interactive_fzy
+    @tty = interactive_fnf
     @tty.send_keys "日本語"
     @tty.assert_matches "> 日本語"
     @tty.send_keys(ctrl('W'))
@@ -407,7 +407,7 @@ class FzyTest < Minitest::Test
   end
 
   def test_unicode_cursor_movement
-    @tty = interactive_fzy
+    @tty = interactive_fnf
     @tty.send_keys "Français"
     @tty.assert_cursor_position(y: 0, x: 10)
 
@@ -417,7 +417,7 @@ class FzyTest < Minitest::Test
     @tty.send_keys(RIGHT*3)
     @tty.assert_cursor_position(y: 0, x: 8)
 
-    @tty = interactive_fzy
+    @tty = interactive_fnf
     @tty.send_keys "日本語"
     @tty.assert_matches "> 日本語"
     @tty.assert_cursor_position(y: 0, x: 8)
@@ -439,7 +439,7 @@ class FzyTest < Minitest::Test
     ascii = "LongStringOfText" * 6
     unicode = "ＬｏｎｇＳｔｒｉｎｇＯｆＴｅｘｔ" * 3
 
-    @tty = interactive_fzy(input: [ascii, unicode])
+    @tty = interactive_fnf(input: [ascii, unicode])
     @tty.assert_matches <<~TTY
       >
       LongStringOfTextLongStringOfTextLongStringOfTextLongStringOfTextLongStringOfText
@@ -448,7 +448,7 @@ class FzyTest < Minitest::Test
   end
 
   def test_show_info
-    @tty = interactive_fzy(input: %w[foo bar baz], args: "-i")
+    @tty = interactive_fnf(input: %w[foo bar baz], args: "-i")
     @tty.assert_matches ">\n[3/3]\nfoo\nbar\nbaz"
     @tty.send_keys("ba")
     @tty.assert_matches "> ba\n[2/3]\nbar\nbaz"
@@ -457,9 +457,9 @@ class FzyTest < Minitest::Test
   end
 
   def test_help
-    @tty = TTYtest.new_terminal(%{#{FZY_PATH} --help})
+    @tty = TTYtest.new_terminal(%{#{FNF_PATH} --help})
     @tty.assert_matches <<TTY
-Usage: fzy [OPTION]...
+Usage: fnf [OPTION]...
  -l, --lines=LINES        Specify how many lines of results to show (default 10)
  -p, --prompt=PROMPT      Input prompt (default '> ')
  -q, --query=QUERY        Use QUERY as the initial search string
@@ -476,10 +476,10 @@ TTY
 
   private
 
-  def interactive_fzy(input: [], before: nil, after: nil, args: "")
+  def interactive_fnf(input: [], before: nil, after: nil, args: "")
     cmd = []
     cmd << %{echo "#{before}"} if before
-    cmd << %{printf "#{input.join("\\n")}" | #{FZY_PATH} #{args}}
+    cmd << %{printf "#{input.join("\\n")}" | #{FNF_PATH} #{args}}
     cmd << %{echo "#{after}"} if after
     cmd = cmd.join("; ")
     TTYtest.new_terminal(cmd)

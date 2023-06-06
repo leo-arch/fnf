@@ -12,23 +12,23 @@ INSTALL_PROGRAM=$(INSTALL)
 INSTALL_DATA=${INSTALL} -m 644
 
 LIBS=-lpthread
-OBJECTS=src/fzy.o src/match.o src/tty.o src/choices.o src/options.o src/tty_interface.o
+OBJECTS=src/fnf.o src/match.o src/tty.o src/choices.o src/options.o src/tty_interface.o
 THEFTDEPS = deps/theft/theft.o deps/theft/theft_bloom.o deps/theft/theft_mt.o deps/theft/theft_hash.o
-TESTOBJECTS=test/fzytest.c test/test_properties.c test/test_choices.c test/test_match.c src/match.o src/choices.o src/options.o $(THEFTDEPS)
+TESTOBJECTS=test/fnftest.c test/test_properties.c test/test_choices.c test/test_match.c src/match.o src/choices.o src/options.o $(THEFTDEPS)
 
-all: fzy
+all: fnf
 
-test/fzytest: $(TESTOBJECTS)
+test/fnftest: $(TESTOBJECTS)
 	$(CC) $(CFLAGS) $(CCFLAGS) -Isrc -o $@ $(TESTOBJECTS) $(LIBS)
 
-acceptance: fzy
+acceptance: fnf
 	cd test/acceptance && bundle --quiet && bundle exec ruby acceptance_test.rb
 
 test: check
-check: test/fzytest
-	$(DEBUGGER) ./test/fzytest
+check: test/fnftest
+	$(DEBUGGER) ./test/fnftest
 
-fzy: $(OBJECTS)
+fnf: $(OBJECTS)
 	$(CC) $(CFLAGS) $(CCFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
 #%.o: %.c config.h
@@ -37,23 +37,23 @@ fzy: $(OBJECTS)
 #config.h: src/config.def.h
 #	cp src/config.def.h config.h
 
-install: fzy
+install: fnf
 	mkdir -p $(DESTDIR)$(BINDIR)
-	cp fzy $(DESTDIR)$(BINDIR)/
-	chmod 755 ${DESTDIR}${BINDIR}/fzy
+	cp fnf $(DESTDIR)$(BINDIR)/
+	chmod 755 ${DESTDIR}${BINDIR}/fnf
 	mkdir -p $(DESTDIR)$(MANDIR)/man1
-	cp fzy.1 $(DESTDIR)$(MANDIR)/man1/
-	chmod 644 ${DESTDIR}${MANDIR}/man1/fzy.1
+	cp fnf.1 $(DESTDIR)$(MANDIR)/man1/
+	chmod 644 ${DESTDIR}${MANDIR}/man1/fnf.1
 
 uninstall:
-	rm -- $(DESTDIR)$(BINDIR)/fzy
-	rm -- $(DESTDIR)$(MANDIR)/fzy.1
+	rm -- $(DESTDIR)$(BINDIR)/fnf
+	rm -- $(DESTDIR)$(MANDIR)/man1/fnf.1
 
 fmt:
 	clang-format -i src/*.c src/*.h
 
 clean:
-	rm -f fzy test/fzytest src/*.o src/*.d deps/*/*.o
+	rm -f fnf test/fnftest src/*.o src/*.d deps/*/*.o
 
 #veryclean: clean
 #	rm -f config.h

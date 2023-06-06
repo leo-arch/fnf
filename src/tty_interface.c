@@ -27,7 +27,7 @@ static char buf[PATH_MAX];
 static size_t seln = 0, sel_counter = 0;
 
 static char colors[COLOR_ITEMS_NUM][MAX_COLOR_LEN];
-/* Parse colors taken from FZY_COLORS environment variable
+/* Parse colors taken from FNF_COLORS environment variable
  * Colors are parsed in strict order (see config.h)
  * Colors could be: 0-7 for normal colors, and b0-b7 for bold colors
  * Specific colors could be skipped using a dash ('-').
@@ -49,7 +49,7 @@ set_colors(void)
 	if (p)
 		return;
 
-	p = getenv("FZY_COLORS");
+	p = getenv("FNF_COLORS");
 	if (!p || !*p)
 		p = DEFAULT_COLORS;
 
