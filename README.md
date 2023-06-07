@@ -72,11 +72,13 @@ nnoremap <leader>s :call FzyCommand("ag . --silent -l -g ''", ":sp")<cr>
 
 ### Use with [clifm](https://github.com/leo-arch/clifm)
 
-Just run clifm as follows:
+Just run **clifm** as follows:
 
 ```sh
 clifm --fnftab
 ```
+
+**Note**: You need at least **clifm** 1.12.9. If running a previous version use the [our old fzy fork](https://github.com/leo-arch/fzy) using `--fzytab` instead of `--fnftab`.
 
 ## Sorting
 
