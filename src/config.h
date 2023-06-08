@@ -29,6 +29,9 @@
 * THE SOFTWARE.
 */
 
+#ifndef CONFIG_H
+#define CONFIG_H
+
 #define TTY_COLOR_HIGHLIGHT TTY_COLOR_YELLOW
 
 #define SCORE_GAP_LEADING -0.005
@@ -78,4 +81,8 @@
 #define COLOR_ITEMS_NUM 5
 #define MAX_COLOR_LEN 48
 
+//#ifndef VERSION
 #define VERSION "0.1"
+//#endif
+
+#endif /* CONFIG_H */

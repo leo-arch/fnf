@@ -1,7 +1,5 @@
-VERSION=1.1
-
-CPPFLAGS=-DVERSION=\"${VERSION}\" -D_GNU_SOURCE
-CFLAGS+=-MD -Wall -Wextra -g -std=c99 -O3 -pedantic -Ideps -Werror=vla
+CPPFLAGS=-D_GNU_SOURCE
+CFLAGS+=-MD -Wall -Wextra -std=c99 -O3 -pedantic -Ideps -Werror=vla
 PREFIX?=/usr/local
 MANDIR?=$(PREFIX)/share/man
 BINDIR?=$(PREFIX)/bin
@@ -31,12 +29,6 @@ check: test/fnftest
 fnf: $(OBJECTS)
 	$(CC) $(CFLAGS) $(CCFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
-#%.o: %.c config.h
-#	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
-
-#config.h: src/config.def.h
-#	cp src/config.def.h config.h
-
 install: fnf
 	mkdir -p $(DESTDIR)$(BINDIR)
 	cp fnf $(DESTDIR)$(BINDIR)/
@@ -55,10 +47,6 @@ fmt:
 clean:
 	rm -f fnf test/fnftest src/*.o src/*.d deps/*/*.o
 
-#veryclean: clean
-#	rm -f config.h
-
-#.PHONY: test check all clean veryclean install fmt acceptance
 .PHONY: test check all clean install fmt acceptance
 
 -include $(OBJECTS:.o=.d)
