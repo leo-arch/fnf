@@ -23,6 +23,8 @@ Rather than clearing the screen, fzy displays its interface directly below the c
 
 ## Installation
 
+If running on Archlinux, **FNF** can be installed from the [AUR](https://aur.archlinux.org/packages/fnf). Else, perform a manual installation as follows:
+
 ```sh
 mkdir build && cd build
 git clone https://github.com/leo-arch/fnf
@@ -33,6 +35,8 @@ sudo make install
 
 The `PREFIX` environment variable can be used to specify the install location,
 the default is `/usr/local`.
+
+
 
 <!---
 ## Usage
