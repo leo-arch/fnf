@@ -106,6 +106,7 @@ options_init(options_t *options)
 	options->scrolloff       = DEFAULT_SCROLLOFF;
 	options->tty_filename    = DEFAULT_TTY;
 	options->num_lines       = DEFAULT_NUM_LINES;
+	options->auto_lines      = DEFAULT_AUTO_LINES;
 	options->prompt          = DEFAULT_PROMPT;
 	options->workers         = DEFAULT_WORKERS;
 	options->input_delimiter = DEFAULT_DELIMITER;
@@ -166,6 +167,9 @@ options_parse(options_t *options, int argc, char *argv[])
 			int l;
 			if (!strcmp(optarg, "max")) {
 				l = INT_MAX;
+			} else if (!strcmp(optarg, "auto")) {
+				l = 0;
+				options->auto_lines = 1;
 //			} else if (sscanf(optarg, "%d", &l) != 1 || l < 3) {
 			} else if (sscanf(optarg, "%d", &l) != 1 || l < 2) {
 				fprintf(stderr, "Invalid format for --lines: %s\n", optarg);

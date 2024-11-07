@@ -39,6 +39,7 @@ typedef struct {
 	const char *tty_filename;
 	int show_scores;
 	unsigned int num_lines;
+	int auto_lines;
 	unsigned int scrolloff;
 	const char *prompt;
 	unsigned int workers;

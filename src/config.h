@@ -49,6 +49,7 @@
 #define DEFAULT_TTY "/dev/tty"
 #define DEFAULT_PROMPT "> "
 #define DEFAULT_NUM_LINES 10
+#define DEFAULT_AUTO_LINES 0
 #define DEFAULT_WORKERS 0
 #define DEFAULT_SHOW_INFO 0
 #define DEFAULT_DELIMITER '\n'
