@@ -806,12 +806,18 @@ tty_interface_run(tty_interface_t *state)
 {
 	if (state->options->no_color == 0)
 		set_colors();
+	if (state->options->auto_lines)
+		state->options->num_lines = tty_getheight(state->tty) - 1;
 	draw(state);
 
 	for (;;) {
 		do {
 			while(!tty_input_ready(state->tty, -1, 1)) {
 				/* We received a signal (probably WINCH) */
+				if (state->options->auto_lines) {
+					tty_getwinsz(state->tty);
+					state->options->num_lines = tty_getheight(state->tty) - 1;
+				}
 				draw(state);
 			}
 
