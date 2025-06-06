@@ -6,9 +6,9 @@
 #
 # requires fd
 
-
+# TODO: make fnf appear on next line instead of replacing prompt and line buffer
 file-widget() {
-	LBUFFER="${LBUFFER}$(fd --hidden | fnf --lines 20 --reverse --multi | tr '\n' ' ')"
+	LBUFFER="${LBUFFER}$(fd --hidden | fnf --lines 20 --multi | tr '\n' ' ')"
 	zle reset-prompt
 }
 zle -N file-widget
@@ -17,7 +17,7 @@ bindkey -M vicmd '^t' file-widget
 bindkey -M viins '^t' file-widget
 
 dir-widget() {
-	dir="$(fd --type directory --hidden | fnf --lines 20 --reverse)"
+	dir="$(fd --type directory --hidden | fnf --lines 20)"
 	[ -d "$dir" ] && cd "$dir"
 	zle reset-prompt
 }
@@ -27,7 +27,7 @@ bindkey -M vicmd '^[c' dir-widget
 bindkey -M viins '^[c' dir-widget
 
 history-widget() {
-	selected=$(fc -l | fnf --query="$LBUFFER" | cut -f6- -d' ' )
+	selected=$(fc -l | fnf --query="$LBUFFER" --reverse | cut -f6- -d' ' )
 	[ -n "$selected" ] && LBUFFER="$selected"
 	zle reset-prompt
 }
