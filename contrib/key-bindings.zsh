@@ -9,7 +9,7 @@
 use_find=0
 
 if ! command -v fd; then
-  echo "fnf-widget: warning fd is not installed, using find as file searcher"
+  echo "fnf-widget: warning fd is not installed, using find as file searcher" 1>&2
   use_find=1
 fi
 
