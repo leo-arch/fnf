@@ -6,11 +6,21 @@
 #
 # requires fd
 
+use_find=0
+
+if ! command -v fd; then
+  echo "fnf-widget: warning fd is not installed, using find as file searcher"
+  use_find=1
+fi
 
 file-widget() {
   # print an extra line
   echo ""
-  LBUFFER="${LBUFFER}$(fd --hidden | fnf --lines 20 --multi | tr '\n' ' ')"
+  if [ $use_find -eq 0 ]; then
+    LBUFFER="${LBUFFER}$(fd --hidden | fnf --lines 20 --multi | tr '\n' ' ')"
+  else
+    LBUFFER="${LBUFFER}$(find . -type f | fnf --lines 20 --multi | tr '\n' ' ')"
+  fi
   # Remove the extra line
   printf "\x1b[1A"
   zle reset-prompt
@@ -22,7 +32,11 @@ bindkey -M viins '^t' file-widget
 
 dir-widget() {
   echo ""
-  dir="$(fd --type directory --hidden | fnf --lines 20)"
+  if [ $use_find -eq 0 ]; then
+    dir="$(fd --type directory --hidden | fnf --lines 20)"
+  else
+    dir="$(find . -type d | fnf --lines 20)"
+  fi
   [ -d "$dir" ] && cd "$dir"
   printf "\x1b[1A"
   zle reset-prompt
