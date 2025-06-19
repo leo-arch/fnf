@@ -17,10 +17,11 @@ file-widget() {
   # print an extra line
   echo ""
   if [ $use_find -eq 0 ]; then
-    LBUFFER="${LBUFFER}$(fd --hidden | fnf --lines 20 --multi | tr '\n' ' ')"
+    files=$(fd --hidden)
   else
-    LBUFFER="${LBUFFER}$(find . -type f | fnf --lines 20 --multi | tr '\n' ' ')"
+    files=$(find . -type f)
   fi
+  LBUFFER="${LBUFFER}$(echo "$files" | fnf --lines 20 --multi | tr '\n' ' ')"
   # Remove the extra line
   printf "\x1b[1A"
   zle reset-prompt
@@ -33,11 +34,12 @@ bindkey -M viins '^t' file-widget
 dir-widget() {
   echo ""
   if [ $use_find -eq 0 ]; then
-    dir="$(fd --type directory --hidden | fnf --lines 20)"
+    dirs="$(fd --type directory --hidden)"
   else
-    dir="$(find . -type d | fnf --lines 20)"
+    dirs="$(find . -type d )"
   fi
-  [ -d "$dir" ] && cd "$dir"
+  selected="$(echo $dirs | fnf --lines 20)"
+  [ -d "$selected" ] && cd "$selected"
   printf "\x1b[1A"
   zle reset-prompt
 }
