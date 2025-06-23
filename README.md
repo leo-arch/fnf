@@ -25,7 +25,7 @@ Rather than clearing the screen, fzy displays its interface directly below the c
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/fnf.svg)](https://repology.org/project/fnf/versions)
 
-**FNF** is availible in multiple package repositories. If not packaged for your system, perform a manual installation as follows:
+**Fnf** is availible in multiple package repositories. If not packaged for your system, perform a manual installation as follows:
 
 ```sh
 mkdir build && cd build
@@ -88,7 +88,7 @@ clifm --fnftab
 
 ## Sorting
 
-fzy attempts to present the best matches first. The following considerations are weighted when sorting:
+**Fnf** attempts to present the best matches first. The following considerations are weighted when sorting:
 
 It prefers consecutive characters: `file` will match <tt><b>file</b></tt> over <tt><b>fil</b>t<b>e</b>r</tt>.
 
