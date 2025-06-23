@@ -24,7 +24,8 @@ Rather than clearing the screen, fzy displays its interface directly below the c
 ## Installation
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/fnf.svg)](https://repology.org/project/fnf/versions)
-**FNF** is availible in multiple package repositories, if there is not a package for your system, perform a manual installation as follows:
+
+**FNF** is availible in multiple package repositories. If not packaged for your system, perform a manual installation as follows:
 
 ```sh
 mkdir build && cd build
