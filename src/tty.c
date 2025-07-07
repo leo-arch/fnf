@@ -5,7 +5,7 @@
  *
  * Copyright
  * (C) 2014-2022 John Hawthorn <john.hawthorn@gmail.com>
- * (C) 2022-2023, L. Abramovich <leo.clifm@outlook.com>
+ * (C) 2022-2025, L. Abramovich <leo.clifm@outlook.com>
  * All rights reserved.
 
 * The MIT License (MIT)
@@ -261,11 +261,12 @@ tty_flush(tty_t *tty)
 	fflush(tty->fout);
 }
 
+/*
 size_t
 tty_getwidth(tty_t *tty)
 {
 	return tty->maxwidth;
-}
+} */
 
 size_t
 tty_getheight(tty_t *tty)

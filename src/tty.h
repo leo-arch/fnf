@@ -5,7 +5,7 @@
  *
  * Copyright
  * (C) 2014-2022 John Hawthorn <john.hawthorn@gmail.com>
- * (C) 2022-2023, L. Abramovich <leo.clifm@outlook.com>
+ * (C) 2022-2025, L. Abramovich <leo.clifm@outlook.com>
  * All rights reserved.
 
 * The MIT License (MIT)
@@ -85,7 +85,7 @@ void tty_printf(tty_t *tty, const char *fmt, ...);
 void tty_putc(tty_t *tty, char c);
 void tty_flush(tty_t *tty);
 
-size_t tty_getwidth(tty_t *tty);
+//size_t tty_getwidth(tty_t *tty);
 size_t tty_getheight(tty_t *tty);
 
 #endif
