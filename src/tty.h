@@ -81,6 +81,9 @@ void tty_clearline(tty_t *tty);
 void tty_moveup(tty_t *tty, const int i);
 void tty_setcol(tty_t *tty, const int col);
 
+void tty_hide_cursor(tty_t *tty);
+void tty_unhide_cursor(tty_t *tty);
+
 void tty_fputs(tty_t *tty, const char *str);
 void tty_printf(tty_t *tty, const char *fmt, ...);
 void tty_putc(tty_t *tty, const char c);

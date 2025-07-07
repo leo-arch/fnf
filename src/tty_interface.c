@@ -352,6 +352,8 @@ draw(tty_interface_t *state)
 		}
 	}
 
+	tty_hide_cursor(tty);
+
 	for (size_t i = start; i < start + num_lines; i++) {
 		if (options->reverse == 0)
 			tty_putc(tty, '\n');
@@ -374,6 +376,8 @@ draw(tty_interface_t *state)
 		tty_moveup(tty, num_lines + options->show_info);
 
 	tty_setcol(tty, options->pad);
+	tty_unhide_cursor(tty);
+
 	tty_printf(tty, "%s%s%s", colors[PROMPT_COLOR], options->prompt, NC);
 	for (size_t i = 0; i < state->cursor; i++)
 		fputc(state->search[i], tty->fout);

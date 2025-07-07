@@ -267,6 +267,18 @@ tty_flush(tty_t *tty)
 	fflush(tty->fout);
 }
 
+void
+tty_hide_cursor(tty_t *tty)
+{
+	fputs("\x1b[?25l", tty->fout);
+}
+
+void
+tty_unhide_cursor(tty_t *tty)
+{
+	fputs("\x1b[?25h", tty->fout);
+}
+
 size_t
 tty_getheight(tty_t *tty)
 {
