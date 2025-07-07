@@ -46,7 +46,7 @@
 # endif /* __linux */
 #endif /* PATH_MAX */
 
-#define _ESC 27
+#define KEY_ESC 27
 
 /* Array to store selected/marked entries */
 static char **selections = (char **)NULL;
@@ -107,7 +107,7 @@ set_colors(void)
 }
 
 /* Search for the string P in the selections array. If found, return 1,
- * otherwise zero */
+ * otherwise zero. */
 static int
 is_selected(const char *p)
 {
@@ -126,7 +126,7 @@ is_selected(const char *p)
 /* Remote the entry NAME from the selections array by setting the first
  * byte of the corresponding array entry to NUL */
 static void
-deselect_entry(char *name)
+deselect_entry(const char *name)
 {
 	if (!name || !*name || sel_counter == 0)
 		return;
@@ -152,11 +152,11 @@ decolor_name(const char *name)
 	size_t i, j = 0;
 	size_t name_len = strlen(name);
 	for (i = 0; name[i] && i < name_len; i++) {
-		if (name[i] == _ESC && name[i + 1] == '[') {
+		if (name[i] == KEY_ESC && name[i + 1] == '[') {
 			for (j = i + 1; name[j]; j++) {
 				if (name[j] != 'm')
 					continue;
-				i = j + (name[j + 1] == _ESC ? 0 : 1);
+				i = j + (name[j + 1] == KEY_ESC ? 0 : 1);
 				break;
 			}
 		}
@@ -171,7 +171,7 @@ decolor_name(const char *name)
 	return *q ? q : (char *)NULL;
 }
 
-/* Save the string P into the selections array */
+/* Save the string P into the selections array. */
 static void
 save_selection(const char *p)
 {
@@ -184,7 +184,7 @@ save_selection(const char *p)
 }
 
 /* Select the currently highighted/hovered entry if not already selected.
- * Otherwise, remove it from the selections list */
+ * Otherwise, remove it from the selections list. */
 static int
 action_select(tty_interface_t *state)
 {
@@ -193,7 +193,7 @@ action_select(tty_interface_t *state)
 		return EXIT_FAILURE;
 
 	if (is_selected(p) == 1) {
-		deselect_entry((char *)p);
+		deselect_entry(p);
 		return EXIT_FAILURE;
 	}
 
@@ -201,7 +201,7 @@ action_select(tty_interface_t *state)
 	return EXIT_SUCCESS;
 }
 
-/* Print the list of selected/marked entries to STDOUT */
+/* Print the list of selected/marked entries to STDOUT. */
 static void
 print_selections(tty_interface_t *state)
 {
@@ -213,14 +213,14 @@ print_selections(tty_interface_t *state)
 		if (!*selections[i])
 			continue;
 		char *p = (char *)NULL;
-		if (strchr(selections[i], _ESC))
+		if (strchr(selections[i], KEY_ESC))
 			p = decolor_name(selections[i]);
 		printf("%s\n", p ? p : selections[i]);
 	}
 
 }
 
-/* Free the selections array */
+/* Free the selections array. */
 static void
 free_selections(tty_interface_t *state)
 {
@@ -264,18 +264,17 @@ clear(tty_interface_t *state)
 }
 
 static void
-draw_match(tty_interface_t *state, const char *choice, int selected)
+draw_match(tty_interface_t *state, const char *choice, const int selected)
 {
 	tty_t *tty = state->tty;
 	options_t *options = state->options;
-	char *search = state->last_search;
+	const char *search = state->last_search;
 
-	int n = strlen(search);
 	size_t positions[MATCH_MAX_LEN];
-	for (int i = 0; i < n + 1 && i < MATCH_MAX_LEN; i++)
-		positions[i] = -1;
+	memset(positions, -1, sizeof(positions));
 
-	score_t score = match_positions(search, choice, &positions[0]);
+	const score_t score = search
+		? match_positions(search, choice, &positions[0]) : SCORE_MIN;
 
 	if (options->show_scores) {
 		if (score == SCORE_MIN) {
@@ -285,16 +284,16 @@ draw_match(tty_interface_t *state, const char *choice, int selected)
 		}
 	}
 
-	if (selected) {
+	if (selected == 1) {
 #ifdef TTY_SELECTION_UNDERLINE
 		tty_setunderline(tty);
 #else
 		/* Let's colorize the selected entry */
 		if (*colors[SEL_FG_COLOR] || *colors[SEL_BG_COLOR]) {
 			if (*colors[SEL_FG_COLOR])
-				tty_printf(tty, "%s", colors[SEL_FG_COLOR]);
+				tty_fputs(tty, colors[SEL_FG_COLOR]);
 			if (*colors[SEL_BG_COLOR])
-				tty_printf(tty, "%s", colors[SEL_BG_COLOR]);
+				tty_fputs(tty, colors[SEL_BG_COLOR]);
 		} else {
 			tty_setinvert(tty);
 		}
@@ -302,17 +301,23 @@ draw_match(tty_interface_t *state, const char *choice, int selected)
 	}
 
 	tty_setnowrap(tty);
-	for (size_t i = 0, p = 0; choice[i] != '\0'; i++) {
-		if (positions[p] == i) {
-			tty_setfg(tty, TTY_COLOR_HIGHLIGHT);
-			p++;
-		} else {
-			tty_setfg(tty, TTY_COLOR_NORMAL);
+
+	if (score == SCORE_MIN) { /* No query string */
+		tty_setfg(tty, TTY_COLOR_NORMAL);
+		fputs(choice, tty->fout);
+	} else { /* We have a query string: colorize matching characters */
+		for (size_t i = 0, p = 0; choice[i] != '\0'; i++) {
+			if (positions[p] == i) {
+				tty_setfg(tty, TTY_COLOR_HIGHLIGHT);
+				p++;
+			} else {
+				tty_setfg(tty, TTY_COLOR_NORMAL);
+			}
+			if (choice[i] == '\n')
+				tty_putc(tty, ' ');
+			else
+				tty_putc(tty, choice[i]);
 		}
-		if (choice[i] == '\n')
-			tty_putc(tty, ' ');
-		else
-			tty_printf(tty, "%c", choice[i]);
 	}
 	tty_setwrap(tty);
 	tty_setnormal(tty);
@@ -325,9 +330,9 @@ draw(tty_interface_t *state)
 	choices_t *choices = state->choices;
 	options_t *options = state->options;
 
-	unsigned int num_lines = options->num_lines;
+	const unsigned int num_lines = options->num_lines;
 	size_t start = 0;
-	size_t current_selection = choices->selection;
+	const size_t current_selection = choices->selection;
 	if (current_selection + options->scrolloff >= num_lines) {
 		start = current_selection + options->scrolloff - num_lines + 1;
 		size_t available = choices_available(choices);
@@ -349,11 +354,11 @@ draw(tty_interface_t *state)
 
 	for (size_t i = start; i < start + num_lines; i++) {
 		if (options->reverse == 0)
-			tty_printf(tty, "\n");
+			tty_putc(tty, '\n');
 		tty_clearline(tty);
 		const char *choice = choices_get(choices, i);
 		if (choice) {
-			int multi_sel = options->multi == 1 && is_selected((char *)choice);
+			const int multi_sel = (options->multi == 1 && is_selected(choice));
 			tty_printf(tty, "%*s%s%c%s%c%s",
 				options->pad, "", colors[POINTER_COLOR],
 				i == choices->selection ? options->pointer : ' ',
@@ -362,7 +367,7 @@ draw(tty_interface_t *state)
 			draw_match(state, choice, i == choices->selection);
 		}
 		if (options->reverse == 1)
-			tty_printf(tty, "\n");
+			tty_putc(tty, '\n');
 	}
 
 	if (options->reverse == 0 && num_lines + options->show_info)
@@ -388,68 +393,6 @@ draw(tty_interface_t *state)
 	}
 	tty_flush(tty);
 }
-
-/*
-static void
-draw(tty_interface_t *state)
-{
-	tty_t *tty = state->tty;
-	choices_t *choices = state->choices;
-	options_t *options = state->options;
-
-	unsigned int num_lines = options->num_lines;
-	size_t start = 0;
-	size_t current_selection = choices->selection;
-	if (current_selection + options->scrolloff >= num_lines) {
-		start = current_selection + options->scrolloff - num_lines + 1;
-		size_t available = choices_available(choices);
-		if (start + num_lines >= available && available > 0) {
-			start = available - num_lines;
-		}
-	}
-
-	if (options->reverse == 1) // Move to the bottom and print the prompt
-		tty_printf(tty, "\x1b[%dB", num_lines);
-
-	tty_setcol(tty, options->pad);
-	tty_printf(tty, "%s%s", options->prompt, state->search);
-	tty_clearline(tty);
-
-	if (options->show_info) {
-		tty_printf(tty, "\n[%lu/%lu]", choices->available, choices->size);
-		tty_clearline(tty);
-	}
-
-	if (options->reverse == 1) // Go back to the top to print the files list
-		tty_printf(tty, "\x1b[M\x1b[%dA", num_lines + 1);
-
-	for (size_t i = start; i < start + num_lines; i++) {
-		tty_printf(tty, "\n");
-		tty_clearline(tty);
-		const char *choice = choices_get(choices, i);
-		if (choice) {
-			int multi_sel = options->multi == 1 && is_selected((char *)choice);
-			tty_printf(tty, "%*s%s%c%s%c%s",
-				options->pad, "", colors[POINTER_COLOR],
-				i == choices->selection ? options->pointer : ' ',
-				colors[MARKER_COLOR],
-				multi_sel == 1 ? options->marker : ' ', NC);
-			draw_match(state, choice, i == choices->selection);
-		}
-	}
-
-	if (options->reverse == 0 && num_lines + options->show_info)
-		tty_moveup(tty, num_lines + options->show_info);
-
-	if (options->reverse == 1)
-		tty_printf(tty, "%c", '\n');
-
-	tty_setcol(tty, options->pad);
-	tty_printf(tty, "%s%s%s", colors[PROMPT_COLOR], options->prompt, NC);
-	for (size_t i = 0; i < state->cursor; i++)
-		fputc(state->search[i], tty->fout);
-	tty_flush(tty);
-} */
 
 static void
 update_search(tty_interface_t *state)
@@ -496,7 +439,7 @@ action_emit(tty_interface_t *state)
 	const char *selection = choices_get(state->choices, state->choices->selection);
 	if (selection) { /* output the selected result */
 		char *p = (char *)NULL;
-		if (strchr(selection, _ESC))
+		if (strchr(selection, KEY_ESC))
 			p = decolor_name(selection);
 		printf("%s\n", p ? p : selection);
 	} else { /* No match, output the query instead */
@@ -511,8 +454,8 @@ action_del_char(tty_interface_t *state)
 {
 	if (state->cursor == 0)
 		return;
-	size_t length = strlen(state->search);
-	size_t original_cursor = state->cursor;
+	const size_t length = strlen(state->search);
+	const size_t original_cursor = state->cursor;
 
 	do {
 		state->cursor--;
@@ -525,7 +468,7 @@ action_del_char(tty_interface_t *state)
 static void
 action_del_word(tty_interface_t *state)
 {
-	size_t original_cursor = state->cursor;
+	const size_t original_cursor = state->cursor;
 	size_t cursor = state->cursor;
 
 	while (cursor && isspace(state->search[cursor - 1]))
@@ -673,7 +616,7 @@ static void
 append_search(tty_interface_t *state, char ch)
 {
 	char *search = state->search;
-	size_t search_size = strlen(search);
+	const size_t search_size = strlen(search);
 	if (search_size < SEARCH_SIZE_MAX) {
 		memmove(&search[state->cursor+1], &search[state->cursor],
 			search_size - state->cursor + 1);
@@ -713,40 +656,41 @@ typedef struct {
 #define KEY_CTRL(key) ((const char[]){((key) - ('@')), '\0'})
 
 static const keybinding_t keybindings[] = {
-					   {"\x1b", action_exit},             /* ESC */
-					   {"\x7f", action_del_char},	      /* DEL */
-					   {KEY_CTRL('H'), action_del_char}, /* Backspace (C-H) */
-					   {KEY_CTRL('W'), action_del_word}, /* C-W */
-					   {KEY_CTRL('U'), action_del_all},  /* C-U */
-					   {KEY_CTRL('I'), action_tab},      /* TAB (C-I ) */
-					   {KEY_CTRL('C'), action_exit},	 /* C-C */
-					   {KEY_CTRL('D'), action_exit},	 /* C-D */
-					   {KEY_CTRL('G'), action_exit},	 /* C-G */
-					   {KEY_CTRL('M'), action_emit},	 /* CR */
-					   {KEY_CTRL('P'), action_prev},	 /* C-P */
-					   {KEY_CTRL('N'), action_next},	 /* C-N */
-					   {KEY_CTRL('K'), action_prev},	 /* C-K */
-					   {KEY_CTRL('J'), action_next},	 /* C-J */
-					   {KEY_CTRL('A'), action_beginning},    /* C-A */
-					   {KEY_CTRL('E'), action_end},		 /* C-E */
+	   {"\x1b", action_exit},             /* ESC */
+	   {"\x7f", action_del_char},	      /* DEL */
+	   {KEY_CTRL('H'), action_del_char}, /* Backspace (C-H) */
+	   {KEY_CTRL('W'), action_del_word}, /* C-W */
+	   {KEY_CTRL('U'), action_del_all},  /* C-U */
+	   {KEY_CTRL('I'), action_tab},      /* TAB (C-I ) */
+	   {KEY_CTRL('C'), action_exit},	 /* C-C */
+	   {KEY_CTRL('D'), action_exit},	 /* C-D */
+	   {KEY_CTRL('G'), action_exit},	 /* C-G */
+	   {KEY_CTRL('M'), action_emit},	 /* CR */
+	   {KEY_CTRL('P'), action_prev},	 /* C-P */
+	   {KEY_CTRL('N'), action_next},	 /* C-N */
+	   {KEY_CTRL('K'), action_prev},	 /* C-K */
+	   {KEY_CTRL('J'), action_next},	 /* C-J */
+	   {KEY_CTRL('A'), action_beginning},    /* C-A */
+	   {KEY_CTRL('E'), action_end},		 /* C-E */
 
-					   {"\x1bOD", action_left}, /* LEFT */
-					   {"\x1b[D", action_left}, /* LEFT */
-					   {"\x1bOC", action_right}, /* RIGHT */
-					   {"\x1b[C", action_right}, /* RIGHT */
-					   {"\x1b[1~", action_beginning}, /* HOME */
-					   {"\x1b[H", action_beginning}, /* HOME */
-					   {"\x1b[4~", action_end}, /* END */
-					   {"\x1b[F", action_end}, /* END */
-					   {"\x1b[A", action_prev}, /* UP */
-					   {"\x1bOA", action_prev}, /* UP */
-					   {"\x1b[B", action_next}, /* DOWN */
-					   {"\x1bOB", action_next}, /* DOWN */
-					   {"\x1b[5~", action_pageup},
-					   {"\x1b[6~", action_pagedown},
-					   {"\x1b[200~", action_ignore},
-					   {"\x1b[201~", action_ignore},
-					   {NULL, NULL}};
+	   {"\x1bOD", action_left}, /* LEFT */
+	   {"\x1b[D", action_left}, /* LEFT */
+	   {"\x1bOC", action_right}, /* RIGHT */
+	   {"\x1b[C", action_right}, /* RIGHT */
+	   {"\x1b[1~", action_beginning}, /* HOME */
+	   {"\x1b[H", action_beginning}, /* HOME */
+	   {"\x1b[4~", action_end}, /* END */
+	   {"\x1b[F", action_end}, /* END */
+	   {"\x1b[A", action_prev}, /* UP */
+	   {"\x1bOA", action_prev}, /* UP */
+	   {"\x1b[B", action_next}, /* DOWN */
+	   {"\x1bOB", action_next}, /* DOWN */
+	   {"\x1b[5~", action_pageup},
+	   {"\x1b[6~", action_pagedown},
+	   {"\x1b[200~", action_ignore},
+	   {"\x1b[201~", action_ignore},
+	   {NULL, NULL}
+};
 
 #undef KEY_CTRL
 
@@ -789,7 +733,7 @@ handle_input(tty_interface_t *state, const char *s, int handle_ambiguous_key)
 
 	/* No matching keybinding, decolorize and add to search */
 	char *p = input, *q = (char *)NULL;
-	if (strchr(input, _ESC) && (q = decolor_name(input)))
+	if (strchr(input, KEY_ESC) && (q = decolor_name(input)))
 		p = q;
 
 	for (int i = 0; p[i]; i++) {
@@ -821,7 +765,7 @@ tty_interface_run(tty_interface_t *state)
 				draw(state);
 			}
 
-			char s[2] = {tty_getchar(state->tty), '\0'};
+			const char s[2] = {tty_getchar(state->tty), '\0'};
 			handle_input(state, s, 0);
 
 			if (state->exit >= 0) {
@@ -836,7 +780,7 @@ tty_interface_run(tty_interface_t *state)
 			state->ambiguous_key_pending ? KEYTIMEOUT : 0, 0));
 
 		if (state->ambiguous_key_pending) {
-			char s[1] = "";
+			const char s[1] = "";
 			handle_input(state, s, 1);
 
 			if (state->exit >= 0) {

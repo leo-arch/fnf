@@ -50,7 +50,7 @@ void tty_getwinsz(tty_t *tty);
 char tty_getchar(tty_t *tty);
 int tty_input_ready(tty_t *tty, long int timeout, int return_on_signal);
 
-void tty_setfg(tty_t *tty, int fg);
+void tty_setfg(tty_t *tty, const int fg);
 void tty_setinvert(tty_t *tty);
 void tty_setunderline(tty_t *tty);
 void tty_setnormal(tty_t *tty);
@@ -78,14 +78,14 @@ void tty_newline(tty_t *tty);
  */
 void tty_clearline(tty_t *tty);
 
-void tty_moveup(tty_t *tty, int i);
-void tty_setcol(tty_t *tty, int col);
+void tty_moveup(tty_t *tty, const int i);
+void tty_setcol(tty_t *tty, const int col);
 
+void tty_fputs(tty_t *tty, const char *str);
 void tty_printf(tty_t *tty, const char *fmt, ...);
-void tty_putc(tty_t *tty, char c);
+void tty_putc(tty_t *tty, const char c);
 void tty_flush(tty_t *tty);
 
-//size_t tty_getwidth(tty_t *tty);
 size_t tty_getheight(tty_t *tty);
 
 #endif

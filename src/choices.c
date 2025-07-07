@@ -47,10 +47,10 @@
 #define INITIAL_CHOICE_CAPACITY 128
 
 static int
-cmpchoice(const void *_idx1, const void *_idx2)
+cmpchoice(const void *idx1, const void *idx2)
 {
-	const struct scored_result *a = _idx1;
-	const struct scored_result *b = _idx2;
+	const struct scored_result *a = idx1;
+	const struct scored_result *b = idx2;
 
 	if (a->score == b->score) {
 		/* To ensure a stable sort, we must also sort by the string
@@ -231,7 +231,8 @@ worker_get_next_batch(struct search_job *job, size_t *start, size_t *end)
 	pthread_mutex_unlock(&job->lock);
 }
 
-static struct result_list merge2(struct result_list list1, struct result_list list2)
+static struct result_list
+merge2(struct result_list list1, struct result_list list2)
 {
 	size_t result_index = 0, index1 = 0, index2 = 0;
 
@@ -243,17 +244,17 @@ static struct result_list merge2(struct result_list list1, struct result_list li
 		abort();
 	}
 
-	while(index1 < list1.size && index2 < list2.size) {
+	while (index1 < list1.size && index2 < list2.size) {
 		if (cmpchoice(&list1.list[index1], &list2.list[index2]) < 0)
 			result.list[result_index++] = list1.list[index1++];
 		else
 			result.list[result_index++] = list2.list[index2++];
 	}
 
-	while(index1 < list1.size)
+	while (index1 < list1.size)
 		result.list[result_index++] = list1.list[index1++];
 
-	while(index2 < list2.size)
+	while (index2 < list2.size)
 		result.list[result_index++] = list2.list[index2++];
 
 	free(list1.list);
@@ -272,13 +273,13 @@ choices_search_worker(void *data)
 
 	size_t start, end;
 
-	for(;;) {
+	for (;;) {
 		worker_get_next_batch(job, &start, &end);
 
-		if(start == end)
+		if (start == end)
 			break;
 
-		for(size_t i = start; i < end; i++) {
+		for (size_t i = start; i < end; i++) {
 			if (has_match(job->search, c->strings[i])) {
 				result->list[result->size].str = c->strings[i];
 				result->list[result->size].score = match(job->search, c->strings[i]);
@@ -291,7 +292,7 @@ choices_search_worker(void *data)
 	qsort(result->list, result->size, sizeof(struct scored_result), cmpchoice);
 
 	/* Fan-in, merging results */
-	for(unsigned int step = 0;; step++) {
+	for (unsigned int step = 0;; step++) {
 		if (w->worker_num % (2 << step))
 			break;
 
@@ -366,8 +367,7 @@ choices_get(choices_t *c, size_t n)
 {
 	if (n < c->available)
 		return c->results[n].str;
-	else
-		return (char *)NULL;
+	return (char *)NULL;
 }
 
 score_t

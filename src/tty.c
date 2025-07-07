@@ -124,7 +124,7 @@ char
 tty_getchar(tty_t *tty)
 {
 	char ch;
-	int size = read(tty->fdin, &ch, 1);
+	const int size = read(tty->fdin, &ch, 1);
 	if (size < 0) {
 		perror("error reading from tty");
 		exit(EXIT_FAILURE);
@@ -171,13 +171,13 @@ tty_input_ready(tty_t *tty, long int timeout, int return_on_signal)
 }
 
 static void
-tty_sgr(tty_t *tty, int code)
+tty_sgr(tty_t *tty, const int code)
 {
-	tty_printf(tty, "%c%c%im", 0x1b, '[', code);
+	fprintf(tty->fout, "\x1b[%dm", code);
 }
 
 void
-tty_setfg(tty_t *tty, int fg)
+tty_setfg(tty_t *tty, const int fg)
 {
 	if (tty->fgcolor != fg) {
 		tty_sgr(tty, 30 + fg);
@@ -207,37 +207,43 @@ tty_setnormal(tty_t *tty)
 void
 tty_setnowrap(tty_t *tty)
 {
-	tty_printf(tty, "%c%c?7l", 0x1b, '[');
+	fputs("\x1b[?7l", tty->fout);
 }
 
 void
 tty_setwrap(tty_t *tty)
 {
-	tty_printf(tty, "%c%c?7h", 0x1b, '[');
+	fputs("\x1b[?7h", tty->fout);
 }
 
 void
 tty_newline(tty_t *tty)
 {
-	tty_printf(tty, "%c%cK\n", 0x1b, '[');
+	fputs("\x1b[K\n", tty->fout);
 }
 
 void
 tty_clearline(tty_t *tty)
 {
-	tty_printf(tty, "%c%cK", 0x1b, '[');
+	fputs("\x1b[K", tty->fout);
 }
 
 void
-tty_setcol(tty_t *tty, int col)
+tty_setcol(tty_t *tty, const int col)
 {
-	tty_printf(tty, "%c%c%iG", 0x1b, '[', col + 1);
+	fprintf(tty->fout, "\x1b[%dG", col + 1);
 }
 
 void
-tty_moveup(tty_t *tty, int i)
+tty_moveup(tty_t *tty, const int i)
 {
-	tty_printf(tty, "%c%c%iA", 0x1b, '[', i);
+	fprintf(tty->fout, "\x1b[%dA", i);
+}
+
+void
+tty_fputs(tty_t *tty, const char *str)
+{
+	fputs(str, tty->fout);
 }
 
 void
@@ -250,7 +256,7 @@ tty_printf(tty_t *tty, const char *fmt, ...)
 }
 
 void
-tty_putc(tty_t *tty, char c)
+tty_putc(tty_t *tty, const char c)
 {
 	fputc(c, tty->fout);
 }
@@ -260,13 +266,6 @@ tty_flush(tty_t *tty)
 {
 	fflush(tty->fout);
 }
-
-/*
-size_t
-tty_getwidth(tty_t *tty)
-{
-	return tty->maxwidth;
-} */
 
 size_t
 tty_getheight(tty_t *tty)

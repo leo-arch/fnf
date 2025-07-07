@@ -52,10 +52,9 @@ has_match(const char *needle, const char *haystack)
 {
 	while (*needle) {
 		char nch = *needle++;
-
-		if (!(haystack = strcasechr(haystack, nch))) {
+		if (!(haystack = strcasechr(haystack, nch)))
 			return 0;
-		}
+
 		haystack++;
 	}
 	return 1;
@@ -109,9 +108,9 @@ static inline void
 match_row(const struct match_struct *match, int row, score_t *curr_D, score_t *curr_M,
 const score_t *last_D, const score_t *last_M)
 {
-	int n = match->needle_len;
-	int m = match->haystack_len;
-	int i = row;
+	const int n = match->needle_len;
+	const int m = match->haystack_len;
+	const int i = row;
 
 	const char *lower_needle = match->lower_needle;
 	const char *lower_haystack = match->lower_haystack;
@@ -150,8 +149,8 @@ match(const char *needle, const char *haystack)
 	struct match_struct match;
 	setup_match_struct(&match, needle, haystack);
 
-	int n = match.needle_len;
-	int m = match.haystack_len;
+	const int n = match.needle_len;
+	const int m = match.haystack_len;
 
 	if (m > MATCH_MAX_LEN || n > m) {
 		/*
@@ -201,14 +200,14 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 	struct match_struct match;
 	setup_match_struct(&match, needle, haystack);
 
-	int n = match.needle_len;
-	int m = match.haystack_len;
+	const int n = match.needle_len;
+	const int m = match.haystack_len;
 
 	if (m > MATCH_MAX_LEN || n > m) {
 		/*
 		 * Unreasonably large candidate: return no score
 		 * If it is a valid match it will still be returned, it will
-		 * just be ranked below any reasonably sized candidates
+		 * just be ranked below any reasonably sized candidates.
 		 */
 		return SCORE_MIN;
 	} else if (n == m) {
