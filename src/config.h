@@ -5,7 +5,7 @@
  *
  * Copyright
  * (C) 2014-2022 John Hawthorn <john.hawthorn@gmail.com>
- * (C) 2022-2023, L. Abramovich <leo.clifm@outlook.com>
+ * (C) 2022-2025, L. Abramovich <leo.clifm@outlook.com>
  * All rights reserved.
 
 * The MIT License (MIT)
@@ -82,8 +82,6 @@
 #define COLOR_ITEMS_NUM 5
 #define MAX_COLOR_LEN 48
 
-//#ifndef VERSION
 #define VERSION "0.1"
-//#endif
 
 #endif /* CONFIG_H */
