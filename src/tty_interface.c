@@ -176,7 +176,13 @@ static void
 save_selection(const char *p)
 {
 	selections = (char **)realloc(selections, (seln + 2) * sizeof(char *));
+	if (!selections)
+		return;
+
 	selections[seln] = (char *)malloc((strlen(p) + 1) * sizeof(char));
+	if (!selections[seln])
+		return;
+
 	strcpy(selections[seln], p);
 	seln++;
 	sel_counter++;
@@ -212,9 +218,8 @@ print_selections(tty_interface_t *state)
 	for (i = 0; selections[i]; i++) {
 		if (!*selections[i])
 			continue;
-		char *p = (char *)NULL;
-		if (strchr(selections[i], KEY_ESC))
-			p = decolor_name(selections[i]);
+		const char *p = strchr(selections[i], KEY_ESC)
+			? decolor_name(selections[i]) : NULL;
 		printf("%s\n", p ? p : selections[i]);
 	}
 
@@ -450,7 +455,8 @@ action_emit(tty_interface_t *state)
 	/* ttyout should be flushed before outputting on stdout */
 	tty_close(state->tty);
 
-	const char *selection = choices_get(state->choices, state->choices->selection);
+	const char *selection =
+		choices_get(state->choices, state->choices->selection);
 	if (selection) { /* output the selected result */
 		const char *p = strchr(selection, KEY_ESC)
 			? decolor_name(selection) : NULL;
@@ -640,7 +646,8 @@ append_search(tty_interface_t *state, const char ch)
 }
 
 void
-tty_interface_init(tty_interface_t *state, tty_t *tty, choices_t *choices, options_t *options)
+tty_interface_init(tty_interface_t *state, tty_t *tty, choices_t *choices,
+	options_t *options)
 {
 	state->tty = tty;
 	state->choices = choices;
