@@ -171,7 +171,7 @@ tty_input_ready(tty_t *tty, long int timeout, int return_on_signal)
 }
 
 static void
-tty_sgr(tty_t *tty, const int code)
+tty_sgr(const tty_t *tty, const int code)
 {
 	fprintf(tty->fout, "\x1b[%dm", code);
 }
@@ -186,13 +186,13 @@ tty_setfg(tty_t *tty, const int fg)
 }
 
 void
-tty_setinvert(tty_t *tty)
+tty_setinvert(const tty_t *tty)
 {
 	tty_sgr(tty, 7);
 }
 
 void
-tty_setunderline(tty_t *tty)
+tty_setunderline(const tty_t *tty)
 {
 	tty_sgr(tty, 4);
 }
@@ -205,43 +205,43 @@ tty_setnormal(tty_t *tty)
 }
 
 void
-tty_setnowrap(tty_t *tty)
+tty_setnowrap(const tty_t *tty)
 {
 	fputs("\x1b[?7l", tty->fout);
 }
 
 void
-tty_setwrap(tty_t *tty)
+tty_setwrap(const tty_t *tty)
 {
 	fputs("\x1b[?7h", tty->fout);
 }
 
 void
-tty_newline(tty_t *tty)
+tty_newline(const tty_t *tty)
 {
 	fputs("\x1b[K\n", tty->fout);
 }
 
 void
-tty_clearline(tty_t *tty)
+tty_clearline(const tty_t *tty)
 {
 	fputs("\x1b[K", tty->fout);
 }
 
 void
-tty_setcol(tty_t *tty, const int col)
+tty_setcol(const tty_t *tty, const int col)
 {
 	fprintf(tty->fout, "\x1b[%dG", col + 1);
 }
 
 void
-tty_moveup(tty_t *tty, const int i)
+tty_moveup(const tty_t *tty, const int i)
 {
 	fprintf(tty->fout, "\x1b[%dA", i);
 }
 
 void
-tty_fputs(tty_t *tty, const char *str)
+tty_fputs(const tty_t *tty, const char *str)
 {
 	fputs(str, tty->fout);
 }
@@ -256,31 +256,31 @@ tty_printf(tty_t *tty, const char *fmt, ...)
 }
 
 void
-tty_putc(tty_t *tty, const char c)
+tty_putc(const tty_t *tty, const char c)
 {
 	fputc(c, tty->fout);
 }
 
 void
-tty_flush(tty_t *tty)
+tty_flush(const tty_t *tty)
 {
 	fflush(tty->fout);
 }
 
 void
-tty_hide_cursor(tty_t *tty)
+tty_hide_cursor(const tty_t *tty)
 {
 	fputs("\x1b[?25l", tty->fout);
 }
 
 void
-tty_unhide_cursor(tty_t *tty)
+tty_unhide_cursor(const tty_t *tty)
 {
 	fputs("\x1b[?25h", tty->fout);
 }
 
 size_t
-tty_getheight(tty_t *tty)
+tty_getheight(const tty_t *tty)
 {
 	return tty->maxheight;
 }

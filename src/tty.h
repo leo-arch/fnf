@@ -51,11 +51,11 @@ char tty_getchar(tty_t *tty);
 int tty_input_ready(tty_t *tty, long int timeout, int return_on_signal);
 
 void tty_setfg(tty_t *tty, const int fg);
-void tty_setinvert(tty_t *tty);
-void tty_setunderline(tty_t *tty);
+void tty_setinvert(const tty_t *tty);
+void tty_setunderline(const tty_t *tty);
 void tty_setnormal(tty_t *tty);
-void tty_setnowrap(tty_t *tty);
-void tty_setwrap(tty_t *tty);
+void tty_setnowrap(const tty_t *tty);
+void tty_setwrap(const tty_t *tty);
 
 #define TTY_COLOR_BLACK 0
 #define TTY_COLOR_RED 1
@@ -71,24 +71,24 @@ void tty_setwrap(tty_t *tty);
  * Move cursor to the beginning of the next line, clearing to the end of the
  * current line
  */
-void tty_newline(tty_t *tty);
+void tty_newline(const tty_t *tty);
 
 /* tty_clearline
  * Clear to the end of the current line without advancing the cursor.
  */
-void tty_clearline(tty_t *tty);
+void tty_clearline(const tty_t *tty);
 
-void tty_moveup(tty_t *tty, const int i);
-void tty_setcol(tty_t *tty, const int col);
+void tty_moveup(const tty_t *tty, const int i);
+void tty_setcol(const tty_t *tty, const int col);
 
-void tty_hide_cursor(tty_t *tty);
-void tty_unhide_cursor(tty_t *tty);
+void tty_hide_cursor(const tty_t *tty);
+void tty_unhide_cursor(const tty_t *tty);
 
-void tty_fputs(tty_t *tty, const char *str);
+void tty_fputs(const tty_t *tty, const char *str);
 void tty_printf(tty_t *tty, const char *fmt, ...);
-void tty_putc(tty_t *tty, const char c);
-void tty_flush(tty_t *tty);
+void tty_putc(const tty_t *tty, const char c);
+void tty_flush(const tty_t *tty);
 
-size_t tty_getheight(tty_t *tty);
+size_t tty_getheight(const tty_t *tty);
 
 #endif

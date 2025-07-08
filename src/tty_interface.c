@@ -246,7 +246,7 @@ is_boundary(char c)
 }
 
 static void
-clear(tty_interface_t *state)
+clear(const tty_interface_t *state)
 {
 	tty_t *tty = state->tty;
 
@@ -260,6 +260,27 @@ clear(tty_interface_t *state)
 		tty_moveup(tty, line - 1);
 
 	tty_flush(tty);
+}
+
+static void
+colorize_match(const tty_interface_t *state, const size_t *positions,
+	const char *choice)
+{
+	tty_t *tty = state->tty;
+	const int no_color = state->options->no_color;
+
+	for (size_t i = 0, p = 0; choice[i] != '\0'; i++) {
+		if (positions[p] == i) {
+			no_color == 1 ? tty_setunderline(tty)
+				: tty_setfg(tty, TTY_COLOR_HIGHLIGHT);
+			p++;
+		} else {
+			no_color == 1 ? tty_setnormal(tty)
+				: tty_setfg(tty, TTY_COLOR_NORMAL);
+		}
+
+		tty_putc(tty, choice[i] == '\n' ? ' ' : choice[i]);
+	}
 }
 
 static void
@@ -301,24 +322,11 @@ draw_match(tty_interface_t *state, const char *choice, const int selected)
 
 	tty_setnowrap(tty);
 
-	if (score == SCORE_MIN) { /* No matching result */
+	if (score == SCORE_MIN) { /* No matching result. */
 		tty_setfg(tty, TTY_COLOR_NORMAL);
 		fputs(choice, tty->fout);
-	} else { /* We have a query string: colorize matching characters */
-		for (size_t i = 0, p = 0; choice[i] != '\0'; i++) {
-			if (positions[p] == i) {
-				state->options->no_color == 1 ? tty_setunderline(tty)
-					: tty_setfg(tty, TTY_COLOR_HIGHLIGHT);
-				p++;
-			} else {
-				state->options->no_color == 1 ? tty_setnormal(tty)
-					: tty_setfg(tty, TTY_COLOR_NORMAL);
-			}
-			if (choice[i] == '\n')
-				tty_putc(tty, ' ');
-			else
-				tty_putc(tty, choice[i]);
-		}
+	} else { /* We have a query string: colorize the matching characters. */
+		colorize_match(state, positions, choice);
 	}
 	tty_setwrap(tty);
 	tty_setnormal(tty);
@@ -444,9 +452,8 @@ action_emit(tty_interface_t *state)
 
 	const char *selection = choices_get(state->choices, state->choices->selection);
 	if (selection) { /* output the selected result */
-		char *p = (char *)NULL;
-		if (strchr(selection, KEY_ESC))
-			p = decolor_name(selection);
+		const char *p = strchr(selection, KEY_ESC)
+			? decolor_name(selection) : NULL;
 		printf("%s\n", p ? p : selection);
 	} else { /* No match, output the query instead */
 		printf("%s\n", state->search);
