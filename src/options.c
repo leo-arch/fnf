@@ -70,29 +70,29 @@ usage(const char *argv0)
 }
 
 static struct option longopts[] = {
-                   {"show-matches", required_argument, NULL, 'e'},
-				   {"query", required_argument, NULL, 'q'},
-				   {"lines", required_argument, NULL, 'l'},
-				   {"tty", required_argument, NULL, 't'},
-				   {"prompt", required_argument, NULL, 'p'},
-				   {"show-scores", no_argument, NULL, 's'},
-				   {"read-null", no_argument, NULL, '0'},
-				   {"version", no_argument, NULL, 'v'},
-				   {"benchmark", optional_argument, NULL, 'b'},
-				   {"workers", required_argument, NULL, 'j'},
-				   {"show-info", no_argument, NULL, 'i'},
-				   {"help", no_argument, NULL, 'h'},
-				   {"pad", required_argument, NULL, 'P'},
-				   {"multi", no_argument, NULL, 'm'},
-				   {"pointer", required_argument, NULL, 1},
-				   {"marker", required_argument, NULL, 2},
-				   {"cycle", no_argument, NULL, 3},
-				   {"tab-accepts", no_argument, NULL, 4},
-				   {"right-accepts", no_argument, NULL, 5},
-				   {"left-aborts", no_argument, NULL, 6},
-				   {"no-color", no_argument, NULL, 7},
-				   {"reverse", no_argument, NULL, 8},
-				   {NULL, 0, NULL, 0}
+	{"show-matches", required_argument, NULL, 'e'},
+	{"query", required_argument, NULL, 'q'},
+	{"lines", required_argument, NULL, 'l'},
+	{"tty", required_argument, NULL, 't'},
+	{"prompt", required_argument, NULL, 'p'},
+	{"show-scores", no_argument, NULL, 's'},
+	{"read-null", no_argument, NULL, '0'},
+	{"version", no_argument, NULL, 'v'},
+	{"benchmark", optional_argument, NULL, 'b'},
+	{"workers", required_argument, NULL, 'j'},
+	{"show-info", no_argument, NULL, 'i'},
+	{"help", no_argument, NULL, 'h'},
+	{"pad", required_argument, NULL, 'P'},
+	{"multi", no_argument, NULL, 'm'},
+	{"pointer", required_argument, NULL, 1},
+	{"marker", required_argument, NULL, 2},
+	{"cycle", no_argument, NULL, 3},
+	{"tab-accepts", no_argument, NULL, 4},
+	{"right-accepts", no_argument, NULL, 5},
+	{"left-aborts", no_argument, NULL, 6},
+	{"no-color", no_argument, NULL, 7},
+	{"reverse", no_argument, NULL, 8},
+	{NULL, 0, NULL, 0}
 };
 
 void
@@ -170,12 +170,9 @@ options_parse(options_t *options, int argc, char *argv[])
 			} else if (!strcmp(optarg, "auto")) {
 				l = 0;
 				options->auto_lines = 1;
-//			} else if (sscanf(optarg, "%d", &l) != 1 || l < 3) {
 			} else if (sscanf(optarg, "%d", &l) != 1 || l < 2) {
 				fprintf(stderr, "Invalid format for --lines: %s\n", optarg);
 				fprintf(stderr, "Must be integer in range 2..\n");
-//				fprintf(stderr, "Must be integer in range 3..\n");
-//				usage(argv[0]);
 				exit(EXIT_FAILURE);
 			}
 			options->num_lines = l;

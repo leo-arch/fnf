@@ -126,10 +126,9 @@ const score_t *last_D, const score_t *last_M)
 				score = (j * SCORE_GAP_LEADING) + match_bonus[j];
 			} else if (j) { /* i > 0 && j > 0*/
 				score = max(
-						last_M[j - 1] + match_bonus[j],
-
-						/* consecutive match, doesn't stack with match_bonus */
-						last_D[j - 1] + SCORE_MATCH_CONSECUTIVE);
+					last_M[j - 1] + match_bonus[j],
+					/* consecutive match, doesn't stack with match_bonus */
+					last_D[j - 1] + SCORE_MATCH_CONSECUTIVE);
 			}
 			curr_D[j] = score;
 			curr_M[j] = prev_score = max(score, prev_score + gap_score);
@@ -259,7 +258,7 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 				    (match_required || D[i][j] == M[i][j])) {
 					/* If this score was determined using
 					 * SCORE_MATCH_CONSECUTIVE, the
-					 * previous character MUST be a match
+					 * previous character MUST be a match.
 					 */
 					match_required =
 					    i && j &&

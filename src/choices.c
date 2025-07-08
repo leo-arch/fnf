@@ -89,15 +89,16 @@ choices_fread(choices_t *c, FILE *file, char input_delimiter)
 
 	/* Resize buffer to at least one byte more capacity than our current
 	 * size. This uses a power of two of INITIAL_BUFFER_CAPACITY.
-	 * This must work even when c->buffer is NULL and c->buffer_size is 0
+	 * This must work even when c->buffer is NULL and c->buffer_size is 0.
 	 */
 	size_t capacity = INITIAL_BUFFER_CAPACITY;
 	while (capacity <= c->buffer_size)
 		capacity *= 2;
 	c->buffer = safe_realloc(c->buffer, capacity);
 
-	/* Continue reading until we get a "short" read, indicating EOF */
-	while ((c->buffer_size += fread(c->buffer + c->buffer_size, 1, capacity - c->buffer_size, file)) == capacity) {
+	/* Continue reading until we get a "short" read, indicating EOF. */
+	while ((c->buffer_size += fread(c->buffer + c->buffer_size, 1,
+	capacity - c->buffer_size, file)) == capacity) {
 		capacity *= 2;
 		c->buffer = safe_realloc(c->buffer, capacity);
 	}
@@ -108,7 +109,7 @@ choices_fread(choices_t *c, FILE *file, char input_delimiter)
 	 * future allocations.
 	 */
 
-	/* Tokenize input and add to choices */
+	/* Tokenize input and add to choices. */
 	const char *line_end = c->buffer + c->buffer_size;
 	char *line = c->buffer + buffer_start;
 	do {
@@ -116,7 +117,7 @@ choices_fread(choices_t *c, FILE *file, char input_delimiter)
 		if (nl)
 			*nl++ = '\0';
 
-		/* Skip empty lines */
+		/* Skip empty lines. */
 		if (*line)
 			choices_add(c, line);
 
