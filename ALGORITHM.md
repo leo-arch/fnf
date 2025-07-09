@@ -71,8 +71,6 @@ Using this algorithm fnf is able to score based on the optimal match.
   * capital letter (the start of a CamelCase word)
   * following a dot (often a file extension)
 
-
-
 # Other fuzzy finders
 
 ## TextMate
@@ -82,7 +80,7 @@ text editors. It's influence can be found in the command-t project, various
 other editors use command-t for file finding, and the 't' command in the github
 web interface.
 
-* https://github.com/textmate/textmate/blob/master/Frameworks/text/src/ranker.cc
+* <https://github.com/textmate/textmate/blob/master/Frameworks/text/src/ranker.cc>
 
 ## command-t, ctrlp-cmatcher
 
@@ -93,11 +91,11 @@ Anecdotally, this algorithm works very well. The recursive nature makes it a lit
 
 The wy `last_idx` is suspicious.
 
-* https://github.com/wincent/command-t/blob/master/ruby/command-t/match.c
-* https://github.com/JazzCore/ctrlp-cmatcher/blob/master/autoload/fuzzycomt.c
+* <https://github.com/wincent/command-t/blob/master/ruby/command-t/match.c>
+* <https://github.com/JazzCore/ctrlp-cmatcher/blob/master/autoload/fuzzycomt.c>
 
 ## Length of shortest first match: fzf
-https://github.com/junegunn/fzf/blob/master/src/algo/algo.go
+<https://github.com/junegunn/fzf/blob/master/src/algo/algo.go>
 
 Fnf scores based on the size of the greedy shortest match. fzf finds its match
 by the first match appearing in the candidate string. It has some cleverness to
@@ -123,8 +121,8 @@ Pick has a method, `min_match`, to find the absolute shortest match in a string.
 This will find better results than the finders, at the expense of speed, as backtracking is required.
 
 ## selecta (latest master)
-https://github.com/garybernhardt/selecta/commit/d874c99dd7f0f94225a95da06fc487b0fa5b9edc
-https://github.com/garybernhardt/selecta/issues/80
+<https://github.com/garybernhardt/selecta/commit/d874c99dd7f0f94225a95da06fc487b0fa5b9edc>
+<https://github.com/garybernhardt/selecta/issues/80>
 
 Selecta doesn't compare all possible matches, but only the shortest match from the same start location.
 This can lead to inconsistent results.
@@ -138,12 +136,11 @@ Example results for the search "abc"
 The third result here should have been scored the same as the first, but the
 lower scoring but shorter match is what is measured.
 
-
 ## others
 
-* https://github.com/joshaven/string_score/blob/master/coffee/string_score.coffee (first match + heuristics)
-* https://github.com/atom/fuzzaldrin/blob/master/src/scorer.coffee (modified version of string_score)
-* https://github.com/jeancroy/fuzzaldrin-plus/blob/master/src/scorer.coffee (Smith Waterman)
+* <https://github.com/joshaven/string_score/blob/master/coffee/string_score.coffee> (first match + heuristics)
+* <https://github.com/atom/fuzzaldrin/blob/master/src/scorer.coffee> (modified version of string_score)
+* <https://github.com/jeancroy/fuzzaldrin-plus/blob/master/src/scorer.coffee> (Smith Waterman)
 
 
 # Possible fnf Algorithm Improvements
