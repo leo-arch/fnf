@@ -337,7 +337,7 @@ choices_search(choices_t *c, const char *search)
 	}
 
 	struct worker *workers = job->workers;
-	for (int i = c->worker_count - 1; i >= 0; i--) {
+	for (int i = (int)c->worker_count - 1; i >= 0; i--) {
 		workers[i].job = job;
 		workers[i].worker_num = i;
 		workers[i].result.size = 0;
