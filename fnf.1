@@ -1,19 +1,16 @@
-.TH FNF 1 "Jul 7, 2025" "fnf 0.1.1"
+.TH FNF 1 "Jul 9, 2025" "fnf 0.1.2"
 .SH NAME
 fnf \- A simple fuzzy finder for the terminal.
 .SH SYNOPSIS
 .B fnf
 .IR [OPTION]...
 .SH DESCRIPTION
-\fBFnf\fR is a fuzzy finder for the terminal using a search
-similar to that of TextMate or CmdT.
+\fBFnf\fR is a fuzzy finder for the terminal.
 
-\fBFnf\fR reads a list of newline-separated items from stdin to be displayed as a
-menu in the terminal.
-Upon pressing ENTER, the currently selected item is printed to stdout.
+\fBFnf\fR reads a list of newline-separated items from stdin to be displayed as a menu in the terminal.
+Upon pressing \fBEnter\fR, the currently selected item is printed to stdout.
 
-Entering text narrows the items using fuzzy matching. Results are sorted using
-heuristics for the best match.
+Entering text narrows the items using fuzzy matching. Results are sorted using heuristics for the best match.
 
 .SH OPTIONS
 .TP
@@ -42,7 +39,7 @@ Use TTY instead of the default tty device (/dev/tty).
 .
 .TP
 .BR \-q ", " \-\-query =\fIQUERY\fR
-Use QUERY as the initial search query.
+Use \fIQUERY\fR as the initial search query.
 .
 .TP
 .BR \-e ", " \-\-show-matches =\fIQUERY\fR
@@ -50,7 +47,7 @@ Non-interactive mode. Print the matches in sorted order for QUERY to stdout.
 .
 .TP
 .BR \-0 ", " \-\-read-null
-Read input delimited by ASCII NUL characters.
+Read input delimited by ASCII NUL characters (instead of newline characters).
 .
 .TP
 .BR \-h ", " \-\-help
@@ -96,10 +93,10 @@ Run colorless
 .
 .TP
 .BR "ENTER"
-Print the selected items to stdout and exit. If \fI\-\-right\-accepts\fR is set, the Right arrow key performs the same function. Equally, if \fI\-\-tab\-accepts\fR is set, the TAB key performs the same function.
+Print the selected items to stdout and exit. If \fB\-\-right\-accepts\fR is set, the Right arrow key performs the same function. Equally, if \fB\-\-tab\-accepts\fR is set, the TAB key performs the same function.
 .TP
 .BR "ESC"
-Exit without printing any result. If \fI\-\-left\-aborts\fR is set, the Left arrow key performs the same function.
+Exit without printing any result. If \fB\-\-left\-aborts\fR is set, the Left arrow key performs the same function.
 .TP
 .BR "Ctrl+c, Ctrl+g, Esc"
 Exit with status 1, without making a selection.
@@ -111,7 +108,7 @@ Select the previous item.
 Select the next item.
 .TP
 .BR "TAB"
-Replace the current search string with the selected item. If the multi-selection mode (\fI-m, --multi\fR) is enabled, TAB is used to (un)mark the selected entry instead.
+If the multi-selection mode is enabled (\fB-m, --multi\fR), (un)mark the selected entry.
 .TP
 .BR "Backspace, Ctrl+h"
 Delete the character before the cursor.
