@@ -82,6 +82,6 @@
 #define COLOR_ITEMS_NUM 5
 #define MAX_COLOR_LEN 48
 
-#define VERSION "0.1.2"
+#define VERSION "0.2"
 
 #endif /* CONFIG_H */
