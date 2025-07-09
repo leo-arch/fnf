@@ -101,6 +101,7 @@ set_colors(void)
 			b == 1 ? "1;" : "",
 			c == SEL_BG_COLOR ? '4' : '3',
 			p[i]);
+
 		b = 0;
 		c++;
 	}
@@ -390,25 +391,21 @@ draw(tty_interface_t *state)
 		tty_moveup(tty, num_lines + options->show_info);
 
 	tty_setcol(tty, options->pad);
-	tty_unhide_cursor(tty);
 
 	tty_printf(tty, "%s%s%s", colors[PROMPT_COLOR], options->prompt, NC);
-	for (size_t i = 0; i < state->cursor; i++)
-		fputc(state->search[i], tty->fout);
+	size_t i;
+	for (i = 0; state->search[i]; i++)
+		if (i < state->cursor)
+			fputc(state->search[i], tty->fout);
 
-	if (options->reverse == 0) {
-		tty_flush(tty);
-		return;
+	tty_unhide_cursor(tty);
+
+	if (options->reverse == 1) {
+		const size_t search_len = i;
+		if (state->cursor >= search_len)
+			tty_clearline(tty);
 	}
 
-	tty_setcol(tty, options->pad);
-	tty_printf(tty, "%s%s", options->prompt, state->search);
-	tty_clearline(tty);
-
-	if (options->show_info) {
-		tty_printf(tty, "\n[%lu/%lu]", choices->available, choices->size);
-		tty_clearline(tty);
-	}
 	tty_flush(tty);
 }
 
@@ -654,16 +651,17 @@ tty_interface_init(tty_interface_t *state, tty_t *tty, choices_t *choices,
 	state->options = options;
 	state->ambiguous_key_pending = 0;
 
-	strcpy(state->input, "");
-	strcpy(state->search, "");
-	strcpy(state->last_search, "");
+	*state->input = '\0';
+	*state->search = '\0';
+	*state->last_search = '\0';
+	state->cursor = 0;
 
 	state->exit = -1;
 
-	if (options->init_search)
+	if (options->init_search) {
 		strncpy(state->search, options->init_search, SEARCH_SIZE_MAX);
-
-	state->cursor = strlen(state->search);
+		state->cursor = strlen(state->search);
+	}
 
 	update_search(state);
 }

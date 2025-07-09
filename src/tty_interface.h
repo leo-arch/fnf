@@ -53,7 +53,8 @@ typedef struct {
 	int exit;
 } tty_interface_t;
 
-void tty_interface_init(tty_interface_t *state, tty_t *tty, choices_t *choices, options_t *options);
+void tty_interface_init(tty_interface_t *state, tty_t *tty,
+	choices_t *choices, options_t *options);
 int tty_interface_run(tty_interface_t *state);
 
 #endif
