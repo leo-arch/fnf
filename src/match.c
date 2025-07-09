@@ -92,7 +92,8 @@ setup_match_struct(struct match_struct *match, const char *needle, const char *h
 	match->needle_len = strlen(needle);
 	match->haystack_len = strlen(haystack);
 
-	if (match->haystack_len > MATCH_MAX_LEN || match->needle_len > match->haystack_len)
+	if (match->haystack_len > MATCH_MAX_LEN
+	|| match->needle_len > match->haystack_len)
 		return;
 
 	for (int i = 0; i < match->needle_len; i++)
@@ -202,7 +203,9 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 	const int n = match.needle_len;
 	const int m = match.haystack_len;
 
-	if (m > MATCH_MAX_LEN || n > m) {
+	if (n == 0 || m == 0) {
+		return SCORE_MIN;
+	} else if (m > MATCH_MAX_LEN || n > m) {
 		/*
 		 * Unreasonably large candidate: return no score
 		 * If it is a valid match it will still be returned, it will
@@ -225,11 +228,11 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 	 * M[][] Stores the best possible score at this position.
 	 */
 	score_t (*D)[MATCH_MAX_LEN], (*M)[MATCH_MAX_LEN];
-	M = malloc(sizeof(score_t) * MATCH_MAX_LEN * n);
-	D = malloc(sizeof(score_t) * MATCH_MAX_LEN * n);
+	M = calloc(n, sizeof(*M));
+	D = calloc(n, sizeof(*D));
 
 	score_t *last_D = NULL, *last_M = NULL;
-	score_t *curr_D, *curr_M;
+	score_t *curr_D = NULL, *curr_M = NULL;
 
 	for (int i = 0; i < n; i++) {
 		curr_D = &D[i][0];
