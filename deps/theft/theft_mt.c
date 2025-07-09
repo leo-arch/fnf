@@ -108,11 +108,11 @@ double theft_mt_random_double(struct theft_mt *mt)
 /* generates a random number on [0, 2^64-1]-interval */
 static uint64_t genrand64_int64(struct theft_mt *r)
 {
-    int i;
     uint64_t x;
-    static uint64_t mag01[2]={0ULL, MATRIX_A};
 
     if (r->mti >= NN) { /* generate NN words at one time */
+		int i;
+	    static uint64_t mag01[2]={0ULL, MATRIX_A};
 
         /* if init has not been called, */
         /* a default initial seed is used */
