@@ -76,11 +76,13 @@ static char colors[COLOR_ITEMS_NUM][MAX_COLOR_LEN];
  * 2: MATCHING CHARACTERS in cyan
  * */
 static void
-set_colors(void)
+set_colors(tty_interface_t *state)
 {
 	char *p = getenv("NO_COLOR");
-	if (p)
+	if (p) {
+		state->options->no_color = 1;
 		return;
+	}
 
 	p = getenv("FNF_COLORS");
 	if (!p || !*p)
@@ -92,7 +94,7 @@ set_colors(void)
 			b = 1;
 			continue;
 		}
-		if ((p[i] < '0' || p[i] > '7') || p[i] == '-') {
+		if (p[i] < '0' || p[i] > '7' || p[i] == '-') {
 			*colors[c] = '\0';
 			b = 0;
 			c++;
@@ -776,7 +778,7 @@ int
 tty_interface_run(tty_interface_t *state)
 {
 	if (state->options->no_color == 0)
-		set_colors();
+		set_colors(state);
 	if (state->options->auto_lines)
 		state->options->num_lines = tty_getheight(state->tty) - 1;
 	draw(state);
