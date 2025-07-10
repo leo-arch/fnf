@@ -1,4 +1,4 @@
-.TH FNF 1 "Jul 9, 2025" "fnf 0.2"
+.TH FNF 1 "Jul 10, 2025" "fnf 0.2.1"
 .SH NAME
 fnf \- A simple fuzzy finder for the terminal.
 .SH SYNOPSIS
@@ -128,6 +128,7 @@ Interface colors are read from the environment variable \fBFNF_COLORS\fR using a
  3) Marker
  4) Current entry foreground
  5) Current entry background
+ 6) Characters matching query
 .sp
 \fBB\fR. Possible content (available colors):
  0 = black
@@ -141,15 +142,16 @@ Interface colors are read from the environment variable \fBFNF_COLORS\fR using a
 .sp
 Use a \fBb\fR before the color to make it bold/bright. A dash (\-) means that the color for the interface element in that position must be skipped.
 .sp
-For example, \fBFZF_COLORS="\-b1b2\-4"\fR is to be read as follows:
+For example, \fBFZF_COLORS="\-b1b2\-46"\fR is to be read as follows:
 .sp
  \fB\-\fR: no prompt color
- \fBb1\fR: bold red pointer color
- \fBb2\fR: bold green marker color
+ \fBb1\fR: pointer in bold red
+ \fBb2\fR: marker in bold green
  \fB\-\fR: no color for the current entry foreground
- \fB4\fR: blue current entry background
+ \fB4\fR: current entry background in blue
+ \fB6\fR: matching characters in cyan
 .sp
-Default colors are: \fBb6b1b2b40\fR
+Default colors are: \fBb6b1b2b402\fR
 .
 .SH USAGE EXAMPLES
 .
