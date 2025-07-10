@@ -1,6 +1,17 @@
+---
+Language: Cpp # Cpp is also used for C
+BasedOnStyle: LLVM
+
+ColumnLimit: 0
+BreakBeforeBraces: Linux
+AlignAfterOpenBracket: DontAlign
+
 IndentWidth: 8
 UseTab: Always
-BreakBeforeBraces: Attach
-IndentCaseLabels: true
-AllowShortFunctionsOnASingleLine: false
-ColumnLimit: 100
+IndentCaseLabels: false
+
+AllowShortBlocksOnASingleLine: Empty
+AlwaysBreakAfterReturnType: TopLevelDefinitions
+
+SortIncludes: false
+---
