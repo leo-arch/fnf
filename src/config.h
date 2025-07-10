@@ -32,8 +32,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define TTY_COLOR_HIGHLIGHT TTY_COLOR_YELLOW
-
 #define SCORE_GAP_LEADING -0.005
 #define SCORE_GAP_TRAILING -0.005
 #define SCORE_GAP_INNER -0.01
@@ -69,17 +67,18 @@
 #define DEFAULT_NO_COLOR 0
 #define DEFAULT_REVERSE 0
 
-#define DEFAULT_COLORS "b6b1b2b40"
+#define DEFAULT_COLORS "b6b1b2b402"
 #define NC "\x1b[0m" /* Reset attributes */
 
 /* Color indices: colors (from FNF_COLORS env var) will be parsed
  * exactly in this order. See tty_interface.c */
-#define PROMPT_COLOR 0
+#define PROMPT_COLOR  0
 #define POINTER_COLOR 1
-#define MARKER_COLOR 2
-#define SEL_FG_COLOR 3
-#define SEL_BG_COLOR 4
-#define COLOR_ITEMS_NUM 5
+#define MARKER_COLOR  2
+#define SEL_FG_COLOR  3
+#define SEL_BG_COLOR  4
+#define MATCH_COLOR   5
+#define COLOR_ITEMS_NUM 6
 #define MAX_COLOR_LEN 48
 
 #define VERSION "0.2"

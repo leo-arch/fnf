@@ -53,9 +53,10 @@ static char **selections = (char **)NULL;
 /* A buffer big enough to hold decolored entries */
 static char buf[PATH_MAX];
 
-/* SEL_N is the current size of the selections array, while SEL_COUNTER
- * is the current amount of actually selected entries */
+/* SELN is the current size of the selections array, while SEL_COUNTER
+ * is the current number of actually selected entries. */
 static size_t seln = 0, sel_counter = 0;
+static int color_highlight = TTY_COLOR_GREEN;
 
 static char colors[COLOR_ITEMS_NUM][MAX_COLOR_LEN];
 /* Parse colors taken from FNF_COLORS environment variable
@@ -66,12 +67,13 @@ static char colors[COLOR_ITEMS_NUM][MAX_COLOR_LEN];
  * config.h
  * These colors are applied in draw() and draw_match() functions in this file
  *
- * For example, "-b1b2-4" is read as follows:
+ * For example, "-b1b2-46" is read as follows:
  * -: no PROMPT color
- * b1: bold red POINTER color
- * b2: bold green MARKER color
- * -: no SELECTED ENTRY FOREGROUND color
- * 4: blue SELECTED ENTRY BACKGROUND color
+ * b1: POINTER in bold red
+ * b2: MARKER in bold green
+ * -: no color for SELECTED ENTRY FOREGROUND
+ * 4: SELECTED ENTRY BACKGROUND in blue
+ * 2: MATCHING CHARACTERS in cyan
  * */
 static void
 set_colors(void)
@@ -96,11 +98,16 @@ set_colors(void)
 			c++;
 			continue;
 		}
-		/* 16 colors: 0-7 normal; b0-b7 bright */
-		snprintf(colors[c], MAX_COLOR_LEN, "\x1b[%s%c%cm",
-			b == 1 ? "1;" : "",
-			c == SEL_BG_COLOR ? '4' : '3',
-			p[i]);
+
+		if (c == MATCH_COLOR) {
+			color_highlight = p[i] - '0';
+		} else {
+			/* 16 colors: 0-7 normal; b0-b7 bright */
+			snprintf(colors[c], MAX_COLOR_LEN, "\x1b[%s%c%cm",
+				b == 1 ? "1;" : "",
+				c == SEL_BG_COLOR ? '4' : '3',
+				p[i]);
+		}
 
 		b = 0;
 		c++;
@@ -278,7 +285,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 	for (size_t i = 0, p = 0; choice[i] != '\0'; i++) {
 		if (positions[p] == i) {
 			no_color == 1 ? tty_setunderline(tty)
-				: tty_setfg(tty, TTY_COLOR_HIGHLIGHT);
+				: tty_setfg(tty, color_highlight);
 			p++;
 		} else {
 			no_color == 1 ? tty_setnormal(tty)
@@ -400,11 +407,9 @@ draw(tty_interface_t *state)
 
 	tty_unhide_cursor(tty);
 
-	if (options->reverse == 1) {
-		const size_t search_len = i;
-		if (state->cursor >= search_len)
-			tty_clearline(tty);
-	}
+	const size_t search_len = i;
+	if (options->reverse == 1 && state->cursor >= search_len)
+		tty_clearline(tty);
 
 	tty_flush(tty);
 }
