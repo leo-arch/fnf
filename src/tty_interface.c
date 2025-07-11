@@ -384,11 +384,11 @@ draw(tty_interface_t *state)
 		const char *choice = choices_get(choices, i);
 		if (choice) {
 			const int multi_sel = (options->multi == 1 && is_selected(choice));
-			tty_printf(tty, "%*s%s%c%s%c%s",
+			tty_printf(tty, "%*s%s%s%s%s%s",
 				options->pad, "", colors[POINTER_COLOR],
-				i == choices->selection ? options->pointer : ' ',
+				i == choices->selection ? options->pointer : " ",
 				colors[MARKER_COLOR],
-				multi_sel == 1 ? options->marker : ' ', NC);
+				multi_sel == 1 ? options->marker : " ", NC);
 			draw_match(state, choice, i == choices->selection);
 		}
 		if (options->reverse == 1)

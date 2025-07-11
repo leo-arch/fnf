@@ -43,19 +43,19 @@ static const char *usage_str =
     "Usage: fnf [OPTION]...\n"
     " -l, --lines=LINES        Specify how many lines of results to show (default 10)\n"
     " -m, --multi              Enable multi-selection\n"
-    " -p, --prompt=PROMPT      Input prompt (default '> ')\n"
+    " -p, --prompt=PROMPT      Input prompt (default \"> \")\n"
     " -P, --pad=NUM            Left pad the list of matches NUM places (default 0)\n"
     " -q, --query=QUERY        Use QUERY as the initial search string\n"
     " -e, --show-matches=QUERY Output the sorted matches of QUERY\n"
     " -t, --tty=TTY            Specify file to use as TTY device (default /dev/tty)\n"
     " -s, --show-scores        Show the scores of each match\n"
     " -0, --read-null          Read input delimited by ASCII NUL characters\n"
-    " -j, --workers NUM        Use NUM workers for searching. (default is # of CPUs)\n"
+    " -j, --workers=NUM        Use NUM workers for searching. (default is # of CPUs)\n"
     " -i, --show-info          Show selection info line\n"
     " -h, --help               Display this help and exit\n"
     " -v, --version            Output version information and exit\n"
-    "     --pointer            Pointer to highlighted match (default '>')\n"
-    "     --marker             Multi-select marker (default '*')\n"
+    "     --pointer=STRING     Pointer to highlighted match (default \">\")\n"
+    "     --marker=STRING      Multi-select marker (default \"*\")\n"
     "     --cycle              Enable cyclic scrolling\n"
     "     --tab-accepts        TAB accepts\n"
     "     --right-accepts      Right arrow key accepts\n"
@@ -180,11 +180,11 @@ options_parse(options_t *options, int argc, char *argv[])
 		case 'i': options->show_info = 1; break;
 		case 1:
 			if (optarg && *optarg)
-				options->pointer = *optarg;
+				options->pointer = optarg;
 			break;
 		case 2:
 			if (optarg && *optarg)
-				options->marker = *optarg;
+				options->marker = optarg;
 			break;
 		case 3: options->cycle = 1;	break;
 		case 4:	options->tab_accepts = 1; break;

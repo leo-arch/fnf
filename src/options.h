@@ -33,28 +33,28 @@
 #define OPTIONS_H OPTIONS_H
 
 typedef struct {
-	int benchmark;
 	const char *filter;
 	const char *init_search;
 	const char *tty_filename;
-	int show_scores;
-	unsigned int num_lines;
-	int auto_lines;
-	unsigned int scrolloff;
 	const char *prompt;
+	const char *pointer;
+	const char *marker;
+	unsigned int num_lines;
+	unsigned int scrolloff;
 	unsigned int workers;
-	char input_delimiter;
+	int benchmark;
+	int show_scores;
+	int auto_lines;
 	int show_info;
 	int pad;
 	int multi;
-	char pointer;
-	char marker;
 	int cycle;
 	int tab_accepts;
 	int right_accepts;
 	int left_aborts;
 	int no_color;
 	int reverse;
+	char input_delimiter;
 } options_t;
 
 void options_init(options_t *options);
