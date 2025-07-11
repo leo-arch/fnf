@@ -151,7 +151,9 @@ For example, \fBFZF_COLORS="\-b1b2\-46"\fR is to be read as follows:
  \fB4\fR: current entry background in blue
  \fB6\fR: matching characters in cyan
 .sp
-Default colors are: \fBb6b1b2b702\fR
+Default colors are: \fBb6b1b2b702\fR.
+.sp
+Note that if both the current entry foreground and background colors are set to a dash (e.g. \fBb6b1b2--2\fR), the current entry color is inverted (foreground is background and background is foreground).
 .
 .SH USAGE EXAMPLES
 .
