@@ -67,7 +67,7 @@
 #define DEFAULT_NO_COLOR 0
 #define DEFAULT_REVERSE 0
 
-#define DEFAULT_COLORS "b6b1b2b402"
+#define DEFAULT_COLORS "b6b1b2b702"
 #define NC "\x1b[0m" /* Reset attributes */
 
 /* Color indices: colors (from FNF_COLORS env var) will be parsed

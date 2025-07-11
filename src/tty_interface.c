@@ -322,10 +322,10 @@ draw_match(tty_interface_t *state, const char *choice, const int selected)
 
 	const char *dchoice = choice;
 	if (selected == 1) {
-		if (*choice == KEY_ESC || strchr(choice, KEY_ESC))
-			dchoice = decolor_name(choice);
 		/* Let's colorize the selected entry */
 		if (*colors[SEL_FG_COLOR] || *colors[SEL_BG_COLOR]) {
+			if (*choice == KEY_ESC || strchr(choice, KEY_ESC))
+				dchoice = decolor_name(choice);
 			if (*colors[SEL_FG_COLOR])
 				tty_fputs(tty, colors[SEL_FG_COLOR]);
 			if (*colors[SEL_BG_COLOR])
