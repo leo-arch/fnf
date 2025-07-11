@@ -73,7 +73,7 @@ static char colors[COLOR_ITEMS_NUM][MAX_COLOR_LEN];
  * b2: MARKER in bold green
  * -: no color for SELECTED ENTRY FOREGROUND
  * 4: SELECTED ENTRY BACKGROUND in blue
- * 2: MATCHING CHARACTERS in cyan
+ * 6: MATCHING CHARACTERS in cyan
  * */
 static void
 set_colors(tty_interface_t *state)
@@ -160,13 +160,13 @@ decolor_name(const char *name)
 	char *p = buf, *q = buf;
 
 	size_t i, j = 0;
-	size_t name_len = strlen(name);
+	const size_t name_len = strlen(name);
 	for (i = 0; name[i] && i < name_len; i++) {
 		if (name[i] == KEY_ESC && name[i + 1] == '[') {
 			for (j = i + 1; name[j]; j++) {
 				if (name[j] != 'm')
 					continue;
-				i = j + (name[j + 1] == KEY_ESC ? 0 : 1);
+				i = j + (name[j + 1] != KEY_ESC);
 				break;
 			}
 		}
@@ -228,9 +228,10 @@ print_selections(tty_interface_t *state)
 	for (i = 0; selections[i]; i++) {
 		if (!*selections[i])
 			continue;
-		const char *p = strchr(selections[i], KEY_ESC)
-			? decolor_name(selections[i]) : NULL;
-		printf("%s\n", p ? p : selections[i]);
+		const char *name =
+			(*selections[i] == KEY_ESC || strchr(selections[i], KEY_ESC))
+			? decolor_name(selections[i]) : selections[i];
+		puts(name);
 	}
 
 }
@@ -319,10 +320,10 @@ draw_match(tty_interface_t *state, const char *choice, const int selected)
 		}
 	}
 
+	const char *dchoice = choice;
 	if (selected == 1) {
-#ifdef TTY_SELECTION_UNDERLINE
-		tty_setunderline(tty);
-#else
+		if (*choice == KEY_ESC || strchr(choice, KEY_ESC))
+			dchoice = decolor_name(choice);
 		/* Let's colorize the selected entry */
 		if (*colors[SEL_FG_COLOR] || *colors[SEL_BG_COLOR]) {
 			if (*colors[SEL_FG_COLOR])
@@ -332,17 +333,15 @@ draw_match(tty_interface_t *state, const char *choice, const int selected)
 		} else {
 			tty_setinvert(tty);
 		}
-#endif
 	}
 
 	tty_setnowrap(tty);
 
-	if (score == SCORE_MIN) { /* No matching result. */
-		tty_setfg(tty, TTY_COLOR_NORMAL);
-		fputs(choice, tty->fout);
-	} else { /* We have a query string: colorize the matching characters. */
-		colorize_match(state, positions, choice);
-	}
+	if (score == SCORE_MIN) /* No matching result. */
+		tty_fputs(tty, dchoice);
+	else /* We have a query string: colorize the matching characters. */
+		colorize_match(state, positions, dchoice);
+
 	tty_setwrap(tty);
 	tty_setnormal(tty);
 }
