@@ -54,6 +54,7 @@ typedef struct {
 	int left_aborts;
 	int no_color;
 	int reverse;
+	int unicode;
 	char input_delimiter;
 } options_t;
 

@@ -61,6 +61,7 @@ static const char *usage_str =
     "     --right-accepts      Right arrow key accepts\n"
     "     --left-aborts        Left arrow key aborts\n"
     "     --reverse            Display from top, prompt at bottom\n"
+    "     --no-unicode         Do not use Unicode decorations\n"
     "     --no-color           Run colorless\n";
 
 static void
@@ -92,6 +93,7 @@ static struct option longopts[] = {
 	{"left-aborts", no_argument, NULL, 6},
 	{"no-color", no_argument, NULL, 7},
 	{"reverse", no_argument, NULL, 8},
+	{"no-unicode", no_argument, NULL, 9},
 	{NULL, 0, NULL, 0}
 };
 
@@ -121,12 +123,15 @@ options_init(options_t *options)
 	options->left_aborts     = DEFAULT_LEFT_ABORTS;
 	options->no_color        = DEFAULT_NO_COLOR;
 	options->reverse         = DEFAULT_REVERSE;
+	options->unicode         = DEFAULT_UNICODE;
 }
 
 void
 options_parse(options_t *options, int argc, char *argv[])
 {
 	options_init(options);
+	int pointer_set = 0;
+	int marker_set = 0;
 
 	int c;
 	while ((c = getopt_long(argc, argv, "mvhs0e:q:l:t:p:P:j:i", longopts, NULL)) != -1) {
@@ -179,12 +184,16 @@ options_parse(options_t *options, int argc, char *argv[])
 		} break;
 		case 'i': options->show_info = 1; break;
 		case 1:
-			if (optarg && *optarg)
+			if (optarg && *optarg) {
+				pointer_set = 1;
 				options->pointer = optarg;
+			}
 			break;
 		case 2:
-			if (optarg && *optarg)
+			if (optarg && *optarg) {
+				marker_set = 1;
 				options->marker = optarg;
+			}
 			break;
 		case 3: options->cycle = 1;	break;
 		case 4:	options->tab_accepts = 1; break;
@@ -192,6 +201,7 @@ options_parse(options_t *options, int argc, char *argv[])
 		case 6:	options->left_aborts = 1; break;
 		case 7:	options->no_color = 1; break;
 		case 8:	options->reverse = 1; break;
+		case 9: options->unicode = 0; break;
 
 		case 'h': /* fallthrough */
 		default:
@@ -199,8 +209,16 @@ options_parse(options_t *options, int argc, char *argv[])
 			exit(EXIT_SUCCESS);
 		}
 	}
+
 	if (optind != argc) {
 		usage(argv[0]);
 		exit(EXIT_FAILURE);
+	}
+
+	if (options->unicode != 0) {
+		if (pointer_set == 0)
+			options->pointer = DEFAULT_POINTER_UNICODE;
+		if (marker_set == 0)
+			options->marker = DEFAULT_MARKER_UNICODE;
 	}
 }

@@ -57,7 +57,9 @@
 #define DEFAULT_FILTER NULL
 #define DEFAULT_INIT_SEARCH NULL
 #define DEFAULT_MARKER "*"
+#define DEFAULT_MARKER_UNICODE "✔"
 #define DEFAULT_POINTER ">"
+#define DEFAULT_POINTER_UNICODE "▌"
 #define DEFAULT_PAD 0
 #define DEFAULT_MULTI 0
 #define DEFAULT_CYCLE 0
@@ -66,6 +68,7 @@
 #define DEFAULT_LEFT_ABORTS 0
 #define DEFAULT_NO_COLOR 0
 #define DEFAULT_REVERSE 0
+#define DEFAULT_UNICODE 1
 
 #define DEFAULT_COLORS "b6b1b2b702"
 #define NC "\x1b[0m" /* Reset attributes */
