@@ -452,20 +452,18 @@ action_emit(tty_interface_t *state)
 		return;
 	}
 
-	/* Reset the tty as close as possible to the previous state */
+	/* Reset the tty as close as possible to the previous state. */
 	clear(state);
 
-	/* ttyout should be flushed before outputting on stdout */
+	/* ttyout should be flushed before outputting on stdout. */
 	tty_close(state->tty);
 
 	const char *selection =
 		choices_get(state->choices, state->choices->selection);
 	if (selection) { /* output the selected result */
-		const char *p = strchr(selection, KEY_ESC)
-			? decolor_name(selection) : NULL;
-		printf("%s\n", p ? p : selection);
-	} else { /* No match, output the query instead */
-		printf("%s\n", state->search);
+		const char *p = (*selection == KEY_ESC || strchr(selection, KEY_ESC))
+			? decolor_name(selection) : selection;
+		printf("%s\n", p);
 	}
 
 	state->exit = EXIT_SUCCESS;
@@ -618,20 +616,8 @@ action_tab(tty_interface_t *state)
 		return;
 	}
 
-	if (state->options->tab_accepts == 1) {
+	if (state->options->tab_accepts == 1)
 		action_emit(state);
-		return;
-	}
-
-	/* Autocomplete */
-	update_state(state);
-	const char *current_selection = choices_get(state->choices,
-		state->choices->selection);
-	if (current_selection) {
-		strncpy(state->search, choices_get(state->choices,
-			state->choices->selection), SEARCH_SIZE_MAX);
-		state->cursor = strlen(state->search);
-	}
 }
 
 static void
@@ -682,33 +668,33 @@ typedef struct {
 static const keybinding_t keybindings[] = {
 	   {"\x1b", action_exit},             /* ESC */
 	   {"\x7f", action_del_char},	      /* DEL */
-	   {KEY_CTRL('H'), action_del_char}, /* Backspace (C-H) */
-	   {KEY_CTRL('W'), action_del_word}, /* C-W */
-	   {KEY_CTRL('U'), action_del_all},  /* C-U */
-	   {KEY_CTRL('I'), action_tab},      /* TAB (C-I ) */
-	   {KEY_CTRL('C'), action_exit},	 /* C-C */
-	   {KEY_CTRL('D'), action_exit},	 /* C-D */
-	   {KEY_CTRL('G'), action_exit},	 /* C-G */
-	   {KEY_CTRL('M'), action_emit},	 /* CR */
-	   {KEY_CTRL('P'), action_prev},	 /* C-P */
-	   {KEY_CTRL('N'), action_next},	 /* C-N */
-	   {KEY_CTRL('K'), action_prev},	 /* C-K */
-	   {KEY_CTRL('J'), action_next},	 /* C-J */
-	   {KEY_CTRL('A'), action_beginning},    /* C-A */
-	   {KEY_CTRL('E'), action_end},		 /* C-E */
+	   {KEY_CTRL('H'), action_del_char},  /* Backspace (C-H) */
+	   {KEY_CTRL('W'), action_del_word},  /* C-W */
+	   {KEY_CTRL('U'), action_del_all},   /* C-U */
+	   {KEY_CTRL('I'), action_tab},       /* TAB (C-I ) */
+	   {KEY_CTRL('C'), action_exit},	  /* C-C */
+	   {KEY_CTRL('D'), action_exit},	  /* C-D */
+	   {KEY_CTRL('G'), action_exit},	  /* C-G */
+	   {KEY_CTRL('M'), action_emit},	  /* CR */
+	   {KEY_CTRL('P'), action_prev},	  /* C-P */
+	   {KEY_CTRL('N'), action_next},	  /* C-N */
+	   {KEY_CTRL('K'), action_prev},	  /* C-K */
+	   {KEY_CTRL('J'), action_next},	  /* C-J */
+	   {KEY_CTRL('A'), action_beginning}, /* C-A */
+	   {KEY_CTRL('E'), action_end},		  /* C-E */
 
-	   {"\x1bOD", action_left}, /* LEFT */
-	   {"\x1b[D", action_left}, /* LEFT */
-	   {"\x1bOC", action_right}, /* RIGHT */
-	   {"\x1b[C", action_right}, /* RIGHT */
+	   {"\x1bOD", action_left},       /* LEFT */
+	   {"\x1b[D", action_left},       /* LEFT */
+	   {"\x1bOC", action_right},      /* RIGHT */
+	   {"\x1b[C", action_right},      /* RIGHT */
 	   {"\x1b[1~", action_beginning}, /* HOME */
-	   {"\x1b[H", action_beginning}, /* HOME */
-	   {"\x1b[4~", action_end}, /* END */
-	   {"\x1b[F", action_end}, /* END */
-	   {"\x1b[A", action_prev}, /* UP */
-	   {"\x1bOA", action_prev}, /* UP */
-	   {"\x1b[B", action_next}, /* DOWN */
-	   {"\x1bOB", action_next}, /* DOWN */
+	   {"\x1b[H", action_beginning},  /* HOME */
+	   {"\x1b[4~", action_end},       /* END */
+	   {"\x1b[F", action_end},        /* END */
+	   {"\x1b[A", action_prev},       /* UP */
+	   {"\x1bOA", action_prev},       /* UP */
+	   {"\x1b[B", action_next},       /* DOWN */
+	   {"\x1bOB", action_next},       /* DOWN */
 	   {"\x1b[5~", action_pageup},
 	   {"\x1b[6~", action_pagedown},
 	   {"\x1b[200~", action_ignore},
@@ -761,7 +747,8 @@ handle_input(tty_interface_t *state, const char *s, int handle_ambiguous_key)
 
 	/* No matching keybinding, decolorize and add to search. */
 	char *p = input, *q = (char *)NULL;
-	if (strchr(input, KEY_ESC) && (q = decolor_name(input)))
+	if ((*input == KEY_ESC || strchr(input, KEY_ESC))
+	&& (q = decolor_name(input)))
 		p = q;
 
 	for (int i = 0; p[i]; i++) {
