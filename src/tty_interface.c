@@ -464,9 +464,10 @@ action_emit(tty_interface_t *state)
 		const char *p = (*selection == KEY_ESC || strchr(selection, KEY_ESC))
 			? decolor_name(selection) : selection;
 		printf("%s\n", p);
+		state->exit = EXIT_SUCCESS;
+	} else {
+		state->exit = EXIT_FAILURE;
 	}
-
-	state->exit = EXIT_SUCCESS;
 }
 
 static void
@@ -544,7 +545,7 @@ action_exit(tty_interface_t *state)
 	clear(state);
 	tty_close(state->tty);
 
-	state->exit = EXIT_FAILURE;
+	state->exit = 130;
 }
 
 static void
@@ -705,7 +706,8 @@ static const keybinding_t keybindings[] = {
 #undef KEY_CTRL
 
 static void
-handle_input(tty_interface_t *state, const char *s, int handle_ambiguous_key)
+handle_input(tty_interface_t *state, const char *s,
+	const int handle_ambiguous_key)
 {
 	state->ambiguous_key_pending = 0;
 
@@ -717,6 +719,7 @@ handle_input(tty_interface_t *state, const char *s, int handle_ambiguous_key)
 	 * middle of one (both can happen, because of Esc). */
 	int found_keybinding = -1;
 	int in_middle = 0;
+
 	for (int i = 0; keybindings[i].key; i++) {
 		if (*input != *keybindings[i].key || (input_len > 1
 		&& input[1] != keybindings[i].key[1]))
@@ -736,24 +739,21 @@ handle_input(tty_interface_t *state, const char *s, int handle_ambiguous_key)
 
 	/* We could have a complete keybinding, or could be in the middle of one.
 	 * We'll need to wait a few milliseconds to find out. */
-	if (found_keybinding != -1 && in_middle) {
+	if (found_keybinding != -1 && in_middle == 1) {
 		state->ambiguous_key_pending = 1;
 		return;
 	}
 
 	/* Wait for more if we are in the middle of a keybinding. */
-	if (in_middle)
+	if (in_middle == 1)
 		return;
 
-	/* No matching keybinding, decolorize and add to search. */
-	char *p = input, *q = (char *)NULL;
-	if ((*input == KEY_ESC || strchr(input, KEY_ESC))
-	&& (q = decolor_name(input)))
-		p = q;
-
-	for (int i = 0; p[i]; i++) {
-		if (isprint_unicode(p[i]))
-			append_search(state, p[i]);
+	/* No matching keybinding, add to search. */
+	if (isprint_unicode(*input)) {
+		for (int i = 0; input[i]; i++) {
+			if (isprint_unicode(input[i]))
+				append_search(state, input[i]);
+		}
 	}
 
 	/* We have processed the input, so clear it. */
@@ -769,6 +769,8 @@ tty_interface_run(tty_interface_t *state)
 		state->options->num_lines = tty_getheight(state->tty) - 1;
 	draw(state);
 
+	char curr_char[2] = "";
+
 	for (;;) {
 		do {
 			while (!tty_input_ready(state->tty, -1, 1)) {
@@ -780,8 +782,8 @@ tty_interface_run(tty_interface_t *state)
 				draw(state);
 			}
 
-			const char s[2] = {tty_getchar(state->tty), '\0'};
-			handle_input(state, s, 0);
+			curr_char[0] = tty_getchar(state->tty);
+			handle_input(state, curr_char, 0);
 
 			if (state->exit >= 0) {
 				free_selections(state);
