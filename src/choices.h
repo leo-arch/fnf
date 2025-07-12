@@ -58,14 +58,14 @@ typedef struct {
 	unsigned int worker_count;
 } choices_t;
 
-void choices_init(choices_t *c, options_t *options);
-void choices_fread(choices_t *c, FILE *file, char input_delimiter);
+void choices_init(choices_t *c, const options_t *options);
+void choices_fread(choices_t *c, FILE *file, const char input_delimiter);
 void choices_destroy(choices_t *c);
 void choices_add(choices_t *c, const char *choice);
-size_t choices_available(choices_t *c);
+size_t choices_available(const choices_t *c);
 void choices_search(choices_t *c, const char *search);
-const char *choices_get(choices_t *c, size_t n);
-score_t choices_getscore(choices_t *c, size_t n);
+const char *choices_get(const choices_t *c, const size_t n);
+score_t choices_getscore(const choices_t *c, const size_t n);
 void choices_prev(choices_t *c);
 void choices_next(choices_t *c);
 

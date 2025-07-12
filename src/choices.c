@@ -70,7 +70,7 @@ cmpchoice(const void *idx1, const void *idx2)
 }
 
 static void *
-safe_realloc(void *buffer, size_t size)
+safe_realloc(void *buffer, const size_t size)
 {
 	buffer = realloc(buffer, size);
 	if (!buffer) {
@@ -82,7 +82,7 @@ safe_realloc(void *buffer, size_t size)
 }
 
 void
-choices_fread(choices_t *c, FILE *file, char input_delimiter)
+choices_fread(choices_t *c, FILE *file, const char input_delimiter)
 {
 	/* Save current position for parsing later */
 	size_t buffer_start = c->buffer_size;
@@ -126,7 +126,7 @@ choices_fread(choices_t *c, FILE *file, char input_delimiter)
 }
 
 static void
-choices_resize(choices_t *c, size_t new_capacity)
+choices_resize(choices_t *c, const size_t new_capacity)
 {
 	c->strings = safe_realloc(c->strings, new_capacity * sizeof(const char *));
 	c->capacity = new_capacity;
@@ -141,7 +141,7 @@ choices_reset_search(choices_t *c)
 }
 
 void
-choices_init(choices_t *c, options_t *options)
+choices_init(choices_t *c, const options_t *options)
 {
 	c->strings = NULL;
 	c->results = NULL;
@@ -189,7 +189,7 @@ choices_add(choices_t *c, const char *choice)
 }
 
 size_t
-choices_available(choices_t *c)
+choices_available(const choices_t *c)
 {
 	return c->available;
 }
@@ -364,7 +364,7 @@ choices_search(choices_t *c, const char *search)
 }
 
 const char *
-choices_get(choices_t *c, size_t n)
+choices_get(const choices_t *c, const size_t n)
 {
 	if (n < c->available)
 		return c->results[n].str;
@@ -372,7 +372,7 @@ choices_get(choices_t *c, size_t n)
 }
 
 score_t
-choices_getscore(choices_t *c, size_t n)
+choices_getscore(const choices_t *c, const size_t n)
 {
 	return c->results[n].score;
 }

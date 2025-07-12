@@ -252,13 +252,13 @@ free_selections(tty_interface_t *state)
 static int
 isprint_unicode(char c)
 {
-	return isprint(c) || c & (1 << 7);
+	return (isprint(c) || c & (1 << 7));
 }
 
 static int
 is_boundary(char c)
 {
-	return ~c & (1 << 7) || c & (1 << 6);
+	return (~c & (1 << 7) || c & (1 << 6));
 }
 
 static void
@@ -545,7 +545,7 @@ action_exit(tty_interface_t *state)
 	clear(state);
 	tty_close(state->tty);
 
-	state->exit = 130;
+	state->exit = 130; /* 128 + SIGINT (usually 2). */
 }
 
 static void
@@ -702,7 +702,6 @@ static const keybinding_t keybindings[] = {
 	   {"\x1b[201~", action_ignore},
 	   {NULL, NULL}
 };
-
 #undef KEY_CTRL
 
 static void
@@ -748,7 +747,9 @@ handle_input(tty_interface_t *state, const char *s,
 	if (in_middle == 1)
 		return;
 
-	/* No matching keybinding, add to search. */
+	/* No matching keybinding, add to search.
+	 * Exclude input starting with non-printing char, mostly keybindings,
+	 * e.g. INSERT, etc. */
 	if (isprint_unicode(*input)) {
 		for (int i = 0; input[i]; i++) {
 			if (isprint_unicode(input[i]))
