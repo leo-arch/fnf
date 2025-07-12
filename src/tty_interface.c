@@ -285,7 +285,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 	tty_t *tty = state->tty;
 	const int no_color = state->options->no_color;
 
-	for (size_t i = 0, p = 0; choice[i] != '\0'; i++) {
+	for (size_t i = 0, p = 0; choice[i]; i++) {
 		if (positions[p] == i) {
 			no_color == 1 ? tty_setunderline(tty)
 				: tty_setfg(tty, color_highlight);
@@ -309,8 +309,12 @@ draw_match(tty_interface_t *state, const char *choice, const int selected)
 	size_t positions[MATCH_MAX_LEN];
 	memset(positions, -1, sizeof(positions));
 
+	const char *dchoice = choice;
+	if (selected == 1 && (*choice == KEY_ESC || strchr(choice, KEY_ESC)))
+		dchoice = decolor_name(choice);
+
 	const score_t score = search
-		? match_positions(search, choice, &positions[0]) : SCORE_MIN;
+		? match_positions(search, dchoice, &positions[0]) : SCORE_MIN;
 
 	if (options->show_scores) {
 		if (score == SCORE_MIN) {
@@ -320,12 +324,9 @@ draw_match(tty_interface_t *state, const char *choice, const int selected)
 		}
 	}
 
-	const char *dchoice = choice;
 	if (selected == 1) {
 		/* Let's colorize the selected entry */
 		if (*colors[SEL_FG_COLOR] || *colors[SEL_BG_COLOR]) {
-			if (*choice == KEY_ESC || strchr(choice, KEY_ESC))
-				dchoice = decolor_name(choice);
 			if (*colors[SEL_FG_COLOR])
 				tty_fputs(tty, colors[SEL_FG_COLOR]);
 			if (*colors[SEL_BG_COLOR])
@@ -337,7 +338,7 @@ draw_match(tty_interface_t *state, const char *choice, const int selected)
 
 	tty_setnowrap(tty);
 
-	if (score == SCORE_MIN) /* No matching result. */
+	if (positions[0] == (size_t)-1) /* No matching result. */
 		tty_fputs(tty, dchoice);
 	else /* We have a query string: colorize the matching characters. */
 		colorize_match(state, positions, dchoice);
