@@ -44,7 +44,6 @@ static char **selections = (char **)NULL;
 /* SELN is the current size of the selections array, while SEL_COUNTER
  * is the current number of actually selected entries. */
 static size_t seln = 0, sel_counter = 0;
-static int color_highlight = TTY_COLOR_GREEN;
 
 static char colors[COLOR_ITEMS_NUM][MAX_COLOR_LEN];
 
@@ -90,15 +89,11 @@ set_colors(tty_interface_t *state)
 			continue;
 		}
 
-		if (c == MATCH_COLOR) {
-			color_highlight = p[i] - '0';
-		} else {
-			/* 16 colors: 0-7 normal; b0-b7 bright */
-			snprintf(colors[c], MAX_COLOR_LEN, "\x1b[%s%c%cm",
-				b == 1 ? "1;" : "",
-				c == SEL_BG_COLOR ? '4' : '3',
-				p[i]);
-		}
+		/* 16 colors: 0-7 normal; b0-b7 bright */
+		snprintf(colors[c], MAX_COLOR_LEN, "\x1b[%s%c%cm",
+			b == 1 ? "1;" : "",
+			c == SEL_BG_COLOR ? '4' : '3',
+			p[i]);
 
 		b = 0;
 		c++;
@@ -274,7 +269,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 {
 	tty_t *tty = state->tty;
 	const int no_color = state->options->no_color;
-	const int hl = color_highlight + 30;
+	const char *hl = colors[MATCH_COLOR];
 	static char buf[BUF_SIZE];
 	size_t l = 0; /* Current buffer length */
 	size_t p = 0;
@@ -298,7 +293,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 				if (no_color == 1)
 					l += snprintf(buf + l, BUF_SIZE - l, UNDERLINE);
 				else
-					l += snprintf(buf + l, BUF_SIZE - l, "\x1b[%dm", hl); /* Highlight */
+					l += snprintf(buf + l, BUF_SIZE - l, "%s", hl); /* Highlight */
 				in_match = 1; /* Transition from non-match to match */
 			}
 		} else {
