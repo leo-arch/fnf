@@ -392,6 +392,13 @@ draw_match(tty_interface_t *state, const char *choice, const int selected)
 	static size_t positions[MATCH_MAX_LEN];
 	memset(positions, -1, sizeof(positions));
 
+	static char sel_color[(MAX_COLOR_LEN * 2) + 1] = "";
+	if (!*sel_color) {
+		snprintf(sel_color, sizeof(sel_color), "%s%s",
+			*colors[SEL_FG_COLOR] ? colors[SEL_FG_COLOR] : "",
+			*colors[SEL_BG_COLOR] ? colors[SEL_BG_COLOR] : "");
+	}
+
 	const char *dchoice = choice;
 	if (*choice == KEY_ESC || strchr(choice, KEY_ESC))
 		dchoice = decolor_name(choice);
@@ -414,7 +421,7 @@ draw_match(tty_interface_t *state, const char *choice, const int selected)
 		const char *orig_color = dchoice != choice
 			? get_original_color(choice) : NULL;
 		colorize_match(state, positions, dchoice, selected == 1
-			? colors[SEL_FG_COLOR] : orig_color);
+			? sel_color : orig_color);
 	}
 
 	tty_setwrap(tty);
