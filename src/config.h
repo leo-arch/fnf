@@ -71,7 +71,6 @@
 #define DEFAULT_UNICODE 1
 
 #define DEFAULT_COLORS "b6b1b2b702"
-#define NC "\x1b[0m" /* Reset attributes */
 
 /* Color indices: colors (from FNF_COLORS env var) will be parsed
  * exactly in this order. See tty_interface.c */

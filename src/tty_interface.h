@@ -37,6 +37,22 @@
 #include "tty.h"
 
 #define SEARCH_SIZE_MAX 4096
+#ifndef PATH_MAX
+# ifdef __linux__
+#  define PATH_MAX 4096
+# else
+#  define PATH_MAX 1024
+# endif /* __linux__ */
+#endif /* PATH_MAX */
+
+#define KEY_ESC 27
+
+#define RESET_ATTR "\x1b[0m" /* Reset attributes */
+#define CLEAR_LINE "\x1b[K"
+#define UNDERLINE  "\x1b[4m"
+#define INVERT     "\x1b[7m"
+
+#define SIG_INTERRUPT 130 /* 128 + SIGINT (usually 2) */
 
 typedef struct {
 	tty_t *tty;

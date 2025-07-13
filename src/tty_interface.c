@@ -38,16 +38,6 @@
 #include "tty_interface.h"
 #include "config.h"
 
-#ifndef PATH_MAX
-# ifdef __linux__
-#  define PATH_MAX 4096
-# else
-#  define PATH_MAX 1024
-# endif /* __linux */
-#endif /* PATH_MAX */
-
-#define KEY_ESC 27
-
 /* Array to store selected/marked entries */
 static char **selections = (char **)NULL;
 
@@ -298,7 +288,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 	if (positions[p] != 0) {
 		/* If the first character is not a match, set the original color */
 		if (no_color == 1 || !orig_color || !*orig_color)
-			l += snprintf(buf + l, BUF_SIZE - l, "\x1b[0m"); /* Reset */
+			l += snprintf(buf + l, BUF_SIZE - l, RESET_ATTR);
 		else
 			l += snprintf(buf + l, BUF_SIZE - l, "%s", orig_color);
 	}
@@ -309,7 +299,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 		if (is_match) {
 			if (!in_match) {
 				if (no_color == 1)
-					l += snprintf(buf + l, BUF_SIZE - l, "\x1b[4m"); /* Underline */
+					l += snprintf(buf + l, BUF_SIZE - l, UNDERLINE);
 				else
 					l += snprintf(buf + l, BUF_SIZE - l, "\x1b[%dm", hl); /* Highlight */
 				in_match = 1; /* Transition from non-match to match */
@@ -317,7 +307,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 		} else {
 			if (in_match) {
 				if (no_color == 1 || !orig_color || !*orig_color)
-					l += snprintf(buf + l, BUF_SIZE - l, "\x1b[0m");
+					l += snprintf(buf + l, BUF_SIZE - l, RESET_ATTR);
 				else
 					l += snprintf(buf + l, BUF_SIZE - l, "%s", orig_color);
 				in_match = 0; /* Transition from match to non-match */
@@ -359,7 +349,7 @@ colorize_no_match(tty_t *tty, const int selected, const char *choice)
 		if (*colors[SEL_BG_COLOR])
 			l += snprintf(buf + l, BUF_SIZE - l, "%s", colors[SEL_BG_COLOR]);
 	} else { /* If no specific colors, set invert */
-		l += snprintf(buf + l, BUF_SIZE - l, "\x1b[7m");
+		l += snprintf(buf + l, BUF_SIZE - l, INVERT);
 	}
 
 	/* Append the choice to the buffer and null-terminate the string. */
@@ -452,8 +442,8 @@ draw(tty_interface_t *state)
 
 	if (options->reverse == 0) {
 		/* Set column, print prompt, and clear line. */
-		tty_printf(tty, "\x1b[%dG%s%s\x1b[K", options->pad + 1,
-			options->prompt, state->search);
+		tty_printf(tty, "\x1b[%dG%s%s%s", options->pad + 1,
+			options->prompt, state->search, CLEAR_LINE);
 
 		if (options->show_info) {
 			tty_printf(tty, "\n[%lu/%lu]", choices->available, choices->size);
@@ -470,7 +460,7 @@ draw(tty_interface_t *state)
 	const char *options_marker = options->marker;
 
 	for (size_t i = start; i < start + num_lines; i++) {
-		fprintf(tty->fout, "%s\x1b[K", options_reverse == 0 ? "\n" : "");
+		fprintf(tty->fout, "%s%s", options_reverse == 0 ? "\n" : "", CLEAR_LINE);
 
 		const char *choice = choices_get(choices, i);
 		if (choice) {
@@ -479,7 +469,7 @@ draw(tty_interface_t *state)
 				options_pad, "", colors[POINTER_COLOR],
 				i == choices->selection ? options_pointer : " ",
 				colors[MARKER_COLOR],
-				multi_sel == 1 ? options_marker : " ", NC);
+				multi_sel == 1 ? options_marker : " ", RESET_ATTR);
 			draw_match(state, choice, i == choices->selection);
 		}
 
@@ -491,7 +481,7 @@ draw(tty_interface_t *state)
 		tty_moveup(tty, num_lines + options->show_info);
 
 	tty_printf(tty, "\x1b[%dG%s%s%s", options->pad + 1,
-		colors[PROMPT_COLOR], options->prompt, NC);
+		colors[PROMPT_COLOR], options->prompt, RESET_ATTR);
 
 	static char input_buf[SEARCH_SIZE_MAX + 1];
 	*input_buf = '\0';
@@ -643,7 +633,7 @@ action_exit(tty_interface_t *state)
 	clear(state);
 	tty_close(state->tty);
 
-	state->exit = 130; /* 128 + SIGINT (usually 2). */
+	state->exit = SIG_INTERRUPT;
 }
 
 static void
