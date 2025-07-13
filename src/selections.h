@@ -1,10 +1,9 @@
-/* colors.h */
+/* selections.h */
 
 /*
  * This file is part of fnf
  *
  * Copyright
- * (C) 2014-2022 John Hawthorn <john.hawthorn@gmail.com>
  * (C) 2022-2025, L. Abramovich <leo.clifm@outlook.com>
  * All rights reserved.
 
@@ -36,10 +35,10 @@
 
 extern size_t seln;
 
-int is_selected(const char *p);
 void deselect_entry(const char *name);
-void save_selection(const char *p);
-void print_selections(tty_interface_t *state);
 void free_selections(tty_interface_t *state);
+int  is_selected(const char *p);
+void print_selections(tty_interface_t *state);
+void save_selection(const char *p);
 
 #endif /* SELECTIONS_H */
