@@ -47,11 +47,24 @@ strcasechr(const char *s, char c)
 	return strpbrk(s, accept);
 }
 
+#define IS_SGR_CHAR(c) (((c) >= '0' && (c) <= '9') || (c) == ';' || (c) == '[')
+#define KEY_ESC 27
 int
 has_match(const char *needle, const char *haystack)
 {
+	/* Skip initial SGR sequence from haystack. */
+	if (*haystack == KEY_ESC && haystack[1] == '[') {
+		haystack += 2;
+		while (*haystack && *haystack != 'm' && IS_SGR_CHAR(*haystack))
+			haystack++;
+		if (*haystack == 'm')
+			haystack++;
+		if (!*haystack)
+			return 0;
+	}
+
 	while (*needle) {
-		char nch = *needle++;
+		const char nch = *needle++;
 		if (!(haystack = strcasechr(haystack, nch)))
 			return 0;
 
@@ -59,9 +72,10 @@ has_match(const char *needle, const char *haystack)
 	}
 	return 1;
 }
+#undef KEY_ESC
+#undef IS_SGR_CHAR
 
 #define SWAP(x, y, T) do { T SWAP = x; x = y; y = SWAP; } while (0)
-
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 
 struct match_struct {
