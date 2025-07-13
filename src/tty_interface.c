@@ -34,9 +34,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "colors.h"
+#include "config.h"
 #include "match.h"
 #include "tty_interface.h"
-#include "config.h"
 
 /* Array to store selected/marked entries */
 static char **selections = (char **)NULL;
@@ -44,61 +45,6 @@ static char **selections = (char **)NULL;
 /* SELN is the current size of the selections array, while SEL_COUNTER
  * is the current number of actually selected entries. */
 static size_t seln = 0, sel_counter = 0;
-
-static char colors[COLOR_ITEMS_NUM][MAX_COLOR_LEN];
-
-/* Parse colors taken from FNF_COLORS environment variable
- * Colors are parsed in strict order (see config.h)
- * Colors could be: 0-7 for normal colors, and b0-b7 for bold colors
- * Specific colors could be skipped using a dash ('-').
- * Colors are stored in the COLORS array using the same order defined in
- * config.h
- * These colors are applied in draw() and draw_match() functions in this file
- *
- * For example, "-b1b2-46" is read as follows:
- * -: no PROMPT color
- * b1: POINTER in bold red
- * b2: MARKER in bold green
- * -: no color for SELECTED ENTRY FOREGROUND
- * 4: SELECTED ENTRY BACKGROUND in blue
- * 6: MATCHING CHARACTERS in cyan
- * */
-static void
-set_colors(tty_interface_t *state)
-{
-	char *p = getenv("NO_COLOR");
-	if (p) {
-		state->options->no_color = 1;
-		return;
-	}
-
-	p = getenv("FNF_COLORS");
-	if (!p || !*p)
-		p = DEFAULT_COLORS;
-
-	size_t i, b = 0, c = 0;
-	for (i = 0; p[i] && c < COLOR_ITEMS_NUM; i++) {
-		if (p[i] == 'b') {
-			b = 1;
-			continue;
-		}
-		if (p[i] < '0' || p[i] > '7' || p[i] == '-') {
-			*colors[c] = '\0';
-			b = 0;
-			c++;
-			continue;
-		}
-
-		/* 16 colors: 0-7 normal; b0-b7 bright */
-		snprintf(colors[c], MAX_COLOR_LEN, "\x1b[%s%c%cm",
-			b == 1 ? "1;" : "",
-			c == SEL_BG_COLOR ? '4' : '3',
-			p[i]);
-
-		b = 0;
-		c++;
-	}
-}
 
 /* Search for the string P in the selections array. If found, return 1,
  * otherwise zero. */
@@ -135,36 +81,6 @@ deselect_entry(const char *name)
 	}
 }
 
-static char *
-decolor_name(const char *name)
-{
-	if (!name)
-		return NULL;
-
-	static char buf[PATH_MAX + 1];
-	char *p = buf;
-
-	size_t i = 0;
-	const size_t name_len = strlen(name);
-
-	while (i < name_len) {
-		if (name[i] == KEY_ESC && name[i + 1] == '[') {
-			/* Skip the escape sequence */
-			while (i < name_len && name[i] != 'm')
-				i++;
-
-			/* Move past the 'm' */
-			if (i < name_len)
-				i++;
-		} else {
-			*p++ = name[i++];
-		}
-	}
-
-	*p = '\0';
-	return (p == buf) ? NULL : buf;
-}
-
 /* Save the string P into the selections array. */
 static void
 save_selection(const char *p)
@@ -181,24 +97,6 @@ save_selection(const char *p)
 	seln++;
 	sel_counter++;
 	selections[seln] = (char *)NULL;
-}
-
-/* Select the currently highighted/hovered entry if not already selected.
- * Otherwise, remove it from the selections list. */
-static int
-action_select(tty_interface_t *state)
-{
-	const char *p = choices_get(state->choices, state->choices->selection);
-	if (!p)
-		return EXIT_FAILURE;
-
-	if (is_selected(p) == 1) {
-		deselect_entry(p);
-		return EXIT_FAILURE;
-	}
-
-	save_selection(p);
-	return EXIT_SUCCESS;
 }
 
 /* Print the list of selected/marked entries to STDOUT. */
@@ -233,6 +131,24 @@ free_selections(tty_interface_t *state)
 	selections = (char **)NULL;
 }
 
+/* Select the currently highighted/hovered entry if not already selected.
+ * Otherwise, remove it from the selections list. */
+static int
+action_select(tty_interface_t *state)
+{
+	const char *p = choices_get(state->choices, state->choices->selection);
+	if (!p)
+		return EXIT_FAILURE;
+
+	if (is_selected(p) == 1) {
+		deselect_entry(p);
+		return EXIT_FAILURE;
+	}
+
+	save_selection(p);
+	return EXIT_SUCCESS;
+}
+
 static int
 isprint_unicode(char c)
 {
@@ -260,121 +176,6 @@ clear(const tty_interface_t *state)
 		tty_moveup(tty, line - 1);
 
 	tty_flush(tty);
-}
-
-#define BUF_SIZE 4096
-static void
-colorize_match(const tty_interface_t *state, const size_t *positions,
-	const char *choice, const char *orig_color)
-{
-	tty_t *tty = state->tty;
-	const int no_color = state->options->no_color;
-	const char *hl = colors[MATCH_COLOR];
-	static char buf[BUF_SIZE];
-	size_t l = 0; /* Current buffer length */
-	size_t p = 0;
-	int in_match = 0; /* Track whether we are currently in a match */
-
-	*buf = '\0';
-
-	if (positions[p] != 0) {
-		/* If the first character is not a match, set the original color */
-		if (no_color == 1 || !orig_color || !*orig_color)
-			l += snprintf(buf + l, BUF_SIZE - l, RESET_ATTR);
-		else
-			l += snprintf(buf + l, BUF_SIZE - l, "%s", orig_color);
-	}
-
-	for (size_t i = 0; choice[i]; i++) {
-		const int is_match = (positions[p] == i);
-
-		if (is_match) {
-			if (!in_match) {
-				if (no_color == 1)
-					l += snprintf(buf + l, BUF_SIZE - l, UNDERLINE);
-				else
-					l += snprintf(buf + l, BUF_SIZE - l, "%s", hl); /* Highlight */
-				in_match = 1; /* Transition from non-match to match */
-			}
-		} else {
-			if (in_match) {
-				if (no_color == 1 || !orig_color || !*orig_color)
-					l += snprintf(buf + l, BUF_SIZE - l, RESET_ATTR);
-				else
-					l += snprintf(buf + l, BUF_SIZE - l, "%s", orig_color);
-				in_match = 0; /* Transition from match to non-match */
-			}
-		}
-
-		/* Add the character to the buffer */
-		buf[l++] = (choice[i] == '\n') ? ' ' : choice[i];
-
-		if (l >= BUF_SIZE - 1)
-			break; /* Buffer is full, stop adding more characters */
-
-		/* Move to the next position if we are at a match */
-		if (is_match)
-			p++;
-	}
-
-	buf[l] = '\0';
-	tty_fputs(tty, buf);
-	tty_setnormal(tty); /* Reset to normal after writing */
-}
-
-static void
-colorize_no_match(tty_t *tty, const int selected, const char *choice)
-{
-	if (selected == 0) {
-		tty_fputs(tty, choice);
-		return;
-	}
-
-	static char buf[BUF_SIZE];
-	*buf = '\0';
-	size_t l = 0;
-
-	/* If selected, handle colors */
-	if (*colors[SEL_FG_COLOR] || *colors[SEL_BG_COLOR]) {
-		if (*colors[SEL_FG_COLOR])
-			l += snprintf(buf + l, BUF_SIZE - l, "%s", colors[SEL_FG_COLOR]);
-		if (*colors[SEL_BG_COLOR])
-			l += snprintf(buf + l, BUF_SIZE - l, "%s", colors[SEL_BG_COLOR]);
-	} else { /* If no specific colors, set invert */
-		l += snprintf(buf + l, BUF_SIZE - l, INVERT);
-	}
-
-	/* Append the choice to the buffer and null-terminate the string. */
-	l += snprintf(buf + l, BUF_SIZE - l, "%s", choice);
-	buf[l] = '\0';
-
-	tty_fputs(tty, buf);
-}
-#undef BUF_SIZE
-
-static const char *
-get_original_color(const char *choice)
-{
-	static char orig_color[MAX_COLOR_LEN + 1];
-	size_t i = 0;
-
-	/* Iterate through the string until we find the ending character ('m')
-	 * of the last contiguous SGR sequence. */
-	while (choice[i] != '\0') {
-		if (choice[i] == 'm' && choice[i + 1] != KEY_ESC) /* Stop copying after 'm' */
-			break;
-		orig_color[i] = choice[i];
-		i++;
-	}
-
-	/* If 'm' was found, copy it and null-terminate */
-	if (choice[i] == 'm') {
-		orig_color[i] = choice[i];
-		orig_color[i + 1] = '\0';
-		return orig_color;
-	}
-
-	return NULL;
 }
 
 static void

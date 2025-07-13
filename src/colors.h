@@ -1,4 +1,4 @@
-/* tty_interface.h */
+/* colors.h */
 
 /*
  * This file is part of fnf
@@ -29,43 +29,35 @@
 * THE SOFTWARE.
 */
 
-#ifndef TTY_INTERFACE_H
-#define TTY_INTERFACE_H TTY_INTERFACE_H
+#ifndef COLORS_H
+#define COLORS_H
 
-#include "choices.h"
-#include "options.h"
-#include "tty.h"
+/* Color indices: colors (from FNF_COLORS env var) will be parsed
+ * exactly in this order by set_colors(). */
+#define PROMPT_COLOR  0
+#define POINTER_COLOR 1
+#define MARKER_COLOR  2
+#define SEL_FG_COLOR  3
+#define SEL_BG_COLOR  4
+#define MATCH_COLOR   5
+#define COLOR_ITEMS_NUM 6
+#define MAX_COLOR_LEN 48
 
-#define SEARCH_SIZE_MAX 4096
-#ifndef PATH_MAX
-# ifdef __linux__
-#  define PATH_MAX 4096
-# else
-#  define PATH_MAX 1024
-# endif /* __linux__ */
-#endif /* PATH_MAX */
+#define RESET_ATTR "\x1b[0m" /* Reset attributes */
+#define CLEAR_LINE "\x1b[K"
+#define UNDERLINE  "\x1b[4m"
+#define INVERT     "\x1b[7m"
+#define KEY_ESC    27
 
-#define KEY_ESC 27
+#include "tty_interface.h"
 
-#define SIG_INTERRUPT 130 /* 128 + SIGINT (usually 2) */
+extern char colors[COLOR_ITEMS_NUM][MAX_COLOR_LEN];
 
-typedef struct {
-	tty_t *tty;
-	choices_t *choices;
-	options_t *options;
+char *decolor_name(const char *name);
+void colorize_match(const tty_interface_t *state, const size_t *positions,
+	const char *choice, const char *orig_color);
+void colorize_no_match(tty_t *tty, const int selected, const char *choice);
+const char *get_original_color(const char *choice);
+void set_colors(tty_interface_t *state);
 
-	char search[SEARCH_SIZE_MAX + 1];
-	char last_search[SEARCH_SIZE_MAX + 1];
-	size_t cursor;
-
-	int ambiguous_key_pending;
-	char input[32]; /* Pending input buffer */
-
-	int exit;
-} tty_interface_t;
-
-void tty_interface_init(tty_interface_t *state, tty_t *tty,
-	choices_t *choices, options_t *options);
-int tty_interface_run(tty_interface_t *state);
-
-#endif
+#endif /* COLORS_H */

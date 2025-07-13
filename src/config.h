@@ -69,19 +69,7 @@
 #define DEFAULT_NO_COLOR 0
 #define DEFAULT_REVERSE 0
 #define DEFAULT_UNICODE 1
-
 #define DEFAULT_COLORS "b6b1b2b702"
-
-/* Color indices: colors (from FNF_COLORS env var) will be parsed
- * exactly in this order. See tty_interface.c */
-#define PROMPT_COLOR  0
-#define POINTER_COLOR 1
-#define MARKER_COLOR  2
-#define SEL_FG_COLOR  3
-#define SEL_BG_COLOR  4
-#define MATCH_COLOR   5
-#define COLOR_ITEMS_NUM 6
-#define MAX_COLOR_LEN 48
 
 #define VERSION "0.2.3"
 
