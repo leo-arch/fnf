@@ -3,8 +3,7 @@
 /*
  * This file is part of fnf
  *
- * Copyright
- * (C) 2022-2025, L. Abramovich <leo.clifm@outlook.com>
+ * Copyright (C) 2022-2025, L. Abramovich <leo.clifm@outlook.com>
  * All rights reserved.
 
 * The MIT License (MIT)
@@ -33,12 +32,12 @@
 
 /* Color indices: colors (from FNF_COLORS env var) will be parsed
  * exactly in this order by set_colors(). */
-#define PROMPT_COLOR  0
-#define POINTER_COLOR 1
-#define MARKER_COLOR  2
-#define SEL_FG_COLOR  3
-#define SEL_BG_COLOR  4
-#define MATCH_COLOR   5
+#define PROMPT_COLOR    0
+#define POINTER_COLOR   1
+#define MARKER_COLOR    2
+#define SEL_FG_COLOR    3
+#define SEL_BG_COLOR    4
+#define HIGHLIGHT_COLOR 5
 #define COLOR_ITEMS_NUM 6
 #define MAX_COLOR_LEN 48
 
@@ -47,9 +46,12 @@
 #define UNDERLINE  "\x1b[4m"
 #define INVERT     "\x1b[7m"
 
+#define COLOR_FIELD_SEP ':'
 #define KEY_ESC 27
-#define IS_SGR_CHAR(c) (((c) >= '0' && (c) <= '9') || (c) == ';' || (c) == '[')
+#define IS_SGR_CHAR(c)  (((c) >= '0' && (c) <= '9') || (c) == ';' || (c) == '[')
 #define IS_SGR_START(s) (*(s) == KEY_ESC && (s)[1] == '[')
+#define IS_BG_COLOR(n)  ((n) == SEL_BG_COLOR)
+#define IS_DIGIT(c)     ((c) >= '0' && (c) <= '9')
 
 #include "tty_interface.h"
 

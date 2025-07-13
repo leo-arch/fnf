@@ -33,6 +33,7 @@
 #define OPTIONS_H OPTIONS_H
 
 typedef struct {
+	char *color;
 	const char *filter;
 	const char *init_search;
 	const char *tty_filename;

@@ -3,8 +3,7 @@
 /*
  * This file is part of fnf
  *
- * Copyright
- * (C) 2022-2025, L. Abramovich <leo.clifm@outlook.com>
+ * Copyright (C) 2022-2025, L. Abramovich <leo.clifm@outlook.com>
  * All rights reserved.
 
 * The MIT License (MIT)

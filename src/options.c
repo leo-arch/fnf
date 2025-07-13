@@ -62,6 +62,7 @@ static const char *usage_str =
     "     --left-aborts        Left arrow key aborts\n"
     "     --reverse            Display from top, prompt at bottom\n"
     "     --no-unicode         Do not use Unicode decorations\n"
+    "     --color=COLORSPEC    Set custom colors (consult the manpage)\n"
     "     --no-color           Run colorless\n";
 
 static void
@@ -94,6 +95,7 @@ static struct option longopts[] = {
 	{"no-color", no_argument, NULL, 7},
 	{"reverse", no_argument, NULL, 8},
 	{"no-unicode", no_argument, NULL, 9},
+	{"color", required_argument, NULL, 10},
 	{NULL, 0, NULL, 0}
 };
 
@@ -124,6 +126,7 @@ options_init(options_t *options)
 	options->no_color        = DEFAULT_NO_COLOR;
 	options->reverse         = DEFAULT_REVERSE;
 	options->unicode         = DEFAULT_UNICODE;
+	options->color           = NULL;
 }
 
 void
@@ -202,6 +205,7 @@ options_parse(options_t *options, int argc, char *argv[])
 		case 7:	options->no_color = 1; break;
 		case 8:	options->reverse = 1; break;
 		case 9: options->unicode = 0; break;
+		case 10: options->color = optarg; break;
 
 		case 'h': /* fallthrough */
 		default:
