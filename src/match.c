@@ -49,11 +49,12 @@ strcasechr(const char *s, char c)
 
 #define IS_SGR_CHAR(c) (((c) >= '0' && (c) <= '9') || (c) == ';' || (c) == '[')
 #define KEY_ESC 27
+#define IS_SGR_START(s) (*(s) == KEY_ESC && (s)[1] == '[')
 int
 has_match(const char *needle, const char *haystack)
 {
 	/* Skip initial SGR sequence from haystack. */
-	while (*haystack == KEY_ESC && haystack[1] == '[') {
+	while (IS_SGR_START(haystack)) {
 		haystack += 2;
 		while (*haystack && *haystack != 'm' && IS_SGR_CHAR(*haystack))
 			haystack++;
@@ -66,7 +67,7 @@ has_match(const char *needle, const char *haystack)
 	/* Set a pointer to the beginning of the last SGR sequence */
 	const char *escape_key = haystack;
 	while (*escape_key) {
-		if (*escape_key == KEY_ESC && escape_key[1] == '[')
+		if (IS_SGR_START(escape_key))
 			break;
 		escape_key++;
 	}
@@ -84,6 +85,7 @@ has_match(const char *needle, const char *haystack)
 }
 #undef KEY_ESC
 #undef IS_SGR_CHAR
+#undef IS_SGR_START
 
 #define SWAP(x, y, T) do { T SWAP = x; x = y; y = SWAP; } while (0)
 #define max(a, b) (((a) > (b)) ? (a) : (b))
@@ -104,7 +106,7 @@ precompute_bonus(const char *haystack, score_t *match_bonus)
 	/* Which positions are beginning of words */
 	char last_ch = '/';
 	for (int i = 0; haystack[i]; i++) {
-		char ch = haystack[i];
+		const char ch = haystack[i];
 		match_bonus[i] = COMPUTE_BONUS(last_ch, ch);
 		last_ch = ch;
 	}
