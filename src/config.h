@@ -71,6 +71,6 @@
 #define DEFAULT_UNICODE 1
 #define DEFAULT_COLORS "b6b1b2b702"
 
-#define VERSION "0.2.3"
+#define VERSION "0.2.4"
 
 #endif /* CONFIG_H */
