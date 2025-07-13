@@ -39,6 +39,7 @@
 
 #include "match.h"
 #include "bonus.h"
+#include "colors.h"
 
 char *
 strcasechr(const char *s, char c)
@@ -47,9 +48,6 @@ strcasechr(const char *s, char c)
 	return strpbrk(s, accept);
 }
 
-#define IS_SGR_CHAR(c) (((c) >= '0' && (c) <= '9') || (c) == ';' || (c) == '[')
-#define KEY_ESC 27
-#define IS_SGR_START(s) (*(s) == KEY_ESC && (s)[1] == '[')
 int
 has_match(const char *needle, const char *haystack)
 {
@@ -83,9 +81,6 @@ has_match(const char *needle, const char *haystack)
 
 	return 1;
 }
-#undef KEY_ESC
-#undef IS_SGR_CHAR
-#undef IS_SGR_START
 
 #define SWAP(x, y, T) do { T SWAP = x; x = y; y = SWAP; } while (0)
 #define max(a, b) (((a) > (b)) ? (a) : (b))

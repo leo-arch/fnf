@@ -45,8 +45,6 @@
 # endif /* __linux__ */
 #endif /* PATH_MAX */
 
-#define KEY_ESC 27
-
 #define SIG_INTERRUPT 130 /* 128 + SIGINT (usually 2) */
 
 typedef struct {

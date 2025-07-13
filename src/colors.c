@@ -66,8 +66,7 @@ set_colors(tty_interface_t *state)
 		p = DEFAULT_COLORS;
 
 	size_t bold = 0, count = 0;
-	size_t i;
-	for (i = 0; p[i] && count < COLOR_ITEMS_NUM; i++) {
+	for (size_t i = 0; p[i] && count < COLOR_ITEMS_NUM; i++) {
 		if (p[i] == 'b') {
 			bold = 1;
 			continue;
@@ -103,7 +102,7 @@ decolor_name(const char *name)
 	const size_t name_len = strlen(name);
 
 	while (i < name_len) {
-		if (name[i] == KEY_ESC && name[i + 1] == '[') {
+		if (IS_SGR_START(name)) {
 			/* Skip the escape sequence */
 			while (i < name_len && name[i] != 'm')
 				i++;
@@ -123,7 +122,7 @@ decolor_name(const char *name)
 #define BUF_SIZE 4096
 void
 colorize_match(const tty_interface_t *state, const size_t *positions,
-	const char *choice, const char *orig_color)
+	const char *name, const char *orig_color)
 {
 	tty_t *tty = state->tty;
 	const int no_color = state->options->no_color;
@@ -143,7 +142,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 			l += snprintf(buf + l, BUF_SIZE - l, "%s", orig_color);
 	}
 
-	for (size_t i = 0; choice[i]; i++) {
+	for (size_t i = 0; name[i]; i++) {
 		const int is_match = (positions[p] == i);
 
 		if (is_match) {
@@ -165,7 +164,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 		}
 
 		/* Add the character to the buffer */
-		buf[l++] = (choice[i] == '\n') ? ' ' : choice[i];
+		buf[l++] = (name[i] == '\n') ? ' ' : name[i];
 
 		if (l >= BUF_SIZE - 1)
 			break; /* Buffer is full, stop adding more characters */
@@ -181,10 +180,10 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 }
 
 void
-colorize_no_match(tty_t *tty, const int selected, const char *choice)
+colorize_no_match(tty_t *tty, const int selected, const char *name)
 {
 	if (selected == 0) {
-		tty_fputs(tty, choice);
+		tty_fputs(tty, name);
 		return;
 	}
 
@@ -203,7 +202,7 @@ colorize_no_match(tty_t *tty, const int selected, const char *choice)
 	}
 
 	/* Append the choice to the buffer and null-terminate the string. */
-	l += snprintf(buf + l, BUF_SIZE - l, "%s", choice);
+	l += snprintf(buf + l, BUF_SIZE - l, "%s", name);
 	buf[l] = '\0';
 
 	tty_fputs(tty, buf);
@@ -211,23 +210,23 @@ colorize_no_match(tty_t *tty, const int selected, const char *choice)
 #undef BUF_SIZE
 
 const char *
-get_original_color(const char *choice)
+get_original_color(const char *name)
 {
 	static char orig_color[MAX_COLOR_LEN + 1];
 	size_t i = 0;
 
 	/* Iterate through the string until we find the ending character ('m')
 	 * of the last contiguous SGR sequence. */
-	while (choice[i] != '\0') {
-		if (choice[i] == 'm' && choice[i + 1] != KEY_ESC) /* Stop copying after 'm' */
+	while (name[i] != '\0') {
+		if (name[i] == 'm' && name[i + 1] != KEY_ESC) /* Stop copying after 'm' */
 			break;
-		orig_color[i] = choice[i];
+		orig_color[i] = name[i];
 		i++;
 	}
 
 	/* If 'm' was found, copy it and null-terminate */
-	if (choice[i] == 'm') {
-		orig_color[i] = choice[i];
+	if (name[i] == 'm') {
+		orig_color[i] = name[i];
 		orig_color[i + 1] = '\0';
 		return orig_color;
 	}

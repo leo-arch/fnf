@@ -32,7 +32,7 @@
 #include <string.h>
 
 #include "colors.h"
-#include "tty_interface.h"
+#include "selections.h"
 
 /* Array to store selected/marked entries */
 static char **selections = (char **)NULL;
@@ -45,14 +45,14 @@ static size_t sel_counter = 0;
 /* Search for the string P in the selections array. If found, return 1,
  * otherwise zero. */
 int
-is_selected(const char *p)
+is_selected(const char *name)
 {
-	if (!p || !*p || sel_counter == 0)
+	if (!name || !*name || sel_counter == 0)
 		return 0;
 
 	size_t i;
 	for (i = 0; selections[i]; i++) {
-		if (*selections[i] == *p && strcmp(selections[i], p) == 0)
+		if (*selections[i] == *name && strcmp(selections[i], name) == 0)
 			return 1;
 	}
 
@@ -79,17 +79,17 @@ deselect_entry(const char *name)
 
 /* Save the string P into the selections array. */
 void
-save_selection(const char *p)
+save_selection(const char *name)
 {
 	selections = (char **)realloc(selections, (seln + 2) * sizeof(char *));
 	if (!selections)
 		return;
 
-	selections[seln] = (char *)malloc((strlen(p) + 1) * sizeof(char));
+	selections[seln] = (char *)malloc((strlen(name) + 1) * sizeof(char));
 	if (!selections[seln])
 		return;
 
-	strcpy(selections[seln], p);
+	strcpy(selections[seln], name);
 	seln++;
 	sel_counter++;
 	selections[seln] = (char *)NULL;

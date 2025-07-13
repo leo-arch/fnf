@@ -46,7 +46,10 @@
 #define CLEAR_LINE "\x1b[K"
 #define UNDERLINE  "\x1b[4m"
 #define INVERT     "\x1b[7m"
-#define KEY_ESC    27
+
+#define KEY_ESC 27
+#define IS_SGR_CHAR(c) (((c) >= '0' && (c) <= '9') || (c) == ';' || (c) == '[')
+#define IS_SGR_START(s) (*(s) == KEY_ESC && (s)[1] == '[')
 
 #include "tty_interface.h"
 
@@ -54,9 +57,9 @@ extern char colors[COLOR_ITEMS_NUM][MAX_COLOR_LEN];
 
 char *decolor_name(const char *name);
 void colorize_match(const tty_interface_t *state, const size_t *positions,
-	const char *choice, const char *orig_color);
-void colorize_no_match(tty_t *tty, const int selected, const char *choice);
-const char *get_original_color(const char *choice);
+	const char *name, const char *orig_color);
+void colorize_no_match(tty_t *tty, const int selected, const char *name);
+const char *get_original_color(const char *name);
 void set_colors(tty_interface_t *state);
 
 #endif /* COLORS_H */
