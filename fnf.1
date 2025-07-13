@@ -178,44 +178,14 @@ A single numbered attribute (\fB0-9\fR) can be added to colors. The meaning of t
 .sp
 In the line \fB--color="prompt:214:1,pointer:#87d700:2,marker:6,sel-fg:#ffff00"\fR, the prompt is set to bold orange (256-color), the pointer to a dimmed green (hex color), the marker to cyan (256-color), and the foreground color for selected entries to yellow (hex color).
 .sp
-Note that when the color for a name is left unspecified, the default color is used.
+The \fBFNF_COLORS\fR environment variable can also be used just as whit the \fB--color\fR option. E.g.:
 .sp
-.B ENVIRONMENT COLORS
+ \fB$ export FNF_COLORS="prompt:214:1,pointer:#87d700:2,marker:6,sel-fg:#ffff0"
+.sp 0
+ \fB$ ls | fnf\fR
 .sp
-Interface colors can also be set using the environment variable \fBFNF_COLORS\fR, which follows a simple pattern: the \fIorder\fR of the color code specifies which \fIinterface element\fR the color must be applied to, while the \fIcontent\fR of this code defines the \fIcolor\fR of this element.
+Colors default to \fB"prompt:6:1,pointer:1:1,marker:2:1,sel-fg:7:1,sel-bg:0,hl:2"\fR.
 .sp
-\fBA\fR. The order is this:
- 1) Prompt
- 2) Pointer
- 3) Marker
- 4) Current entry foreground
- 5) Current entry background
- 6) Characters matching query
-.sp
-\fBB\fR. Possible content (available colors - note that only 4-bit colors are supported):
- 0 = black
- 1 = red
- 2 = green
- 3 = yellow
- 4 = blue
- 5 = magenta
- 6 = cyan
- 7 = white
-.sp
-Use a \fBb\fR before the color to make it bold/bright. A dash (\-) means that the color for the interface element in that position must be skipped.
-.sp
-For example, \fBFZF_COLORS="\-b1b2\-46"\fR is to be read as follows:
-.sp
- \fB\-\fR: no prompt color
- \fBb1\fR: pointer in bold red
- \fBb2\fR: marker in bold green
- \fB\-\fR: no color for the current entry foreground
- \fB4\fR: current entry background in blue
- \fB6\fR: matching characters in cyan
-.sp
-Default colors are: \fBb6b1b2b702\fR.
-.sp
-Note that if both the current entry foreground and background colors are set to a dash (e.g. \fBb6b1b2--2\fR), the current entry color is inverted (foreground is background and background is foreground).
 .
 .SH USAGE EXAMPLES
 .
