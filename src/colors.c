@@ -100,7 +100,7 @@ get_rgb(const char *hex, int *attr, int *r, int *g, int *b)
 	if (h[6] == COLOR_FIELD_SEP && IS_DIGIT(h[7]) && !h[8])
 		*attr = h[7] - '0';
 
-//	if (xargs.no_bold == 1 && *attr == 1)
+//	if (no_bold == 1 && *attr == 1)
 //		*attr = -1;
 
 	return 0;
@@ -199,7 +199,7 @@ parse_color_field(char *field)
 }
 
 static void
-parse_cmdline_colors(char *line)
+parse_color_line(char *line)
 {
 	const char *delimiter = ", ";
 
@@ -210,60 +210,28 @@ parse_cmdline_colors(char *line)
 	}
 }
 
-/* Parse colors taken from FNF_COLORS environment variable
- * Colors are parsed in strict order (see config.h)
- * Colors could be: 0-7 for normal colors, and b0-b7 for bold colors
- * Specific colors could be skipped using a dash ('-').
- * Colors are stored in the COLORS array using the same order defined in
- * config.h
- * These colors are applied in draw() and draw_match() functions in this file
- *
- * For example, "-b1b2-46" is read as follows:
- * -: no PROMPT color
- * b1: POINTER in bold red
- * b2: MARKER in bold green
- * -: no color for SELECTED ENTRY FOREGROUND
- * 4: SELECTED ENTRY BACKGROUND in blue
- * 6: MATCHING CHARACTERS in cyan
- * */
+/* Set interface colors parsing a color line, taken either from the --color
+ * options or from the FNF_COLORS environment variable. */
 void
 set_colors(tty_interface_t *state)
 {
-	char *p = getenv("NO_COLOR");
-	if (p) {
+	char *env = getenv("NO_COLOR");
+	if (env) {
 		state->options->no_color = 1;
 		return;
 	}
 
-	p = getenv("FNF_COLORS");
-	if (!p || !*p)
-		p = DEFAULT_COLORS;
-
-	size_t bold = 0, count = 0;
-	for (size_t i = 0; p[i] && count < COLOR_ITEMS_NUM; i++) {
-		if (p[i] == 'b') {
-			bold = 1;
-			continue;
-		}
-		if (p[i] < '0' || p[i] > '7' || p[i] == '-') {
-			*colors[count] = '\0';
-			bold = 0;
-			count++;
-			continue;
-		}
-
-		/* 16 colors: 0-7 normal; b0-b7 bright */
-		snprintf(colors[count], MAX_COLOR_LEN, "\x1b[%s%c%cm",
-			bold == 1 ? "1;" : "",
-			count == SEL_BG_COLOR ? '4' : '3',
-			p[i]);
-
-		bold = 0;
-		count++;
+	char def_colors[256];
+	env = getenv("FNF_COLORS");
+	if (!env || !*env) {
+		strncpy(def_colors, DEFAULT_COLORS, sizeof(def_colors));
+		env = def_colors;
 	}
 
+	parse_color_line(env);
+
 	if (state->options->color && *state->options->color)
-		parse_cmdline_colors(state->options->color);
+		parse_color_line(state->options->color);
 }
 
 char *
