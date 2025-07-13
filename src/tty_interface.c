@@ -363,9 +363,10 @@ get_original_color(const char *choice)
 	static char orig_color[MAX_COLOR_LEN + 1];
 	size_t i = 0;
 
-	/* Iterate through the string until we find 'm' */
+	/* Iterate through the string until we find the ending character ('m')
+	 * of the last contiguous SGR sequence. */
 	while (choice[i] != '\0') {
-		if (choice[i] == 'm') /* Stop copying after 'm' */
+		if (choice[i] == 'm' && choice[i + 1] != KEY_ESC) /* Stop copying after 'm' */
 			break;
 		orig_color[i] = choice[i];
 		i++;

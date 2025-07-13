@@ -53,7 +53,7 @@ int
 has_match(const char *needle, const char *haystack)
 {
 	/* Skip initial SGR sequence from haystack. */
-	if (*haystack == KEY_ESC && haystack[1] == '[') {
+	while (*haystack == KEY_ESC && haystack[1] == '[') {
 		haystack += 2;
 		while (*haystack && *haystack != 'm' && IS_SGR_CHAR(*haystack))
 			haystack++;
@@ -63,13 +63,23 @@ has_match(const char *needle, const char *haystack)
 			return 0;
 	}
 
+	/* Set a pointer to the beginning of the last SGR sequence */
+	const char *escape_key = haystack;
+	while (*escape_key) {
+		if (*escape_key == KEY_ESC && escape_key[1] == '[')
+			break;
+		escape_key++;
+	}
+
+	/* Inspect haystack up to the beginning of the last SGR sequence */
 	while (*needle) {
 		const char nch = *needle++;
-		if (!(haystack = strcasechr(haystack, nch)))
+		if (!(haystack = strcasechr(haystack, nch)) || haystack >= escape_key)
 			return 0;
 
 		haystack++;
 	}
+
 	return 1;
 }
 #undef KEY_ESC
