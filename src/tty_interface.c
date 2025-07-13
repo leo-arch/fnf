@@ -144,33 +144,30 @@ static char *
 decolor_name(const char *name)
 {
 	if (!name)
-		return (char *)NULL;
+		return NULL;
 
-	/* A buffer big enough to hold decolored entries */
 	static char buf[PATH_MAX + 1];
-	*buf = '\0';
-	char *p = buf, *q = buf;
+	char *p = buf;
 
-	size_t i, j = 0;
+	size_t i = 0;
 	const size_t name_len = strlen(name);
-	for (i = 0; name[i] && i < name_len; i++) {
-		if (name[i] == KEY_ESC && name[i + 1] == '[') {
-			for (j = i + 1; name[j]; j++) {
-				if (name[j] != 'm')
-					continue;
-				i = j + (name[j + 1] != KEY_ESC);
-				break;
-			}
-		}
 
-		if (i == j) /* We have another escape code */
-			continue;
-		*p = name[i];
-		p++;
+	while (i < name_len) {
+		if (name[i] == KEY_ESC && name[i + 1] == '[') {
+			/* Skip the escape sequence */
+			while (i < name_len && name[i] != 'm')
+				i++;
+
+			/* Move past the 'm' */
+			if (i < name_len)
+				i++;
+		} else {
+			*p++ = name[i++];
+		}
 	}
 
 	*p = '\0';
-	return *q ? q : (char *)NULL;
+	return (p == buf) ? NULL : buf;
 }
 
 /* Save the string P into the selections array. */
@@ -446,8 +443,8 @@ draw(tty_interface_t *state)
 			options->prompt, state->search, CLEAR_LINE);
 
 		if (options->show_info) {
-			tty_printf(tty, "\n[%lu/%lu]", choices->available, choices->size);
-			tty_clearline(tty);
+			tty_printf(tty, "\n[%lu/%lu]%s", choices->available,
+				choices->size, CLEAR_LINE);
 		}
 	}
 

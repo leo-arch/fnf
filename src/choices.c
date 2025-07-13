@@ -55,8 +55,7 @@ cmpchoice(const void *idx1, const void *idx2)
 	if (a->score == b->score) {
 		/* To ensure a stable sort, we must also sort by the string
 		 * pointers. We can do this since we know all the strings are
-		 * from a contiguous memory segment (buffer in choices_t).
-		 */
+		 * from a contiguous memory segment (buffer in choices_t). */
 		if (a->str < b->str) {
 			return -1;
 		} else {
@@ -89,8 +88,7 @@ choices_fread(choices_t *c, FILE *file, const char input_delimiter)
 
 	/* Resize buffer to at least one byte more capacity than our current
 	 * size. This uses a power of two of INITIAL_BUFFER_CAPACITY.
-	 * This must work even when c->buffer is NULL and c->buffer_size is 0.
-	 */
+	 * This must work even when c->buffer is NULL and c->buffer_size is 0. */
 	size_t capacity = INITIAL_BUFFER_CAPACITY;
 	while (capacity <= c->buffer_size)
 		capacity *= 2;
@@ -106,8 +104,7 @@ choices_fread(choices_t *c, FILE *file, const char input_delimiter)
 	c->buffer[c->buffer_size++] = '\0';
 
 	/* Truncate buffer to used size, (maybe) freeing some memory for
-	 * future allocations.
-	 */
+	 * future allocations. */
 
 	/* Tokenize input and add to choices. */
 	const char *line_end = c->buffer + c->buffer_size;
@@ -341,10 +338,13 @@ choices_search(choices_t *c, const char *search)
 		workers[i].job = job;
 		workers[i].worker_num = i;
 		workers[i].result.size = 0;
-		workers[i].result.list = malloc(c->size * sizeof(struct scored_result)); /* FIXME: This is overkill */
+		/* FIXME: This is overkill */
+		workers[i].result.list = malloc(c->size * sizeof(struct scored_result));
 
-		/* These must be created last-to-first to avoid a race condition when fanning in */
-		if ((errno = pthread_create(&workers[i].thread_id, NULL, &choices_search_worker, &workers[i]))) {
+		/* These must be created last-to-first to avoid a race condition when
+		 * fanning in. */
+		if ((errno = pthread_create(&workers[i].thread_id, NULL,
+		&choices_search_worker, &workers[i]))) {
 			perror("pthread_create");
 			exit(EXIT_FAILURE);
 		}
