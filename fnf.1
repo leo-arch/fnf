@@ -1,4 +1,4 @@
-.TH FNF 1 "Jul 11, 2025" "fnf 0.2.2"
+.TH FNF 1 "Jul 13, 2025" "fnf 0.2.4"
 .SH NAME
 fnf \- A simple fuzzy finder for the terminal.
 .SH SYNOPSIS
@@ -66,6 +66,10 @@ Pointer to highlighted match (default ">")
 Multi-select marker (default "*")
 .
 .TP
+.BR \-\-color=\fICOLORSPEC\fR
+Set custom colors (consult the \fBCOLORS\fR section for more information)
+.
+.TP
 .BR \-\-cycle
 Enable cyclic scrolling
 .
@@ -93,7 +97,7 @@ Run colorless
 .BR \-\-no\-unicode
 Do not use Unicode decorations
 .
-.SH KEYS
+.SH KEY BINDINGS
 .
 .TP
 .BR "ENTER"
@@ -124,7 +128,61 @@ Delete the word before the cursor.
 Delete the entire line.
 .
 .SH COLORS
-Interface colors are read from the environment variable \fBFNF_COLORS\fR using a simple pattern: the \fIorder\fR of the color code specifies which \fIinterface element\fR the color must be applied to, while the \fIcontent\fR of this code defines the \fIcolor\fR of this element.
+Color configuration is made using the \fB--color\fR option, which takes a color string composed of one or more comma- or space-separated fields. Each field is a color definition with this general format: \fBCOLOR_NAME:ANSI_COLOR[:ATTRIBUTE]\fR.
+.sp
+.B COLOR NAMES
+.sp
+Available color names (or interface elements) are:
+.sp
+ \fBprompt\fR   Prompt
+.sp 0
+ \fBpointer\fR  Pointer to the current line
+.sp 0
+ \fBmarker\fR   Multi-selection marker
+.sp 0
+ \fBsel-fg\fR   Selected line foreground
+.sp 0
+ \fBsel-bg\fR   Selected line  background
+.sp 0
+ \fBhl\fR       Highlighted substrings in the selected line
+.sp
+.B ANSI COLORS
+.sp
+Colors are defined either as an ANSI 256 color (\fB0-255\fR) or as a hexadecimal color (\fB#RRGGBB\fR).
+.sp
+.B ATTRIBUTES
+.sp
+A single numbered attribute (\fB0-9\fR) can be added to colors. The meaning of these numbers is this:
+.sp
+ \fB0\fR  Reset all attributes
+.sp 0
+ \fB1\fR  Bold or increased intensity
+.sp 0
+ \fB2\fR  Faint, decreased intensity or dim
+.sp 0
+ \fB3\fR  Italic (Not widely supported)
+.sp 0
+ \fB4\fR  Underline
+.sp 0
+ \fB5\fR  Slow blink
+.sp 0
+ \fB6\fR  Rapid blink
+.sp 0
+ \fB7\fR  Reverse video or invert
+.sp 0
+ \fB8\fR  Conceal or hide (Not widely supported)
+.sp 0
+ \fB9\fR  Crossed-out or strike
+.sp
+.B EXAMPLE
+.sp
+In the line \fB--color="prompt:214:1,pointer:#87d700:2,marker:6,sel-fg:#ffff00"\fR, the prompt is set to bold orange (256-color), the pointer to a dimmed green (hex color), the marker to cyan (256-color), and the foreground color for selected entries to yellow (hex color).
+.sp
+Note that when the color for a name is left unspecified, the default color is used.
+.sp
+.B ENVIRONMENT COLORS
+.sp
+Interface colors can also be set using the environment variable \fBFNF_COLORS\fR, which follows a simple pattern: the \fIorder\fR of the color code specifies which \fIinterface element\fR the color must be applied to, while the \fIcontent\fR of this code defines the \fIcolor\fR of this element.
 .sp
 \fBA\fR. The order is this:
  1) Prompt
@@ -134,7 +192,7 @@ Interface colors are read from the environment variable \fBFNF_COLORS\fR using a
  5) Current entry background
  6) Characters matching query
 .sp
-\fBB\fR. Possible content (available colors):
+\fBB\fR. Possible content (available colors - note that only 4-bit colors are supported):
  0 = black
  1 = red
  2 = green
