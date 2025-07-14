@@ -109,7 +109,7 @@ print_selections(tty_interface_t *state)
 
 		const char *name =
 			(*selections[i] == KEY_ESC || strchr(selections[i], KEY_ESC))
-			? decolor_name(selections[i]) : selections[i];
+			? decolor_name(selections[i], NULL) : selections[i];
 		printf("%s%c", name, end_char);
 	}
 

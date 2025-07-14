@@ -234,8 +234,11 @@ set_colors(tty_interface_t *state)
 		parse_color_line(state->options->color);
 }
 
+/* Remove the initial SGR sequence from NAME and return the resulting string.
+ * If COLOR_BUF is not NULL, the initial SGR sequence is copied into this
+ * buffer, which must be large enough to hold an SGR sequence (MAX_COLOR_LEN). */
 char *
-decolor_name(const char *name)
+decolor_name(const char *name, char *color_buf)
 {
 	if (!name)
 		return NULL;
@@ -245,6 +248,7 @@ decolor_name(const char *name)
 
 	size_t i = 0;
 	const size_t name_len = strlen(name);
+	size_t sgr_end = (size_t)-1;
 
 	while (i < name_len) {
 		if (IS_SGR_START(name + i)) {
@@ -256,12 +260,25 @@ decolor_name(const char *name)
 			if (i < name_len)
 				i++;
 		} else {
+			if (sgr_end == (size_t)-1)
+				sgr_end = i;
 			*p++ = name[i++];
 		}
 	}
 
 	*p = '\0';
-	return (p == buf) ? NULL : buf;
+
+	if (color_buf != NULL) {
+		/* Copy the removed color into the COLOR_BUF buffer. */
+		if (sgr_end > 0 && sgr_end < MAX_COLOR_LEN) {
+			strncpy(color_buf, name, sgr_end);
+			color_buf[sgr_end] = '\0';
+		} else {
+			color_buf[0] = '\0';
+		}
+	}
+
+	return buf;
 }
 
 #define BUF_SIZE 4096
@@ -353,28 +370,3 @@ colorize_no_match(tty_t *tty, const int selected, const char *name)
 	tty_fputs(tty, buf);
 }
 #undef BUF_SIZE
-
-const char *
-get_original_color(const char *name)
-{
-	static char orig_color[MAX_COLOR_LEN + 1];
-	size_t i = 0;
-
-	/* Iterate through the string until we find the ending character ('m')
-	 * of the last contiguous SGR sequence. */
-	while (name[i] != '\0') {
-		if (name[i] == 'm' && name[i + 1] != KEY_ESC) /* Stop copying after 'm' */
-			break;
-		orig_color[i] = name[i];
-		i++;
-	}
-
-	/* If 'm' was found, copy it and null-terminate */
-	if (name[i] == 'm') {
-		orig_color[i] = name[i];
-		orig_color[i + 1] = '\0';
-		return orig_color;
-	}
-
-	return NULL;
-}

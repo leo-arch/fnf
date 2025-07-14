@@ -94,9 +94,6 @@ draw_match(tty_interface_t *state, const char *choice, const int selected)
 	options_t *options = state->options;
 	const char *search = state->last_search;
 
-	static size_t positions[MATCH_MAX_LEN];
-	memset(positions, -1, sizeof(positions));
-
 	static char sel_color[(MAX_COLOR_LEN * 2) + 1] = "";
 	if (!*sel_color) {
 		snprintf(sel_color, sizeof(sel_color), "%s%s",
@@ -104,9 +101,17 @@ draw_match(tty_interface_t *state, const char *choice, const int selected)
 			*colors[SEL_BG_COLOR] ? colors[SEL_BG_COLOR] : "");
 	}
 
+	static char orig_color[MAX_COLOR_LEN + 1];
+	*orig_color = '\0';
 	const char *dchoice = choice;
 	if (*choice == KEY_ESC || strchr(choice, KEY_ESC))
-		dchoice = decolor_name(choice);
+		dchoice = decolor_name(choice, search ? orig_color : NULL);
+
+	static size_t positions[MATCH_MAX_LEN];
+	if (search)
+		memset(positions, -1, sizeof(positions));
+	else
+		positions[0] = (size_t)-1;
 
 	const score_t score = search
 		? match_positions(search, dchoice, &positions[0]) : SCORE_MIN;
@@ -123,8 +128,6 @@ draw_match(tty_interface_t *state, const char *choice, const int selected)
 	if (positions[0] == (size_t)-1) { /* No matching result (or no query). */
 		colorize_no_match(tty, selected, selected == 0 ? choice : dchoice);
 	} else { /* We have matches (and a query). */
-		const char *orig_color = dchoice != choice
-			? get_original_color(choice) : NULL;
 		colorize_match(state, positions, dchoice, selected == 0
 			? orig_color : sel_color);
 	}
@@ -261,7 +264,7 @@ action_emit(tty_interface_t *state)
 
 	if (selection) { /* Output the selected result */
 		const char *p = (*selection == KEY_ESC || strchr(selection, KEY_ESC))
-			? decolor_name(selection) : selection;
+			? decolor_name(selection, NULL) : selection;
 		printf("%s%c", p, state->options->print_null ? '\0' : '\n');
 		state->exit = EXIT_SUCCESS;
 	} else {
