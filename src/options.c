@@ -104,30 +104,30 @@ static struct option longopts[] = {
 void
 options_init(options_t *options)
 {
+	options->auto_lines      = DEFAULT_AUTO_LINES;
+	options->color           = NULL;
+	options->cycle           = DEFAULT_CYCLE;
 	options->filter          = DEFAULT_FILTER;
 	options->init_search     = DEFAULT_INIT_SEARCH;
+	options->input_delimiter = DEFAULT_DELIMITER;
+	options->left_aborts     = DEFAULT_LEFT_ABORTS;
+	options->marker          = DEFAULT_MARKER;
+	options->multi           = DEFAULT_MULTI;
+	options->no_color        = DEFAULT_NO_COLOR;
+	options->num_lines       = DEFAULT_NUM_LINES;
+	options->pad             = DEFAULT_PAD;
+	options->pointer         = DEFAULT_POINTER;
+	options->print_null      = DEFAULT_PRINT_NULL;
+	options->prompt          = DEFAULT_PROMPT;
+	options->reverse         = DEFAULT_REVERSE;
+	options->right_accepts   = DEFAULT_RIGHT_ACCEPTS;
+	options->show_info       = DEFAULT_SHOW_INFO;
 	options->show_scores     = DEFAULT_SCORES;
 	options->scrolloff       = DEFAULT_SCROLLOFF;
-	options->tty_filename    = DEFAULT_TTY;
-	options->num_lines       = DEFAULT_NUM_LINES;
-	options->auto_lines      = DEFAULT_AUTO_LINES;
-	options->prompt          = DEFAULT_PROMPT;
-	options->workers         = DEFAULT_WORKERS;
-	options->input_delimiter = DEFAULT_DELIMITER;
-	options->show_info       = DEFAULT_SHOW_INFO;
-	options->pad             = DEFAULT_PAD;
-	options->multi           = DEFAULT_MULTI;
-	options->pointer         = DEFAULT_POINTER;
-	options->marker          = DEFAULT_MARKER;
-	options->cycle           = DEFAULT_CYCLE;
 	options->tab_accepts     = DEFAULT_TAB_ACCEPTS;
-	options->right_accepts   = DEFAULT_RIGHT_ACCEPTS;
-	options->left_aborts     = DEFAULT_LEFT_ABORTS;
-	options->no_color        = DEFAULT_NO_COLOR;
-	options->reverse         = DEFAULT_REVERSE;
+	options->tty_filename    = DEFAULT_TTY;
 	options->unicode         = DEFAULT_UNICODE;
-	options->print_null      = DEFAULT_PRINT_NULL;
-	options->color           = NULL;
+	options->workers         = DEFAULT_WORKERS;
 }
 
 void
@@ -198,9 +198,7 @@ options_parse(options_t *options, int argc, char *argv[])
 		case 11: options->print_null = 1; break;
 
 		case 'h': /* fallthrough */
-		default:
-			usage(argv[0]);
-			exit(EXIT_SUCCESS);
+		default: usage(argv[0]); exit(EXIT_SUCCESS);
 		}
 	}
 
