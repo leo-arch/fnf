@@ -43,7 +43,6 @@ typedef struct {
 	unsigned int num_lines;
 	unsigned int scrolloff;
 	unsigned int workers;
-	int benchmark;
 	int show_scores;
 	int auto_lines;
 	int show_info;

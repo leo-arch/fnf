@@ -43,19 +43,19 @@ static const char *usage_str =
     "Usage: fnf [OPTION]...\n"
     " -l, --lines=LINES        Specify how many lines of results to show (default 10)\n"
     " -m, --multi              Enable multi-selection\n"
-    " -p, --prompt=PROMPT      Input prompt (default \"> \")\n"
-    " -P, --pad=NUM            Left pad the list of matches NUM places (default 0)\n"
+    " -p, --prompt=PROMPT      Input prompt (default: \"> \")\n"
+    " -P, --pad=NUM            Left pad the list of matches NUM places (default: 0)\n"
     " -q, --query=QUERY        Use QUERY as the initial search string\n"
-    " -e, --show-matches=QUERY Output the sorted matches of QUERY\n"
-    " -t, --tty=TTY            Specify file to use as TTY device (default /dev/tty)\n"
+    " -e, --show-matches=QUERY Display the sorted matches of QUERY and exit\n"
+    " -t, --tty=TTY            Specify file to use as TTY device (default: /dev/tty)\n"
     " -s, --show-scores        Show the scores of each match\n"
     " -0, --read-null          Read input delimited by ASCII NUL characters\n"
     " -j, --workers=NUM        Use NUM workers for searching. (default is # of CPUs)\n"
     " -i, --show-info          Show selection info line\n"
     " -h, --help               Display this help and exit\n"
     " -v, --version            Output version information and exit\n"
-    "     --pointer=STRING     Pointer to highlighted match (default \">\")\n"
-    "     --marker=STRING      Multi-select marker (default \"*\")\n"
+    "     --pointer=STRING     Pointer to highlighted match (default: \">\")\n"
+    "     --marker=STRING      Multi-select marker (default: \"*\")\n"
     "     --cycle              Enable cyclic scrolling\n"
     "     --tab-accepts        TAB accepts\n"
     "     --right-accepts      Right arrow key accepts\n"
@@ -80,7 +80,6 @@ static struct option longopts[] = {
 	{"show-scores", no_argument, NULL, 's'},
 	{"read-null", no_argument, NULL, '0'},
 	{"version", no_argument, NULL, 'v'},
-	{"benchmark", optional_argument, NULL, 'b'},
 	{"workers", required_argument, NULL, 'j'},
 	{"show-info", no_argument, NULL, 'i'},
 	{"help", no_argument, NULL, 'h'},
@@ -99,11 +98,10 @@ static struct option longopts[] = {
 	{NULL, 0, NULL, 0}
 };
 
+/* Set options to default values. */
 void
 options_init(options_t *options)
 {
-	/* Set defaults */
-	options->benchmark       = DEFAULT_BENCHMARK;
 	options->filter          = DEFAULT_FILTER;
 	options->init_search     = DEFAULT_INIT_SEARCH;
 	options->show_scores     = DEFAULT_SCORES;
@@ -139,24 +137,12 @@ options_parse(options_t *options, int argc, char *argv[])
 	int c;
 	while ((c = getopt_long(argc, argv, "mvhs0e:q:l:t:p:P:j:i", longopts, NULL)) != -1) {
 		switch (c) {
-		case 'v':
-			printf("%s\n", VERSION);
-			exit(EXIT_SUCCESS);
+		case 'v': printf("%s\n", VERSION); exit(EXIT_SUCCESS);
 		case 's': options->show_scores = 1;	break;
 		case '0': options->input_delimiter = '\0'; break;
 		case 'm': options->multi = 1; break;
 		case 'q': options->init_search = optarg; break;
 		case 'e': options->filter = optarg; break;
-		case 'b':
-			if (optarg) {
-				if (sscanf(optarg, "%d", &options->benchmark) != 1) {
-					usage(argv[0]);
-					exit(EXIT_FAILURE);
-				}
-			} else {
-				options->benchmark = 100;
-			}
-			break;
 		case 't': options->tty_filename = optarg; break;
 		case 'p': options->prompt = optarg; break;
 		case 'P':

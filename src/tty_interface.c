@@ -125,8 +125,8 @@ draw_match(tty_interface_t *state, const char *choice, const int selected)
 	} else { /* We have matches (and a query). */
 		const char *orig_color = dchoice != choice
 			? get_original_color(choice) : NULL;
-		colorize_match(state, positions, dchoice, selected == 1
-			? sel_color : orig_color);
+		colorize_match(state, positions, dchoice, selected == 0
+			? orig_color : sel_color);
 	}
 
 	tty_setwrap(tty);

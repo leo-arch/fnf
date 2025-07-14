@@ -55,15 +55,7 @@ main(int argc, char *argv[])
 	choices_t choices;
 	choices_init(&choices, &options);
 
-	if (options.benchmark) {
-		if (!options.filter) {
-			fprintf(stderr, "Must specify -e/--show-matches with --benchmark\n");
-			exit(EXIT_FAILURE);
-		}
-		choices_fread(&choices, stdin, options.input_delimiter);
-		for (int i = 0; i < options.benchmark; i++)
-			choices_search(&choices, options.filter);
-	} else if (options.filter) {
+	if (options.filter) {
 		choices_fread(&choices, stdin, options.input_delimiter);
 		choices_search(&choices, options.filter);
 		for (size_t i = 0; i < choices_available(&choices); i++) {
@@ -71,9 +63,7 @@ main(int argc, char *argv[])
 				printf("%f\t", choices_getscore(&choices, i));
 			printf("%s\n", choices_get(&choices, i));
 		}
-	} else {
-		/* interactive */
-
+	} else { /* interactive */
 		if (isatty(STDIN_FILENO))
 			choices_fread(&choices, stdin, options.input_delimiter);
 
