@@ -30,8 +30,7 @@
 #ifndef COLORS_H
 #define COLORS_H
 
-/* Color indices: colors (from FNF_COLORS env var) will be parsed
- * exactly in this order by set_colors(). */
+/* Color indices for the colors array. */
 #define PROMPT_COLOR    0
 #define POINTER_COLOR   1
 #define MARKER_COLOR    2
@@ -48,10 +47,10 @@
 
 #define COLOR_FIELD_SEP ':'
 #define KEY_ESC 27
-#define IS_SGR_CHAR(c)  (((c) >= '0' && (c) <= '9') || (c) == ';' || (c) == '[')
+#define IS_DIGIT(c)     ((c) >= '0' && (c) <= '9')
+#define IS_SGR_CHAR(c)  (IS_DIGIT((c)) || (c) == ';' || (c) == '[')
 #define IS_SGR_START(s) (*(s) == KEY_ESC && (s)[1] == '[')
 #define IS_BG_COLOR(n)  ((n) == SEL_BG_COLOR)
-#define IS_DIGIT(c)     ((c) >= '0' && (c) <= '9')
 
 #include "tty_interface.h"
 

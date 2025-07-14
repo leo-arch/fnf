@@ -54,6 +54,7 @@ static const char *usage_str =
     " -i, --show-info          Show selection info line\n"
     " -h, --help               Display this help and exit\n"
     " -v, --version            Output version information and exit\n"
+    "     --print-null         Print ouput delimited by ASCII NUL characters\n"
     "     --pointer=STRING     Pointer to highlighted match (default: \">\")\n"
     "     --marker=STRING      Multi-select marker (default: \"*\")\n"
     "     --cycle              Enable cyclic scrolling\n"
@@ -95,6 +96,7 @@ static struct option longopts[] = {
 	{"reverse", no_argument, NULL, 8},
 	{"no-unicode", no_argument, NULL, 9},
 	{"color", required_argument, NULL, 10},
+	{"print-null", no_argument, NULL, 11},
 	{NULL, 0, NULL, 0}
 };
 
@@ -124,6 +126,7 @@ options_init(options_t *options)
 	options->no_color        = DEFAULT_NO_COLOR;
 	options->reverse         = DEFAULT_REVERSE;
 	options->unicode         = DEFAULT_UNICODE;
+	options->print_null      = DEFAULT_PRINT_NULL;
 	options->color           = NULL;
 }
 
@@ -192,6 +195,7 @@ options_parse(options_t *options, int argc, char *argv[])
 		case 8:	options->reverse = 1; break;
 		case 9: options->unicode = 0; break;
 		case 10: options->color = optarg; break;
+		case 11: options->print_null = 1; break;
 
 		case 'h': /* fallthrough */
 		default:

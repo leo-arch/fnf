@@ -101,14 +101,16 @@ print_selections(tty_interface_t *state)
 	if (sel_counter == 0 || state->options->multi == 0)
 		return;
 
-	size_t i;
-	for (i = 0; selections[i]; i++) {
+	const char end_char = state->options->print_null ? '\0' : '\n';
+
+	for (size_t i = 0; selections[i]; i++) {
 		if (!*selections[i])
 			continue;
+
 		const char *name =
 			(*selections[i] == KEY_ESC || strchr(selections[i], KEY_ESC))
 			? decolor_name(selections[i]) : selections[i];
-		puts(name);
+		printf("%s%c", name, end_char);
 	}
 
 }

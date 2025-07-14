@@ -51,7 +51,6 @@
 #define DEFAULT_WORKERS 0
 #define DEFAULT_SHOW_INFO 0
 #define DEFAULT_DELIMITER '\n'
-//#define DEFAULT_BENCHMARK 0
 #define DEFAULT_SCORES 0
 #define DEFAULT_SCROLLOFF 0
 #define DEFAULT_FILTER NULL
@@ -69,6 +68,7 @@
 #define DEFAULT_NO_COLOR 0
 #define DEFAULT_REVERSE 0
 #define DEFAULT_UNICODE 1
+#define DEFAULT_PRINT_NULL 0
 #define DEFAULT_COLORS "prompt:6:1,pointer:1:1,marker:2:1,sel-fg:7:1,sel-bg:0,hl:2"
 
 #define VERSION "0.2.4"

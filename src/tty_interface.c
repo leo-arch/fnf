@@ -258,10 +258,11 @@ action_emit(tty_interface_t *state)
 
 	const char *selection =
 		choices_get(state->choices, state->choices->selection);
-	if (selection) { /* output the selected result */
+
+	if (selection) { /* Output the selected result */
 		const char *p = (*selection == KEY_ESC || strchr(selection, KEY_ESC))
 			? decolor_name(selection) : selection;
-		printf("%s\n", p);
+		printf("%s%c", p, state->options->print_null ? '\0' : '\n');
 		state->exit = EXIT_SUCCESS;
 	} else {
 		state->exit = EXIT_FAILURE;
