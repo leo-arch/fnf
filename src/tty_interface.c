@@ -476,40 +476,39 @@ typedef struct {
 #define KEY_CTRL(key) ((const char[]){((key) - ('@')), '\0'})
 
 static const keybinding_t keybindings[] = {
-	   {"\x1b", action_exit},             /* ESC */
-	   {"\x7f", action_del_char},	      /* DEL */
-	   {KEY_CTRL('H'), action_del_char},  /* Backspace (C-H) */
-	   {KEY_CTRL('W'), action_del_word},  /* C-W */
-	   {KEY_CTRL('U'), action_del_all},   /* C-U */
-	   {KEY_CTRL('I'), action_tab},       /* TAB (C-I ) */
-	   {KEY_CTRL('C'), action_exit},	  /* C-C */
-	   {KEY_CTRL('D'), action_exit},	  /* C-D */
-	   {KEY_CTRL('G'), action_exit},	  /* C-G */
-	   {KEY_CTRL('M'), action_emit},	  /* CR */
-	   {KEY_CTRL('P'), action_prev},	  /* C-P */
-	   {KEY_CTRL('N'), action_next},	  /* C-N */
-	   {KEY_CTRL('K'), action_prev},	  /* C-K */
-	   {KEY_CTRL('J'), action_next},	  /* C-J */
-	   {KEY_CTRL('A'), action_beginning}, /* C-A */
-	   {KEY_CTRL('E'), action_end},		  /* C-E */
-
-	   {"\x1bOD", action_left},       /* LEFT */
-	   {"\x1b[D", action_left},       /* LEFT */
-	   {"\x1bOC", action_right},      /* RIGHT */
-	   {"\x1b[C", action_right},      /* RIGHT */
-	   {"\x1b[1~", action_beginning}, /* HOME */
-	   {"\x1b[H", action_beginning},  /* HOME */
-	   {"\x1b[4~", action_end},       /* END */
-	   {"\x1b[F", action_end},        /* END */
-	   {"\x1b[A", action_prev},       /* UP */
-	   {"\x1bOA", action_prev},       /* UP */
-	   {"\x1b[B", action_next},       /* DOWN */
-	   {"\x1bOB", action_next},       /* DOWN */
-	   {"\x1b[5~", action_pageup},
-	   {"\x1b[6~", action_pagedown},
-	   {"\x1b[200~", action_ignore},
-	   {"\x1b[201~", action_ignore},
-	   {NULL, NULL}
+	{"\x1b[B", action_next},           /* DOWN */
+	{"\x1bOB", action_next},           /* DOWN */
+	{"\x1b[A", action_prev},           /* UP */
+	{"\x1bOA", action_prev},           /* UP */
+	{"\x1b", action_exit},             /* ESC */
+	{"\x7f", action_del_char},	       /* DEL */
+	{KEY_CTRL('H'), action_del_char},  /* Backspace (C-H) */
+	{KEY_CTRL('W'), action_del_word},  /* C-W */
+	{KEY_CTRL('U'), action_del_all},   /* C-U */
+	{KEY_CTRL('I'), action_tab},       /* TAB (C-I ) */
+	{KEY_CTRL('C'), action_exit},      /* C-C */
+	{KEY_CTRL('D'), action_exit},      /* C-D */
+	{KEY_CTRL('G'), action_exit},      /* C-G */
+	{KEY_CTRL('M'), action_emit},      /* CR */
+	{KEY_CTRL('P'), action_prev},      /* C-P */
+	{KEY_CTRL('N'), action_next},      /* C-N */
+	{KEY_CTRL('K'), action_prev},      /* C-K */
+	{KEY_CTRL('J'), action_next},      /* C-J */
+	{KEY_CTRL('A'), action_beginning}, /* C-A */
+	{KEY_CTRL('E'), action_end},   	   /* C-E */
+	{"\x1bOD", action_left},           /* LEFT */
+	{"\x1b[D", action_left},           /* LEFT */
+	{"\x1bOC", action_right},          /* RIGHT */
+	{"\x1b[C", action_right},          /* RIGHT */
+	{"\x1b[1~", action_beginning},     /* HOME */
+	{"\x1b[H", action_beginning},      /* HOME */
+	{"\x1b[4~", action_end},           /* END */
+	{"\x1b[F", action_end},            /* END */
+	{"\x1b[5~", action_pageup},
+	{"\x1b[6~", action_pagedown},
+	{"\x1b[200~", action_ignore},
+	{"\x1b[201~", action_ignore},
+	{NULL, NULL}
 };
 #undef KEY_CTRL
 
@@ -532,6 +531,7 @@ handle_input(tty_interface_t *state, const char *s,
 		if (*input != *keybindings[i].key || (input_len > 1
 		&& input[1] != keybindings[i].key[1]))
 			continue;
+
 		if (strcmp(input, keybindings[i].key) == 0)
 			found_keybinding = i;
 		else if (strncmp(input, keybindings[i].key, input_len) == 0)
@@ -545,16 +545,11 @@ handle_input(tty_interface_t *state, const char *s,
 		return;
 	}
 
-	/* We could have a complete keybinding, or could be in the middle of one.
-	 * We'll need to wait a few milliseconds to find out. */
-	if (found_keybinding != -1 && in_middle == 1) {
+	/* Wait for more if we are in the middle of a keybinding. */
+	if (in_middle == 1) {
 		state->ambiguous_key_pending = 1;
 		return;
 	}
-
-	/* Wait for more if we are in the middle of a keybinding. */
-	if (in_middle == 1)
-		return;
 
 	/* No matching keybinding, add to search.
 	 * Exclude input starting with non-printing char, mostly keybindings,
@@ -595,6 +590,9 @@ tty_interface_run(tty_interface_t *state)
 			curr_char[0] = tty_getchar(state->tty);
 			handle_input(state, curr_char, 0);
 
+			if (state->ambiguous_key_pending == 1)
+				continue;
+
 			if (state->exit >= 0) {
 				free_selections(state);
 				return state->exit;
@@ -605,11 +603,12 @@ tty_interface_run(tty_interface_t *state)
 				tty_printf(state->tty, "\x1b[?25l\x1b[%dA\n",
 					state->options->num_lines + 1);
 			}
+
 			draw(state);
 		} while (tty_input_ready(state->tty,
 			state->ambiguous_key_pending ? KEYTIMEOUT : 0, 0));
 
-		if (state->ambiguous_key_pending) {
+		if (state->ambiguous_key_pending == 1) {
 			handle_input(state, "", 1);
 
 			if (state->exit >= 0) {
