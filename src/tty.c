@@ -137,7 +137,7 @@ tty_getchar(tty_t *tty)
 }
 
 int
-tty_input_ready(tty_t *tty, long int timeout, int return_on_signal)
+tty_input_ready(tty_t *tty, const long int timeout, const int return_on_signal)
 {
 	fd_set readfs;
 	FD_ZERO(&readfs);

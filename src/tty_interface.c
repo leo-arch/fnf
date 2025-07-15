@@ -124,8 +124,6 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 			tty_printf(tty, "(%5.2f) ", score);
 	}
 
-	tty_setnowrap(tty);
-
 	if (positions[0] == (size_t)-1) { /* No matching result (or no query). */
 		colorize_no_match(tty, selected, selected == 0
 			? choice : dchoice, pointer);
@@ -134,7 +132,6 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 			? orig_color : sel_color, pointer);
 	}
 
-	tty_setwrap(tty);
 	tty_setnormal(tty);
 }
 
@@ -155,6 +152,9 @@ draw(tty_interface_t *state)
 			start = available - num_lines;
 	}
 
+	tty_hide_cursor(tty);
+	tty_setnowrap(tty);
+
 	if (options->reverse == 0) {
 		/* Set column, print prompt, and clear line. */
 		tty_printf(tty, "\x1b[%dG%s%s%s", options->pad + 1,
@@ -166,8 +166,6 @@ draw(tty_interface_t *state)
 		}
 	}
 
-	tty_hide_cursor(tty);
-
 	const int options_multi = options->multi;
 	const int options_pad = options->pad;
 	const int options_reverse = options->reverse;
@@ -175,7 +173,7 @@ draw(tty_interface_t *state)
 	const char *options_marker = options->marker;
 
 	for (size_t i = start; i < start + num_lines; i++) {
-		fprintf(tty->fout, "%s%s", options_reverse == 0 ? "\n" : "", CLEAR_LINE);
+		tty_printf(tty, "%s%s", options_reverse == 0 ? "\n" : "", CLEAR_LINE);
 
 		const char *choice = choices_get(choices, i);
 		if (choice) {
@@ -186,6 +184,7 @@ draw(tty_interface_t *state)
 				i == choices->selection ? options_pointer : " ",
 				colors[MARKER_COLOR],
 				multi_sel == 1 ? options_marker : " ", RESET_ATTR);
+
 			draw_match(state, choice, i == choices->selection, pointer);
 		}
 
@@ -207,12 +206,13 @@ draw(tty_interface_t *state)
 	input_buf[l] = '\0';
 
 	const size_t search_len = i;
-	tty_printf(tty, "\x1b[%dG%s%s%s%s%s%s", options->pad + 1,
-		colors[PROMPT_COLOR], options->prompt, RESET_ATTR,
-		input_buf, UNHIDE_CURSOR,
+	tty_printf(tty, "\x1b[%dG%s%s%s%s%s", options->pad + 1,
+		colors[PROMPT_COLOR], options->prompt, RESET_ATTR, input_buf,
 		(options->reverse == 1 && state->cursor >= search_len)
 		? CLEAR_LINE : "");
 
+	tty_setwrap(tty);
+	tty_unhide_cursor(tty);
 	tty_flush(tty);
 }
 
@@ -229,8 +229,11 @@ update_state(tty_interface_t *state)
 	if (*state->last_search != *state->search
 	|| strcmp(state->last_search, state->search) != 0) {
 		update_search(state);
-		if (state->options->reverse == 1)
-			tty_printf(state->tty, "\x1b[%dA\n", state->options->num_lines + 1);
+		if (state->options->reverse == 1) {
+			/* Hide cursor and move it up. */
+			tty_printf(state->tty, "\x1b[?25l\x1b[%dA\n",
+				state->options->num_lines + 1);
+		}
 		draw(state);
 	}
 }
@@ -241,6 +244,7 @@ action_emit(tty_interface_t *state)
 	update_state(state);
 
 	if (state->options->reverse == 1)
+		/* Move the cursor up and clear. */
 		tty_printf(state->tty, "\x1b[%dA\x1b[J", state->options->num_lines);
 
 	if (state->options->multi == 1 && seln > 0) {
@@ -314,18 +318,19 @@ action_del_all(tty_interface_t *state)
 }
 
 static void
+action_ignore(tty_interface_t *state)
+{
+	(void)state;
+}
+
+static void
 action_prev(tty_interface_t *state)
 {
 	if (state->options->cycle == 0 && state->choices->selection == 0)
 		return;
+
 	update_state(state);
 	choices_prev(state->choices);
-}
-
-static void
-action_ignore(tty_interface_t *state)
-{
-	(void)state;
 }
 
 static void
@@ -334,6 +339,7 @@ action_next(tty_interface_t *state)
 	if (state->options->cycle == 0
 	&& state->choices->selection + 1 >= state->choices->available)
 		return;
+
 	update_state(state);
 	choices_next(state->choices);
 }
@@ -342,6 +348,7 @@ static void
 action_exit(tty_interface_t *state)
 {
 	if (state->options->reverse == 1)
+		/* Move the cursor up and clear. */
 		tty_printf(state->tty, "\x1b[%dA\x1b[J", state->options->num_lines);
 
 	clear(state);
@@ -593,8 +600,11 @@ tty_interface_run(tty_interface_t *state)
 				return state->exit;
 			}
 
-			if (state->options->reverse == 1)
-				tty_printf(state->tty, "\x1b[%dA\n", state->options->num_lines + 1);
+			if (state->options->reverse == 1) {
+				/* Hide cursor and move it up. */
+				tty_printf(state->tty, "\x1b[?25l\x1b[%dA\n",
+					state->options->num_lines + 1);
+			}
 			draw(state);
 		} while (tty_input_ready(state->tty,
 			state->ambiguous_key_pending ? KEYTIMEOUT : 0, 0));
