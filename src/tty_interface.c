@@ -196,9 +196,6 @@ draw(tty_interface_t *state)
 	if (options->reverse == 0 && num_lines + options->show_info)
 		tty_moveup(tty, num_lines + options->show_info);
 
-	tty_printf(tty, "\x1b[%dG%s%s%s", options->pad + 1,
-		colors[PROMPT_COLOR], options->prompt, RESET_ATTR);
-
 	static char input_buf[SEARCH_SIZE_MAX + 1];
 	*input_buf = '\0';
 	size_t i, l = 0;
@@ -208,13 +205,13 @@ draw(tty_interface_t *state)
 	}
 
 	input_buf[l] = '\0';
-	tty_fputs(tty, input_buf);
-
-	tty_unhide_cursor(tty);
 
 	const size_t search_len = i;
-	if (options->reverse == 1 && state->cursor >= search_len)
-		tty_clearline(tty);
+	tty_printf(tty, "\x1b[%dG%s%s%s%s%s%s", options->pad + 1,
+		colors[PROMPT_COLOR], options->prompt, RESET_ATTR,
+		input_buf, UNHIDE_CURSOR,
+		(options->reverse == 1 && state->cursor >= search_len)
+		? CLEAR_LINE : "");
 
 	tty_flush(tty);
 }

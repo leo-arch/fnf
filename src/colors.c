@@ -296,8 +296,6 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 
 	*buf = '\0';
 
-	l += snprintf(buf + l, BUF_SIZE - l, "%s", pointer);
-
 	if (positions[p] != 0) {
 		/* If the first character is not a match, set the original color */
 		if (no_color == 1 || !orig_color || !*orig_color)
@@ -339,7 +337,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 	}
 
 	buf[l] = '\0';
-	tty_fputs(tty, buf);
+	tty_printf(tty, "%s%s", pointer, buf);
 }
 
 void
@@ -355,8 +353,6 @@ colorize_no_match(tty_t *tty, const int selected, const char *name,
 	*buf = '\0';
 	size_t l = 0;
 
-	l += snprintf(buf + l, BUF_SIZE - l, "%s", pointer);
-
 	/* If selected, handle colors */
 	if (*colors[SEL_FG_COLOR] || *colors[SEL_BG_COLOR]) {
 		if (*colors[SEL_FG_COLOR])
@@ -371,6 +367,6 @@ colorize_no_match(tty_t *tty, const int selected, const char *name,
 	l += snprintf(buf + l, BUF_SIZE - l, "%s", name);
 	buf[l] = '\0';
 
-	tty_fputs(tty, buf);
+	tty_printf(tty, "%s%s", pointer, buf);
 }
 #undef BUF_SIZE
