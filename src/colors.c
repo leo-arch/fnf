@@ -284,7 +284,8 @@ decolor_name(const char *name, char *color_buf)
 #define BUF_SIZE 4096
 void
 colorize_match(const tty_interface_t *state, const size_t *positions,
-	const char *name, const char *orig_color, const char *pointer)
+	const char *name, const char *orig_color, const char *pointer,
+	const int selected)
 {
 	tty_t *tty = state->tty;
 	const int no_color = state->options->no_color;
@@ -302,6 +303,8 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 			l += snprintf(buf + l, BUF_SIZE - l, RESET_ATTR);
 		else
 			l += snprintf(buf + l, BUF_SIZE - l, "%s", orig_color);
+	} else if (selected == 1) {
+		l += snprintf(buf + l, BUF_SIZE - l, "%s", colors[SEL_BG_COLOR]);
 	}
 
 	for (size_t i = 0; name[i]; i++) {

@@ -129,7 +129,7 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 			? choice : dchoice, pointer);
 	} else { /* We have matches (and a query). */
 		colorize_match(state, positions, dchoice, selected == 0
-			? orig_color : sel_color, pointer);
+			? orig_color : sel_color, pointer, selected);
 	}
 
 	tty_setnormal(tty);
