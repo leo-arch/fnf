@@ -69,7 +69,7 @@
 #define DEFAULT_REVERSE 0
 #define DEFAULT_UNICODE 1
 #define DEFAULT_PRINT_NULL 0
-#define DEFAULT_COLORS "prompt:6:1,pointer:1:1,marker:2:1,sel-fg:7:1,sel-bg:0,hl:2"
+#define DEFAULT_COLORS "prompt:6:1,pointer:1:1,marker:2:1,sel-fg:7:1,sel-bg:236,hl:2"
 
 #define VERSION "0.2.4"
 
