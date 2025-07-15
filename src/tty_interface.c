@@ -88,7 +88,8 @@ clear(const tty_interface_t *state)
 }
 
 static void
-draw_match(tty_interface_t *state, const char *choice, const int selected)
+draw_match(tty_interface_t *state, const char *choice, const int selected,
+	const char *pointer)
 {
 	tty_t *tty = state->tty;
 	options_t *options = state->options;
@@ -107,14 +108,14 @@ draw_match(tty_interface_t *state, const char *choice, const int selected)
 	if (*choice == KEY_ESC || strchr(choice, KEY_ESC))
 		dchoice = decolor_name(choice, search ? orig_color : NULL);
 
+	score_t score = SCORE_MIN;
 	static size_t positions[MATCH_MAX_LEN];
-	if (search)
+	if (search) {
 		memset(positions, -1, sizeof(positions));
-	else
+		score = match_positions(search, dchoice, &positions[0]);
+	} else {
 		positions[0] = (size_t)-1;
-
-	const score_t score = search
-		? match_positions(search, dchoice, &positions[0]) : SCORE_MIN;
+	}
 
 	if (options->show_scores) {
 		if (score == SCORE_MIN)
@@ -126,10 +127,11 @@ draw_match(tty_interface_t *state, const char *choice, const int selected)
 	tty_setnowrap(tty);
 
 	if (positions[0] == (size_t)-1) { /* No matching result (or no query). */
-		colorize_no_match(tty, selected, selected == 0 ? choice : dchoice);
+		colorize_no_match(tty, selected, selected == 0
+			? choice : dchoice, pointer);
 	} else { /* We have matches (and a query). */
 		colorize_match(state, positions, dchoice, selected == 0
-			? orig_color : sel_color);
+			? orig_color : sel_color, pointer);
 	}
 
 	tty_setwrap(tty);
@@ -178,12 +180,13 @@ draw(tty_interface_t *state)
 		const char *choice = choices_get(choices, i);
 		if (choice) {
 			const int multi_sel = (options_multi == 1 && is_selected(choice));
-			tty_printf(tty, "%*s%s%s%s%s%s",
+			static char pointer[256];
+			snprintf(pointer, sizeof(pointer), "%*s%s%s%s%s%s",
 				options_pad, "", colors[POINTER_COLOR],
 				i == choices->selection ? options_pointer : " ",
 				colors[MARKER_COLOR],
 				multi_sel == 1 ? options_marker : " ", RESET_ATTR);
-			draw_match(state, choice, i == choices->selection);
+			draw_match(state, choice, i == choices->selection, pointer);
 		}
 
 		if (options_reverse == 1)

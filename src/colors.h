@@ -58,8 +58,8 @@ extern char colors[COLOR_ITEMS_NUM][MAX_COLOR_LEN];
 
 char *decolor_name(const char *name, char *color);
 void colorize_match(const tty_interface_t *state, const size_t *positions,
-	const char *name, const char *orig_color);
-void colorize_no_match(tty_t *tty, const int selected, const char *name);
+	const char *name, const char *orig_color, const char *pointer);
+void colorize_no_match(tty_t *tty, const int selected, const char *name, const char *pointer);
 void set_colors(tty_interface_t *state);
 
 #endif /* COLORS_H */
