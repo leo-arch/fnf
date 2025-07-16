@@ -176,7 +176,7 @@ draw(tty_interface_t *state)
 			tty_putc(tty, '\n');
 	}
 
-	if (options_reverse == 0 && num_lines + options->show_info)
+	if (options_reverse == 0 && (num_lines + options->show_info) > 0)
 		tty_moveup(tty, num_lines + options->show_info);
 
 	if (options_reverse == 1 && options_show_info == 1)
@@ -248,10 +248,11 @@ action_emit(tty_interface_t *state)
 {
 	update_state(state);
 
-	if (state->options->reverse == 1)
+	if (state->options->reverse == 1) {
 		/* Move the cursor up and clear. */
 		tty_printf(state->tty, "\x1b[%dA\x1b[J",
 			state->options->num_lines + state->options->show_info);
+	}
 
 	if (state->options->multi == 1 && seln > 0) {
 		clear(state);
@@ -287,12 +288,13 @@ action_del_char(tty_interface_t *state)
 {
 	if (state->cursor == 0)
 		return;
+
 	const size_t length = strlen(state->search);
 	const size_t original_cursor = state->cursor;
 
 	do {
 		state->cursor--;
-	} while (!is_boundary(state->search[state->cursor]) && state->cursor);
+	} while (state->cursor > 0 && !is_boundary(state->search[state->cursor]));
 
 	memmove(&state->search[state->cursor], &state->search[original_cursor],
 		length - original_cursor + 1);
@@ -353,10 +355,11 @@ action_next(tty_interface_t *state)
 static void
 action_exit(tty_interface_t *state)
 {
-	if (state->options->reverse == 1)
+	if (state->options->reverse == 1) {
 		/* Move the cursor up and clear. */
 		tty_printf(state->tty, "\x1b[%dA\x1b[J",
 			state->options->num_lines + state->options->show_info);
+	}
 
 	clear(state);
 	tty_close(state->tty);
@@ -374,7 +377,7 @@ action_left(tty_interface_t *state)
 
 	if (state->cursor > 0) {
 		state->cursor--;
-		while (!is_boundary(state->search[state->cursor]) && state->cursor)
+		while (state->cursor > 0 && !is_boundary(state->search[state->cursor]))
 			state->cursor--;
 	}
 }
@@ -410,8 +413,11 @@ static void
 action_pageup(tty_interface_t *state)
 {
 	update_state(state);
-	for (size_t i = 0; i < state->options->num_lines
-	&& state->choices->selection > 0; i++)
+
+	const unsigned int num_lines = state->options->num_lines;
+	const size_t selection = state->choices->selection;
+
+	for (size_t i = 0; i < num_lines && selection > 0; i++)
 		choices_prev(state->choices);
 }
 
@@ -419,8 +425,12 @@ static void
 action_pagedown(tty_interface_t *state)
 {
 	update_state(state);
-	for (size_t i = 0; i < state->options->num_lines
-	&& state->choices->selection < state->choices->available - 1; i++)
+
+	const unsigned int num_lines = state->options->num_lines;
+	const size_t selection = state->choices->selection;
+	const size_t available = state->choices->available;
+
+	for (size_t i = 0; i < num_lines && selection < available - 1; i++)
 		choices_next(state->choices);
 }
 
