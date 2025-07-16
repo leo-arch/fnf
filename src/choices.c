@@ -56,11 +56,10 @@ cmpchoice(const void *idx1, const void *idx2)
 		/* To ensure a stable sort, we must also sort by the string
 		 * pointers. We can do this since we know all the strings are
 		 * from a contiguous memory segment (buffer in choices_t). */
-		if (a->str < b->str) {
+		if (a->str < b->str)
 			return -1;
-		} else {
+		else
 			return 1;
-		}
 	} else if (a->score < b->score) {
 		return 1;
 	} else {
@@ -73,7 +72,7 @@ safe_realloc(void *buffer, const size_t size)
 {
 	buffer = realloc(buffer, size);
 	if (!buffer) {
-		fprintf(stderr, "Error: Can't allocate memory (%zu bytes)\n", size);
+		fprintf(stderr, "Error: Cannot allocate memory (%zu bytes)\n", size);
 		abort();
 	}
 
@@ -238,7 +237,7 @@ merge2(struct result_list list1, struct result_list list2)
 	result.size = list1.size + list2.size;
 	result.list = malloc(result.size * sizeof(struct scored_result));
 	if (!result.list) {
-		fprintf(stderr, "Error: Can't allocate memory\n");
+		fprintf(stderr, "Error: Cannot allocate memory\n");
 		abort();
 	}
 
@@ -316,7 +315,7 @@ choices_search(choices_t *c, const char *search)
 
 	struct search_job *job = calloc(1, sizeof(struct search_job));
 	if (!job) {
-		fprintf(stderr, "Error: Can't allocate memory\n");
+		fprintf(stderr, "Error: Cannot allocate memory\n");
 		abort();
 	}
 
@@ -329,7 +328,7 @@ choices_search(choices_t *c, const char *search)
 
 	job->workers = calloc(c->worker_count, sizeof(struct worker));
 	if (!job->workers) {
-		fprintf(stderr, "Error: Can't allocate memory\n");
+		fprintf(stderr, "Error: Cannot allocate memory\n");
 		abort();
 	}
 

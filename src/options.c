@@ -41,16 +41,16 @@
 static const char *usage_str =
     ""
     "Usage: fnf [OPTION]...\n"
-    " -l, --lines=LINES        Specify how many lines of results to show (default 10)\n"
+    " -l, --lines=LINES        Specify how many lines of results to show (default: 10)\n"
     " -m, --multi              Enable multi-selection\n"
     " -p, --prompt=PROMPT      Input prompt (default: \"> \")\n"
     " -P, --pad=NUM            Left pad the list of matches NUM places (default: 0)\n"
     " -q, --query=QUERY        Use QUERY as the initial search string\n"
     " -e, --show-matches=QUERY Display the sorted matches of QUERY and exit\n"
-    " -t, --tty=TTY            Specify file to use as TTY device (default: /dev/tty)\n"
+    " -t, --tty=TTY            Specify the file to use as TTY device (default: /dev/tty)\n"
     " -s, --show-scores        Show the scores of each match\n"
     " -0, --read-null          Read input delimited by ASCII NUL characters\n"
-    " -j, --workers=NUM        Use NUM workers for searching. (default is # of CPUs)\n"
+    " -j, --workers=NUM        Use NUM workers for searching. (default: # of CPUs)\n"
     " -i, --show-info          Show selection info line\n"
     " -h, --help               Display this help and exit\n"
     " -v, --version            Output version information and exit\n"
@@ -64,7 +64,7 @@ static const char *usage_str =
     "     --reverse            Display from top, prompt at bottom\n"
     "     --no-unicode         Do not use Unicode decorations\n"
     "     --color=COLORSPEC    Set custom colors (consult the manpage)\n"
-    "     --no-color           Run colorless\n";
+    "     --no-color           Disable colors\n";
 
 static void
 usage(const char *argv0)
@@ -139,7 +139,8 @@ options_parse(options_t *options, int argc, char *argv[])
 	int marker_set = 0;
 
 	int c;
-	while ((c = getopt_long(argc, argv, "mvhs0e:q:l:t:p:P:j:i", longopts, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "mvhs0e:q:l:t:p:P:j:i",
+	longopts, NULL)) != -1) {
 		switch (c) {
 		case 'v': printf("%s\n", VERSION); exit(EXIT_SUCCESS);
 		case 's': options->show_scores = 1;	break;
