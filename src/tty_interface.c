@@ -125,9 +125,9 @@ draw(tty_interface_t *state)
 	options_t *options = state->options;
 
 	const unsigned int num_lines = options->num_lines;
+	const size_t current_selection = choices->selection;
 	size_t start = 0;
 
-	const size_t current_selection = choices->selection;
 	if (current_selection + options->scrolloff >= num_lines) {
 		start = current_selection + options->scrolloff - num_lines + 1;
 		const size_t available = choices_available(choices);
@@ -135,25 +135,26 @@ draw(tty_interface_t *state)
 			start = available - num_lines;
 	}
 
+	const int options_multi = options->multi;
+	const int options_pad = options->pad;
+	const int options_reverse = options->reverse;
+	const int options_show_info = options->show_info;
+	const char *options_pointer = options->pointer;
+	const char *options_marker = options->marker;
+
 	tty_hide_cursor(tty);
 	tty_setnowrap(tty);
 
-	if (options->reverse == 0) {
+	if (options_reverse == 0) {
 		/* Set column, print prompt, and clear line. */
-		tty_printf(tty, "\x1b[%dG%s%s%s", options->pad + 1,
+		tty_printf(tty, "\x1b[%dG%s%s%s", options_pad + 1,
 			options->prompt, state->search, CLEAR_LINE);
 
-		if (options->show_info) {
+		if (options_show_info == 1) {
 			tty_printf(tty, "\n[%lu/%lu]%s", choices->available,
 				choices->size, CLEAR_LINE);
 		}
 	}
-
-	const int options_multi = options->multi;
-	const int options_pad = options->pad;
-	const int options_reverse = options->reverse;
-	const char *options_pointer = options->pointer;
-	const char *options_marker = options->marker;
 
 	for (size_t i = start; i < start + num_lines; i++) {
 		tty_printf(tty, "%s%s", options_reverse == 0 ? "\n" : "", CLEAR_LINE);
@@ -175,8 +176,12 @@ draw(tty_interface_t *state)
 			tty_putc(tty, '\n');
 	}
 
-	if (options->reverse == 0 && num_lines + options->show_info)
+	if (options_reverse == 0 && num_lines + options->show_info)
 		tty_moveup(tty, num_lines + options->show_info);
+
+	if (options_reverse == 1 && options_show_info == 1)
+		tty_printf(tty, "\x1b[%dG[%lu/%lu]\n", options_pad + 1,
+			choices->available, choices->size);
 
 	static char input_buf[SEARCH_SIZE_MAX + 1];
 	*input_buf = '\0';
@@ -185,17 +190,12 @@ draw(tty_interface_t *state)
 		if (i < state->cursor)
 			input_buf[l++] = state->search[i];
 	}
-
 	input_buf[l] = '\0';
 
-	if (options->reverse == 1 && options->show_info == 1)
-		tty_printf(tty, "\x1b[%dG[%lu/%lu]\n", options->pad + 1,
-			choices->available, choices->size);
-
 	const size_t search_len = i;
-	tty_printf(tty, "\x1b[%dG%s%s%s%s%s", options->pad + 1,
+	tty_printf(tty, "\x1b[%dG%s%s%s%s%s", options_pad + 1,
 		colors[PROMPT_COLOR], options->prompt, RESET_ATTR, input_buf,
-		(options->reverse == 1 && state->cursor >= search_len)
+		(options_reverse == 1 && state->cursor >= search_len)
 		? CLEAR_LINE : "");
 
 	tty_setwrap(tty);
