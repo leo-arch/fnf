@@ -41,9 +41,6 @@
 #define SCORE_MATCH_CAPITAL 0.7
 #define SCORE_MATCH_DOT 0.6
 
-/* Time (in ms) to wait for additional bytes of an escape sequence */
-//#define KEYTIMEOUT 25
-
 #define DEFAULT_TTY "/dev/tty"
 #define DEFAULT_PROMPT "> "
 #define DEFAULT_NUM_LINES 10

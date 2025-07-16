@@ -97,6 +97,7 @@ static struct option longopts[] = {
 	{"no-unicode", no_argument, NULL, 9},
 	{"color", required_argument, NULL, 10},
 	{"print-null", no_argument, NULL, 11},
+	{"scroll-off", required_argument, NULL, 12},
 	{NULL, 0, NULL, 0}
 };
 
@@ -149,7 +150,7 @@ options_parse(options_t *options, int argc, char *argv[])
 		case 't': options->tty_filename = optarg; break;
 		case 'p': options->prompt = optarg; break;
 		case 'P':
-			if (optarg && *optarg && *optarg >= '0' && *optarg <= '9')
+			if (optarg && *optarg >= '0' && *optarg <= '9')
 				options->pad = atoi(optarg);
 			break;
 		case 'j':
@@ -196,7 +197,10 @@ options_parse(options_t *options, int argc, char *argv[])
 		case 9: options->unicode = 0; break;
 		case 10: options->color = optarg; break;
 		case 11: options->print_null = 1; break;
-
+		case 12:
+			if (optarg && *optarg >= '0' && *optarg <= '9')
+				options->scrolloff = atoi(optarg);
+			break;
 		case 'h': /* fallthrough */
 		default: usage(argv[0]); exit(EXIT_SUCCESS);
 		}

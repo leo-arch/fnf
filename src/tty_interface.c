@@ -40,24 +40,6 @@
 #include "tty_interface.h"
 #include "selections.h"
 
-/* Select the currently highighted/hovered entry if not already selected.
- * Otherwise, remove it from the selections list. */
-static int
-action_select(tty_interface_t *state)
-{
-	const char *p = choices_get(state->choices, state->choices->selection);
-	if (!p)
-		return EXIT_FAILURE;
-
-	if (is_selected(p) == 1) {
-		deselect_entry(p);
-		return EXIT_FAILURE;
-	}
-
-	save_selection(p);
-	return EXIT_SUCCESS;
-}
-
 static int
 isprint_unicode(char c)
 {
@@ -144,6 +126,7 @@ draw(tty_interface_t *state)
 
 	const unsigned int num_lines = options->num_lines;
 	size_t start = 0;
+
 	const size_t current_selection = choices->selection;
 	if (current_selection + options->scrolloff >= num_lines) {
 		start = current_selection + options->scrolloff - num_lines + 1;
@@ -205,6 +188,10 @@ draw(tty_interface_t *state)
 
 	input_buf[l] = '\0';
 
+	if (options->reverse == 1 && options->show_info == 1)
+		tty_printf(tty, "\x1b[%dG[%lu/%lu]\n", options->pad + 1,
+			choices->available, choices->size);
+
 	const size_t search_len = i;
 	tty_printf(tty, "\x1b[%dG%s%s%s%s%s", options->pad + 1,
 		colors[PROMPT_COLOR], options->prompt, RESET_ATTR, input_buf,
@@ -232,10 +219,28 @@ update_state(tty_interface_t *state)
 		if (state->options->reverse == 1) {
 			/* Hide cursor and move it up. */
 			tty_printf(state->tty, "\x1b[?25l\x1b[%dA\n",
-				state->options->num_lines + 1);
+				state->options->num_lines + 1 + state->options->show_info);
 		}
 		draw(state);
 	}
+}
+
+/* Select the currently highighted/hovered entry if not already selected.
+ * Otherwise, remove it from the selections list. */
+static int
+action_select(tty_interface_t *state)
+{
+	const char *p = choices_get(state->choices, state->choices->selection);
+	if (!p)
+		return EXIT_FAILURE;
+
+	if (is_selected(p) == 1) {
+		deselect_entry(p);
+		return EXIT_FAILURE;
+	}
+
+	save_selection(p);
+	return EXIT_SUCCESS;
 }
 
 static void
@@ -245,7 +250,8 @@ action_emit(tty_interface_t *state)
 
 	if (state->options->reverse == 1)
 		/* Move the cursor up and clear. */
-		tty_printf(state->tty, "\x1b[%dA\x1b[J", state->options->num_lines);
+		tty_printf(state->tty, "\x1b[%dA\x1b[J",
+			state->options->num_lines + state->options->show_info);
 
 	if (state->options->multi == 1 && seln > 0) {
 		clear(state);
@@ -349,7 +355,8 @@ action_exit(tty_interface_t *state)
 {
 	if (state->options->reverse == 1)
 		/* Move the cursor up and clear. */
-		tty_printf(state->tty, "\x1b[%dA\x1b[J", state->options->num_lines);
+		tty_printf(state->tty, "\x1b[%dA\x1b[J",
+			state->options->num_lines + state->options->show_info);
 
 	clear(state);
 	tty_close(state->tty);
@@ -601,7 +608,7 @@ tty_interface_run(tty_interface_t *state)
 			if (state->options->reverse == 1) {
 				/* Hide cursor and move it up. */
 				tty_printf(state->tty, "\x1b[?25l\x1b[%dA\n",
-					state->options->num_lines + 1);
+					state->options->num_lines + 1 + state->options->show_info);
 			}
 
 			draw(state);
