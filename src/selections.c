@@ -33,8 +33,13 @@
 #include "colors.h"
 #include "selections.h"
 
-/* Array to store selected/marked entries */
-static char **selections = (char **)NULL;
+/* Struct to store selected/marked entries */
+struct selections_t {
+	char *name;
+	size_t namelen;
+};
+
+static struct selections_t *selections = (struct selections_t *)NULL;
 
 /* SELN is the current size of the selections array, while SEL_COUNTER
  * is the current number of actually selected entries. */
@@ -49,9 +54,11 @@ is_selected(const char *name)
 	if (!name || !*name || sel_counter == 0)
 		return 0;
 
+	const size_t len = strlen(name);
 	size_t i;
-	for (i = 0; selections[i]; i++) {
-		if (*selections[i] == *name && strcmp(selections[i], name) == 0)
+	for (i = 0; selections[i].name; i++) {
+		if (*selections[i].name == *name && selections[i].namelen == len
+		&& strcmp(selections[i].name, name) == 0)
 			return 1;
 	}
 
@@ -66,11 +73,13 @@ deselect_entry(const char *name)
 	if (!name || !*name || sel_counter == 0)
 		return;
 
+	const size_t len = strlen(name);
 	size_t i;
-	for (i = 0; selections[i]; i++) {
-		if (*selections[i] != *name || strcmp(selections[i], name) != 0)
+	for (i = 0; selections[i].name; i++) {
+		if (*selections[i].name != *name || selections[i].namelen != len
+		|| strcmp(selections[i].name, name) != 0)
 			continue;
-		*selections[i] = '\0';
+		*selections[i].name = '\0';
 		sel_counter--;
 		break;
 	}
@@ -80,18 +89,22 @@ deselect_entry(const char *name)
 void
 save_selection(const char *name)
 {
-	selections = (char **)realloc(selections, (seln + 2) * sizeof(char *));
+	selections = (struct selections_t *)realloc(
+		selections, (seln + 2) * sizeof(struct selections_t));
 	if (!selections)
 		return;
 
-	selections[seln] = (char *)malloc((strlen(name) + 1) * sizeof(char));
-	if (!selections[seln])
+	const size_t len = strlen(name);
+	selections[seln].name = (char *)malloc((len + 1) * sizeof(char));
+	if (!selections[seln].name)
 		return;
 
-	strcpy(selections[seln], name);
+	strcpy(selections[seln].name, name);
+	selections[seln].namelen = len;
 	seln++;
 	sel_counter++;
-	selections[seln] = (char *)NULL;
+	selections[seln].name = (char *)NULL;
+	selections[seln].namelen = 0;
 }
 
 /* Print the list of selected/marked entries to STDOUT. */
@@ -103,13 +116,13 @@ print_selections(tty_interface_t *state)
 
 	const char end_char = state->options->print_null ? '\0' : '\n';
 
-	for (size_t i = 0; selections[i]; i++) {
-		if (!*selections[i])
+	for (size_t i = 0; selections[i].name; i++) {
+		if (!*selections[i].name)
 			continue;
 
 		const char *name =
-			(*selections[i] == KEY_ESC || strchr(selections[i], KEY_ESC))
-			? decolor_name(selections[i], NULL) : selections[i];
+			(*selections[i].name == KEY_ESC || strchr(selections[i].name, KEY_ESC))
+			? decolor_name(selections[i].name, NULL) : selections[i].name;
 		printf("%s%c", name, end_char);
 	}
 
@@ -122,8 +135,8 @@ free_selections(tty_interface_t *state)
 	if (state->options->multi == 0 || seln == 0 || !selections)
 		return;
 
-	for (size_t i = 0; selections[i]; i++)
-		free(selections[i]);
+	for (size_t i = 0; selections[i].name; i++)
+		free(selections[i].name);
 	free(selections);
-	selections = (char **)NULL;
+	selections = (struct selections_t *)NULL;
 }
