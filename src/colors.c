@@ -303,7 +303,9 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 			l += snprintf(buf + l, BUF_SIZE - l, RESET_ATTR);
 		else
 			l += snprintf(buf + l, BUF_SIZE - l, "%s", orig_color);
-	} else if (selected == 1) {
+	} else if (selected == 1 && *colors[SEL_BG_COLOR]) {
+		/* The first character is a match. Let's copy the selection background
+		 * color to extend this color to the first character. */
 		l += snprintf(buf + l, BUF_SIZE - l, "%s", colors[SEL_BG_COLOR]);
 	}
 
@@ -344,10 +346,10 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 }
 
 void
-colorize_no_match(tty_t *tty, const int selected, const char *name,
+colorize_no_match(tty_t *tty, const char *sel_color, const char *name,
 	const char *pointer)
 {
-	if (selected == 0) {
+	if (!sel_color) { /* The entry is not selected */
 		tty_printf(tty, "%s%s", pointer, name);
 		return;
 	}
@@ -356,15 +358,11 @@ colorize_no_match(tty_t *tty, const int selected, const char *name,
 	*buf = '\0';
 	size_t l = 0;
 
-	/* If selected, handle colors */
-	if (*colors[SEL_FG_COLOR] || *colors[SEL_BG_COLOR]) {
-		if (*colors[SEL_FG_COLOR])
-			l += snprintf(buf + l, BUF_SIZE - l, "%s", colors[SEL_FG_COLOR]);
-		if (*colors[SEL_BG_COLOR])
-			l += snprintf(buf + l, BUF_SIZE - l, "%s", colors[SEL_BG_COLOR]);
-	} else { /* If no specific colors, set invert */
+	/* If selected, handle colors. */
+	if (*colors[SEL_FG_COLOR] || *colors[SEL_BG_COLOR])
+		l += snprintf(buf + l, BUF_SIZE - l, "%s", sel_color);
+	else /* If no specific colors, set invert. */
 		l += snprintf(buf + l, BUF_SIZE - l, INVERT);
-	}
 
 	/* Append the choice to the buffer and null-terminate the string. */
 	l += snprintf(buf + l, BUF_SIZE - l, "%s", name);

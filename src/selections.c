@@ -42,7 +42,8 @@ struct selections_t {
 static struct selections_t *selections = (struct selections_t *)NULL;
 
 /* SELN is the current size of the selections array, while SEL_COUNTER
- * is the current number of actually selected entries. */
+ * is the current number of actually selected entries (i.e.
+ * seln - deselected_entries, since deselected entries are nullyfied). */
 size_t seln = 0;
 static size_t sel_counter = 0;
 
@@ -120,9 +121,10 @@ print_selections(tty_interface_t *state)
 		if (!*selections[i].name)
 			continue;
 
-		const char *name =
-			(*selections[i].name == KEY_ESC || strchr(selections[i].name, KEY_ESC))
+		const char *name = (*selections[i].name == KEY_ESC
+			|| strchr(selections[i].name, KEY_ESC))
 			? decolor_name(selections[i].name, NULL) : selections[i].name;
+
 		printf("%s%c", name, end_char);
 	}
 

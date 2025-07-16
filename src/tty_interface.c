@@ -107,8 +107,8 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 	}
 
 	if (positions[0] == (size_t)-1) { /* No matching result (or no query). */
-		colorize_no_match(tty, selected, selected == 0
-			? choice : dchoice, pointer);
+		colorize_no_match(tty, selected == 0 ? NULL : sel_color,
+			selected == 0 ? choice : dchoice, pointer);
 	} else { /* We have matches (and a query). */
 		colorize_match(state, positions, dchoice, selected == 0
 			? orig_color : sel_color, pointer, selected);

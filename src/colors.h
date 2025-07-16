@@ -61,7 +61,7 @@ char *decolor_name(const char *name, char *color);
 void colorize_match(const tty_interface_t *state, const size_t *positions,
 	const char *name, const char *orig_color, const char *pointer,
 	const int selected);
-void colorize_no_match(tty_t *tty, const int selected, const char *name,
+void colorize_no_match(tty_t *tty, const char *sel_color, const char *name,
 	const char *pointer);
 void set_colors(tty_interface_t *state);
 
