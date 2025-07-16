@@ -44,7 +44,7 @@
 char *
 strcasechr(const char *s, char c)
 {
-	const char accept[3] = {c, toupper(c), 0};
+	const char accept[3] = {c, TOUPPER(c), 0};
 	return strpbrk(s, accept);
 }
 
