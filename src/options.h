@@ -30,7 +30,7 @@
 */
 
 #ifndef OPTIONS_H
-#define OPTIONS_H OPTIONS_H
+#define OPTIONS_H
 
 typedef struct {
 	char *color;
@@ -62,4 +62,4 @@ typedef struct {
 void options_init(options_t *options);
 void options_parse(options_t *options, int argc, char *argv[]);
 
-#endif
+#endif /* OPTIONS_H */

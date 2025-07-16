@@ -30,7 +30,7 @@
 */
 
 #ifndef TTY_INTERFACE_H
-#define TTY_INTERFACE_H TTY_INTERFACE_H
+#define TTY_INTERFACE_H
 
 #include "choices.h"
 #include "options.h"
@@ -46,6 +46,9 @@
 #endif /* PATH_MAX */
 
 #define SIG_INTERRUPT 130 /* 128 + SIGINT (usually 2) */
+
+/* Time (in ms) to wait for additional bytes of an escape sequence */
+#define KEYTIMEOUT 25
 
 typedef struct {
 	tty_t *tty;
@@ -66,4 +69,4 @@ void tty_interface_init(tty_interface_t *state, tty_t *tty,
 	choices_t *choices, options_t *options);
 int tty_interface_run(tty_interface_t *state);
 
-#endif
+#endif /* TTY_INTERFACE_H */

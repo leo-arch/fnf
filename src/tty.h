@@ -30,7 +30,7 @@
 */
 
 #ifndef TTY_H
-#define TTY_H TTY_H
+#define TTY_H
 
 #include <termios.h>
 
@@ -92,4 +92,4 @@ void tty_flush(const tty_t *tty);
 
 size_t tty_getheight(const tty_t *tty);
 
-#endif
+#endif /* TTY_H */

@@ -30,7 +30,7 @@
 */
 
 #ifndef CHOICES_H
-#define CHOICES_H CHOICES_H
+#define CHOICES_H
 
 #include <stdio.h>
 
@@ -69,4 +69,4 @@ score_t choices_getscore(const choices_t *c, const size_t n);
 void choices_prev(choices_t *c);
 void choices_next(choices_t *c);
 
-#endif
+#endif /* CHOICES_H */

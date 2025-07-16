@@ -30,7 +30,7 @@
 */
 
 #ifndef BONUS_H
-#define BONUS_H BONUS_H
+#define BONUS_H
 
 #include "config.h"
 
@@ -136,4 +136,4 @@ const size_t bonus_index[256] = {
 
 #define COMPUTE_BONUS(last_ch, ch) (bonus_states[bonus_index[(unsigned char)(ch)]][(unsigned char)(last_ch)])
 
-#endif
+#endif /* BONUS_H */
