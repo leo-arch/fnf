@@ -19,6 +19,9 @@ sudo make install
 
 The `PREFIX` environment variable can be used to specify the install location (the default is `/usr/local`).
 
+> [!NOTE]
+> If not running on Linux, you may need to use `gmake` instead of `make`.
+
 ### Use with [clifm](https://github.com/leo-arch/clifm)
 
 Just run **clifm** as follows:
