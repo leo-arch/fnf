@@ -32,6 +32,8 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
+#define VERSION "0.2.6"
+
 typedef struct {
 	char *color;
 	const char *filter;

@@ -67,6 +67,4 @@
 #define DEFAULT_UNICODE 1
 #define DEFAULT_WORKERS 0
 
-#define VERSION "0.2.6"
-
 #endif /* CONFIG_H */
