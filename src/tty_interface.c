@@ -154,10 +154,14 @@ draw(tty_interface_t *state)
 			tty_printf(tty, "\n[%lu/%lu]%s", choices->available,
 				choices->size, CLEAR_LINE);
 		}
+	} else if (num_lines + 1 + options_show_info >= tty->maxheight) {
+		/* Fix the phantom lines issue present in some terminals. */
+		tty_fputs(tty, "\x1b[A\r\x1b[K");
 	}
 
+	const char *new_line = options_reverse == 0 ? "\n" : "";
 	for (size_t i = start; i < start + num_lines; i++) {
-		tty_printf(tty, "%s%s", options_reverse == 0 ? "\n" : "", CLEAR_LINE);
+		tty_printf(tty, "%s%s", new_line, CLEAR_LINE);
 
 		const char *choice = choices_get(choices, i);
 		if (choice) {
