@@ -27,7 +27,7 @@ Just run **clifm** as follows:
 clifm --fnftab
 ```
 
-**Note**: You need at least **clifm** 1.12.9. If running a previous version use [our old fzy fork](https://github.com/leo-arch/fzy) (the option is named `--fzytab` instead of `--fnftab`).
+**Note**: You need at least **clifm** 1.12.9.
 
 ## Sorting
 
