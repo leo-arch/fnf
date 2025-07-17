@@ -247,15 +247,6 @@ tty_fputs(const tty_t *tty, const char *str)
 }
 
 void
-tty_printf(tty_t *tty, const char *fmt, ...)
-{
-	va_list args;
-	va_start(args, fmt);
-	vfprintf(tty->fout, fmt, args);
-	va_end(args);
-}
-
-void
 tty_putc(const tty_t *tty, const char c)
 {
 	fputc(c, tty->fout);
@@ -283,4 +274,13 @@ size_t
 tty_getheight(const tty_t *tty)
 {
 	return tty->maxheight;
+}
+
+void
+tty_printf(tty_t *tty, const char *fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	vfprintf(tty->fout, fmt, args);
+	va_end(args);
 }

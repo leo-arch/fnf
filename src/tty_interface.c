@@ -159,9 +159,9 @@ draw(tty_interface_t *state)
 		tty_fputs(tty, "\x1b[A\r\x1b[K");
 	}
 
-	const char *new_line = options_reverse == 0 ? "\n" : "";
+	const char *clear_line = options_reverse == 0 ? "\n"CLEAR_LINE : CLEAR_LINE;
 	for (size_t i = start; i < start + num_lines; i++) {
-		tty_printf(tty, "%s%s", new_line, CLEAR_LINE);
+		tty_fputs(tty, clear_line);
 
 		const char *choice = choices_get(choices, i);
 		if (choice) {
@@ -180,8 +180,8 @@ draw(tty_interface_t *state)
 			tty_putc(tty, '\n');
 	}
 
-	if (options_reverse == 0 && (num_lines + options->show_info) > 0)
-		tty_moveup(tty, num_lines + options->show_info);
+	if (options_reverse == 0 && (num_lines + options_show_info) > 0)
+		tty_moveup(tty, num_lines + options_show_info);
 
 	if (options_reverse == 1 && options_show_info == 1)
 		tty_printf(tty, "\x1b[%dG[%lu/%lu]%s\n", options_pad + 1,
