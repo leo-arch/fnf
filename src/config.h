@@ -68,6 +68,6 @@
 #define DEFAULT_PRINT_NULL 0
 #define DEFAULT_COLORS "prompt:6:1,pointer:1:1,marker:2:1,sel-fg:7:1,sel-bg:236,hl:2"
 
-#define VERSION "0.2.5"
+#define VERSION "0.2.6"
 
 #endif /* CONFIG_H */
