@@ -32,6 +32,13 @@
 #ifndef TTY_INTERFACE_H
 #define TTY_INTERFACE_H
 
+#ifdef __linux__
+# include <linux/limits.h>
+#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) \
+|| defined(__DragonFly__) || defined(__APPLE__)
+# include <sys/syslimits.h>
+#endif /* __linux__ */
+
 #include "choices.h"
 #include "options.h"
 #include "tty.h"
