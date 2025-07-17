@@ -41,13 +41,13 @@
 #include "selections.h"
 
 static int
-isprint_unicode(char c)
+isprint_unicode(const char c)
 {
 	return (isprint(c) || c & (1 << 7));
 }
 
 static int
-is_boundary(char c)
+is_boundary(const char c)
 {
 	return (~c & (1 << 7) || c & (1 << 6));
 }
