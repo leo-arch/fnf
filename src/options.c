@@ -105,7 +105,6 @@ static struct option longopts[] = {
 void
 options_init(options_t *options)
 {
-	options->auto_lines      = DEFAULT_AUTO_LINES;
 	options->color           = NULL;
 	options->cycle           = DEFAULT_CYCLE;
 	options->filter          = DEFAULT_FILTER;

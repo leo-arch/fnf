@@ -33,7 +33,7 @@
 #define TTY_INTERFACE_H
 
 #ifdef __linux__
-# include <linux/limits.h>
+# include <linux/limits.h> /* PATH_MAX */
 #elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) \
 || defined(__DragonFly__) || defined(__APPLE__)
 # include <sys/syslimits.h>
@@ -43,7 +43,6 @@
 #include "options.h"
 #include "tty.h"
 
-#define SEARCH_SIZE_MAX 4096
 #ifndef PATH_MAX
 # ifdef __linux__
 #  define PATH_MAX 4096
@@ -52,6 +51,7 @@
 # endif /* __linux__ */
 #endif /* PATH_MAX */
 
+#define SEARCH_SIZE_MAX 4096
 #define SIG_INTERRUPT 130 /* 128 + SIGINT (usually 2) */
 
 /* Time (in ms) to wait for additional bytes of an escape sequence */
