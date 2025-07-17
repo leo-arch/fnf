@@ -184,8 +184,8 @@ draw(tty_interface_t *state)
 		tty_moveup(tty, num_lines + options->show_info);
 
 	if (options_reverse == 1 && options_show_info == 1)
-		tty_printf(tty, "\x1b[%dG[%lu/%lu]\n", options_pad + 1,
-			choices->available, choices->size);
+		tty_printf(tty, "\x1b[%dG[%lu/%lu]%s\n", options_pad + 1,
+			choices->available, choices->size, CLEAR_LINE);
 
 	static char input_buf[SEARCH_SIZE_MAX + 1];
 	*input_buf = '\0';
