@@ -61,15 +61,12 @@ typedef struct {
 	tty_t *tty;
 	choices_t *choices;
 	options_t *options;
-
+	size_t cursor;
+	int ambiguous_key_pending;
+	int exit;
 	char search[SEARCH_SIZE_MAX + 1];
 	char last_search[SEARCH_SIZE_MAX + 1];
-	size_t cursor;
-
-	int ambiguous_key_pending;
 	char input[32]; /* Pending input buffer */
-
-	int exit;
 } tty_interface_t;
 
 void tty_interface_init(tty_interface_t *state, tty_t *tty,

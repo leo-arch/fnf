@@ -44,17 +44,13 @@ struct scored_result {
 
 typedef struct {
 	char *buffer;
-	size_t buffer_size;
-
-	size_t capacity;
-	size_t size;
-
 	const char **strings;
 	struct scored_result *results;
-
+	size_t buffer_size;
+	size_t capacity;
+	size_t size;
 	size_t available;
 	size_t selection;
-
 	unsigned int worker_count;
 } choices_t;
 

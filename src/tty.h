@@ -35,12 +35,12 @@
 #include <termios.h>
 
 typedef struct {
-	int fdin;
-	FILE *fout;
 	struct termios original_termios;
-	int fgcolor;
+	FILE *fout;
 	size_t maxwidth;
 	size_t maxheight;
+	int fgcolor;
+	int fdin;
 } tty_t;
 
 void tty_reset(tty_t *tty);
