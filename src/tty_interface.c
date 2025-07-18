@@ -101,7 +101,7 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 
 	if (options->show_scores) {
 		if (score == SCORE_MIN)
-			tty_printf(tty, "(     ) ");
+			tty_fputs(tty, "(     ) ");
 		else
 			tty_printf(tty, "(%5.2f) ", score);
 	}
@@ -151,7 +151,7 @@ draw(tty_interface_t *state)
 			options->prompt, state->search, CLEAR_LINE);
 
 		if (options_show_info == 1) {
-			tty_printf(tty, "\n[%lu/%lu]%s", choices->available,
+			tty_printf(tty, "\n[%zu/%zu]%s", choices->available,
 				choices->size, CLEAR_LINE);
 		}
 	} else if (num_lines + 1 + options_show_info >= tty->maxheight) {
@@ -184,7 +184,7 @@ draw(tty_interface_t *state)
 		tty_moveup(tty, num_lines + options_show_info);
 
 	if (options_reverse == 1 && options_show_info == 1)
-		tty_printf(tty, "\x1b[%dG[%lu/%lu]%s\n", options_pad + 1,
+		tty_printf(tty, "\x1b[%dG[%zu/%zu]%s\n", options_pad + 1,
 			choices->available, choices->size, CLEAR_LINE);
 
 	static char input_buf[SEARCH_SIZE_MAX + 1];

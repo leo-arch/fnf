@@ -63,7 +63,7 @@ main(int argc, char *argv[])
 				printf("%f\t", choices_getscore(&choices, i));
 			printf("%s\n", choices_get(&choices, i));
 		}
-	} else { /* interactive */
+	} else { /* Interactive */
 		if (isatty(STDIN_FILENO))
 			choices_fread(&choices, stdin, options.input_delimiter);
 
@@ -76,9 +76,7 @@ main(int argc, char *argv[])
 		if (options.num_lines > choices.size)
 			options.num_lines = choices.size;
 
-		int num_lines_adjustment = 1;
-		if (options.show_info)
-			num_lines_adjustment++;
+		const int num_lines_adjustment = 1 + options.show_info;
 
 		if (options.num_lines + num_lines_adjustment > tty_getheight(&tty))
 			options.num_lines = tty_getheight(&tty) - num_lines_adjustment;

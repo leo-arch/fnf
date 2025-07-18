@@ -46,6 +46,26 @@
 /* Initial size of choices array */
 #define INITIAL_CHOICE_CAPACITY 128
 
+struct result_list {
+	struct scored_result *list;
+	size_t size;
+};
+
+struct search_job {
+	pthread_mutex_t lock;
+	choices_t *choices;
+	const char *search;
+	size_t processed;
+	struct worker *workers;
+};
+
+struct worker {
+	pthread_t thread_id;
+	struct search_job *job;
+	unsigned int worker_num;
+	struct result_list result;
+};
+
 static int
 cmpchoice(const void *idx1, const void *idx2)
 {
@@ -191,27 +211,6 @@ choices_available(const choices_t *c)
 }
 
 #define BATCH_SIZE 512
-
-struct result_list {
-	struct scored_result *list;
-	size_t size;
-};
-
-struct search_job {
-	pthread_mutex_t lock;
-	choices_t *choices;
-	const char *search;
-	size_t processed;
-	struct worker *workers;
-};
-
-struct worker {
-	pthread_t thread_id;
-	struct search_job *job;
-	unsigned int worker_num;
-	struct result_list result;
-};
-
 static void
 worker_get_next_batch(struct search_job *job, size_t *start, size_t *end)
 {
@@ -227,6 +226,7 @@ worker_get_next_batch(struct search_job *job, size_t *start, size_t *end)
 
 	pthread_mutex_unlock(&job->lock);
 }
+#undef BATCH_SIZE
 
 static struct result_list
 merge2(struct result_list list1, struct result_list list2)
