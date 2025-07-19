@@ -1,7 +1,7 @@
 # FNF
 A fast, simple fuzzy finder for the terminal.
 
-**Fnf** (short for **fnf's not fzy**) is an enhanced fork of the original [fzy tool](https://github.com/jhawthorn/fzy), which was initially designed to work with the [clifm file manager](https://github.com/leo-arch/clifm). This version introduces several new features, including support for 256 and 24-bit colors, customizable padding, and multi-selection capabilities. For detailed usage instructions and additional information, please refer to the manpage.
+**Fnf** (short for **fnf's not fzy**) is a fork of the original [fzy tool](https://github.com/jhawthorn/fzy), which was initially designed to work with the [clifm file manager](https://github.com/leo-arch/clifm). This version introduces several new features, including support for 256 and 24-bit colors, customizable padding, and multi-selection capabilities. For detailed usage instructions and additional information, please refer to the manpage.
 
 ## Installation
 
