@@ -32,6 +32,10 @@
 
 #include "tty_interface.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern size_t seln;
 
 void deselect_entry(const char *name);
@@ -39,5 +43,10 @@ void free_selections(tty_interface_t *state);
 int  is_selected(const char *name);
 void print_selections(tty_interface_t *state);
 void save_selection(const char *name);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SELECTIONS_H */

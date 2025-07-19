@@ -34,6 +34,10 @@
 
 #include <termios.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
 	struct termios original_termios;
 	FILE *fout;
@@ -89,5 +93,9 @@ void tty_putc(const tty_t *tty, const char c);
 void tty_flush(const tty_t *tty);
 
 size_t tty_getheight(const tty_t *tty);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* TTY_H */

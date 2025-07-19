@@ -99,7 +99,7 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 		positions[0] = (size_t)-1;
 	}
 
-	if (options->show_scores) {
+	if (options->show_scores == 1) {
 		if (score == SCORE_MIN)
 			tty_fputs(tty, "(     ) ");
 		else

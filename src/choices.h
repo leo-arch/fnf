@@ -37,6 +37,10 @@
 #include "match.h"
 #include "options.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct scored_result {
 	score_t score;
 	const char *str;
@@ -64,5 +68,9 @@ const char *choices_get(const choices_t *c, const size_t n);
 score_t choices_getscore(const choices_t *c, const size_t n);
 void choices_prev(choices_t *c);
 void choices_next(choices_t *c);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* CHOICES_H */

@@ -106,7 +106,7 @@ get_rgb(const char *hex, int *attr, int *r, int *g, int *b)
 	return 0;
 }
 
-/* Convert hex color HEX into RGB format (as a color code)
+/* Convert hex color HEX into RGB format (as an SGR escape sequence)
  * One color attribute can be added to the hex color as follows:
  * RRGGBB:[1-9], where 1-9 could be:
  * 1: Bold or increased intensity

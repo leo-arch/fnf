@@ -55,6 +55,10 @@
 
 #include "tty_interface.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern char colors[COLOR_ITEMS_NUM][MAX_COLOR_LEN];
 
 char *decolor_name(const char *name, char *color);
@@ -64,5 +68,9 @@ void colorize_match(const tty_interface_t *state, const size_t *positions,
 void colorize_no_match(tty_t *tty, const char *sel_color, const char *name,
 	const char *pointer);
 void set_colors(tty_interface_t *state);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* COLORS_H */
