@@ -30,7 +30,8 @@ Just run **clifm** as follows:
 clifm --fnftab
 ```
 
-**Note**: You need at least **clifm** 1.12.9.
+> [!NOTE]
+> You need at least **clifm** 1.12.9.
 
 ## Sorting
 
