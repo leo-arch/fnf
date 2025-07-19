@@ -55,7 +55,7 @@ main(int argc, char *argv[])
 	choices_t choices;
 	choices_init(&choices, &options);
 
-	if (options.filter) {
+	if (options.filter) { /* --show-matches */
 		choices_fread(&choices, stdin, options.input_delimiter);
 		choices_search(&choices, options.filter);
 		for (size_t i = 0; i < choices_available(&choices); i++) {

@@ -41,6 +41,7 @@
 #define SCORE_MATCH_SLASH 0.9
 #define SCORE_MATCH_WORD 0.8
 
+#define DEFAULT_AUTO_LINES 0
 #define DEFAULT_COLORS "prompt:6:1,pointer:1:1,marker:2:1,sel-fg:7:1,sel-bg:236,hl:2"
 #define DEFAULT_CYCLE 0
 #define DEFAULT_DELIMITER '\n'

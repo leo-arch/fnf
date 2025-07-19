@@ -105,6 +105,7 @@ static struct option longopts[] = {
 void
 options_init(options_t *options)
 {
+	options->auto_lines      = DEFAULT_AUTO_LINES;
 	options->color           = NULL;
 	options->cycle           = DEFAULT_CYCLE;
 	options->filter          = DEFAULT_FILTER;
@@ -163,9 +164,9 @@ options_parse(options_t *options, int argc, char *argv[])
 			if (!optarg)
 				break;
 			int l;
-			if (!strcmp(optarg, "max")) {
+			if (strcmp(optarg, "max") == 0) {
 				l = INT_MAX;
-			} else if (!strcmp(optarg, "auto")) {
+			} else if (strcmp(optarg, "auto") == 0) {
 				l = 0;
 				options->auto_lines = 1;
 			} else if (sscanf(optarg, "%d", &l) != 1 || l < 2) {
