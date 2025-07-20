@@ -32,7 +32,7 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
-#define VERSION "0.2.6"
+#define VERSION "0.2.7"
 
 #ifdef __cplusplus
 extern "C" {
