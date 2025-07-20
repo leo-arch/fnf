@@ -229,7 +229,7 @@ worker_get_next_batch(struct search_job *job, size_t *start, size_t *end)
 #undef BATCH_SIZE
 
 static struct result_list
-merge2(struct result_list list1, struct result_list list2)
+merge_result(struct result_list list1, struct result_list list2)
 {
 	size_t result_index = 0, index1 = 0, index2 = 0;
 
@@ -302,7 +302,7 @@ choices_search_worker(void *data)
 			exit(EXIT_FAILURE);
 		}
 
-		w->result = merge2(w->result, job->workers[next_worker].result);
+		w->result = merge_result(w->result, job->workers[next_worker].result);
 	}
 
 	return (char *)NULL;
