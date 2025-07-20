@@ -120,8 +120,8 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 static void
 draw(tty_interface_t *state)
 {
-	if (state->no_redraw == 1) {
-		state->no_redraw = 0;
+	if (state->redraw == 0) {
+		state->redraw = 1;
 		return;
 	}
 
@@ -343,7 +343,8 @@ static void
 action_prev(tty_interface_t *state)
 {
 	if (state->options->cycle == 0 && state->choices->selection == 0) {
-		state->no_redraw = 1;
+		if (state->redraw != -1)
+			state->redraw = 0;
 		return;
 	}
 
@@ -356,7 +357,8 @@ action_next(tty_interface_t *state)
 {
 	if (state->options->cycle == 0
 	&& state->choices->selection + 1 >= state->choices->available) {
-		state->no_redraw = 1;
+		if (state->redraw != -1)
+			state->redraw = 0;
 		return;
 	}
 
@@ -451,7 +453,9 @@ action_shift_tab(tty_interface_t *state)
 {
 	if (state->options->multi == 1) {
 		action_select(state);
+		state->redraw = -1; /* We want to redraw even if at the top. */
 		action_prev(state);
+		state->redraw = 1;
 	}
 }
 
@@ -460,7 +464,9 @@ action_tab(tty_interface_t *state)
 {
 	if (state->options->multi == 1) {
 		action_select(state);
+		state->redraw = -1; /* We want to redraw even if at the bottom. */
 		action_next(state);
+		state->redraw = 1;
 		return;
 	}
 
@@ -495,7 +501,7 @@ tty_interface_init(tty_interface_t *state, tty_t *tty, choices_t *choices,
 	*state->search = '\0';
 	*state->last_search = '\0';
 	state->cursor = 0;
-	state->no_redraw = 0;
+	state->redraw = 1;
 
 	state->exit = -1;
 
@@ -640,7 +646,8 @@ tty_interface_run(tty_interface_t *state)
 				return state->exit;
 			}
 
-			if (state->options->reverse == 1 && state->no_redraw == 0) {
+			if (state->options->reverse == 1 && state->redraw == 1) {
+//			if (state->options->reverse == 1) {
 				/* Hide cursor and move it up. */
 				tty_printf(state->tty, "\x1b[?25l\x1b[%dA\n",
 					state->options->num_lines + 1 + state->options->show_info);
