@@ -538,7 +538,7 @@ static const keybinding_t keybindings[] = {
 	{"\x1b[6~", action_pagedown},
 	{"\x1b[200~", action_ignore},
 	{"\x1b[201~", action_ignore},
-	{"\x1b[Z", action_shift_tab},
+	{"\x1b[Z", action_shift_tab},      /* Shift-TAB */
 	{NULL, NULL}
 };
 #undef KEY_CTRL
