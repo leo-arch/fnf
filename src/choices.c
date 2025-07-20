@@ -63,6 +63,7 @@ struct worker {
 	pthread_t thread_id;
 	struct search_job *job;
 	unsigned int worker_num;
+	unsigned int sort;
 	struct result_list result;
 };
 
@@ -286,7 +287,8 @@ choices_search_worker(void *data)
 	}
 
 	/* Sort the partial result */
-	qsort(result->list, result->size, sizeof(struct scored_result), cmpchoice);
+	if (w->sort == 1)
+		qsort(result->list, result->size, sizeof(struct scored_result), cmpchoice);
 
 	/* Fan-in, merging results */
 	for (unsigned int step = 0;; step++) {
@@ -309,7 +311,7 @@ choices_search_worker(void *data)
 }
 
 void
-choices_search(choices_t *c, const char *search)
+choices_search(choices_t *c, const char *search, const unsigned int sort)
 {
 	choices_reset_search(c);
 
@@ -337,6 +339,7 @@ choices_search(choices_t *c, const char *search)
 		workers[i].job = job;
 		workers[i].worker_num = i;
 		workers[i].result.size = 0;
+		workers[i].sort = sort;
 		/* FIXME: This is overkill */
 		workers[i].result.list = malloc(c->size * sizeof(struct scored_result));
 

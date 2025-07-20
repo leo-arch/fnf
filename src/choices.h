@@ -63,7 +63,7 @@ void choices_fread(choices_t *c, FILE *file, const char input_delimiter);
 void choices_destroy(choices_t *c);
 void choices_add(choices_t *c, const char *choice);
 size_t choices_available(const choices_t *c);
-void choices_search(choices_t *c, const char *search);
+void choices_search(choices_t *c, const char *search, const unsigned int sort);
 const char *choices_get(const choices_t *c, const size_t n);
 score_t choices_getscore(const choices_t *c, const size_t n);
 void choices_prev(choices_t *c);

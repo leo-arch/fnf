@@ -63,6 +63,7 @@ static const char *usage_str =
     "     --left-aborts        Left arrow key aborts\n"
     "     --reverse            Display from top, prompt at bottom\n"
     "     --no-unicode         Do not use Unicode decorations\n"
+    "     --no-sort            Do not sort the result\n"
     "     --color=COLORSPEC    Set custom colors (consult the manpage)\n"
     "     --no-color           Disable colors\n";
 
@@ -98,6 +99,7 @@ static struct option longopts[] = {
 	{"color", required_argument, NULL, 10},
 	{"print-null", no_argument, NULL, 11},
 	{"scroll-off", required_argument, NULL, 12},
+	{"no-sort", no_argument, NULL, 13},
 	{NULL, 0, NULL, 0}
 };
 
@@ -125,6 +127,7 @@ options_init(options_t *options)
 	options->show_info       = DEFAULT_SHOW_INFO;
 	options->show_scores     = DEFAULT_SCORES;
 	options->scrolloff       = DEFAULT_SCROLLOFF;
+	options->sort            = DEFAULT_SORT;
 	options->tab_accepts     = DEFAULT_TAB_ACCEPTS;
 	options->tty_filename    = DEFAULT_TTY;
 	options->unicode         = DEFAULT_UNICODE;
@@ -202,6 +205,7 @@ options_parse(options_t *options, int argc, char *argv[])
 			if (optarg && *optarg >= '0' && *optarg <= '9')
 				options->scrolloff = atoi(optarg);
 			break;
+		case 13: options->sort = 0; break;
 		case 'h': /* fallthrough */
 		default: usage(argv[0]); exit(EXIT_SUCCESS);
 		}

@@ -49,19 +49,20 @@ typedef struct {
 	unsigned int num_lines;
 	unsigned int scrolloff;
 	unsigned int workers;
-	int show_scores;
 	int auto_lines;
-	int show_info;
-	int pad;
-	int multi;
 	int cycle;
-	int tab_accepts;
-	int right_accepts;
 	int left_aborts;
+	int multi;
 	int no_color;
-	int reverse;
-	int unicode;
+	int pad;
 	int print_null;
+	int reverse;
+	int right_accepts;
+	int show_scores;
+	int show_info;
+	int sort;
+	int tab_accepts;
+	int unicode;
 	char input_delimiter;
 } options_t;
 

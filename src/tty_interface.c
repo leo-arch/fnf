@@ -210,7 +210,7 @@ draw(tty_interface_t *state)
 static void
 update_search(tty_interface_t *state)
 {
-	choices_search(state->choices, state->search);
+	choices_search(state->choices, state->search, state->options->sort);
 	strcpy(state->last_search, state->search);
 }
 

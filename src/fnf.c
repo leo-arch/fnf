@@ -57,7 +57,7 @@ main(int argc, char *argv[])
 
 	if (options.filter) { /* --show-matches */
 		choices_fread(&choices, stdin, options.input_delimiter);
-		choices_search(&choices, options.filter);
+		choices_search(&choices, options.filter, options.sort);
 		for (size_t i = 0; i < choices_available(&choices); i++) {
 			if (options.show_scores)
 				printf("%f\t", choices_getscore(&choices, i));
