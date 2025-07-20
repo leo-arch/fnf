@@ -426,11 +426,16 @@ action_end(tty_interface_t *state)
 static void
 action_pageup(tty_interface_t *state)
 {
-	update_state(state);
-
 	const unsigned int num_lines = state->options->num_lines;
 	const size_t selection = state->choices->selection;
 	const int cycle = state->options->cycle;
+
+	if (cycle == 0 && selection == 0) {
+		state->redraw = 0;
+		return;
+	}
+
+	update_state(state);
 
 	for (size_t i = 0; i < num_lines && selection > 0; i++) {
 		if (cycle == 0 && state->choices->selection == 0)
@@ -443,12 +448,17 @@ action_pageup(tty_interface_t *state)
 static void
 action_pagedown(tty_interface_t *state)
 {
-	update_state(state);
-
 	const unsigned int num_lines = state->options->num_lines;
 	const size_t selection = state->choices->selection;
 	const size_t available = state->choices->available;
 	const int cycle = state->options->cycle;
+
+	if (cycle == 0 && selection + 1 >= available) {
+		state->redraw = 0;
+		return;
+	}
+
+	update_state(state);
 
 	for (size_t i = 0; i < num_lines && selection < available - 1; i++) {
 		if (cycle == 0 && state->choices->selection + 1 >= available)
