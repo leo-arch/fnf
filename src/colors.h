@@ -38,13 +38,13 @@
 #define SEL_BG_COLOR    4
 #define HIGHLIGHT_COLOR 5
 #define COLOR_ITEMS_NUM 6
+
 #define MAX_COLOR_LEN 64
 
 #define RESET_ATTR "\x1b[0m" /* Reset attributes */
 #define CLEAR_LINE "\x1b[K"
 #define UNDERLINE  "\x1b[4m"
 #define INVERT     "\x1b[7m"
-#define UNHIDE_CURSOR "\x1b[?25h"
 
 #define COLOR_FIELD_SEP ':'
 #define KEY_ESC 27

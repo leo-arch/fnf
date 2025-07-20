@@ -261,7 +261,7 @@ decolor_name(const char *name, char *color_buf)
 				i++;
 		} else {
 			if (sgr_end == (size_t)-1)
-				sgr_end = i;
+				sgr_end = i; /* End of the initial SGR sequence */
 			*p++ = name[i++];
 		}
 	}
