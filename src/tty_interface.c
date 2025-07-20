@@ -343,7 +343,7 @@ static void
 action_prev(tty_interface_t *state)
 {
 	if (state->options->cycle == 0 && state->choices->selection == 0) {
-		if (state->redraw != -1)
+		if (state->redraw != FORCE_REDRAW)
 			state->redraw = 0;
 		return;
 	}
@@ -357,7 +357,7 @@ action_next(tty_interface_t *state)
 {
 	if (state->options->cycle == 0
 	&& state->choices->selection + 1 >= state->choices->available) {
-		if (state->redraw != -1)
+		if (state->redraw != FORCE_REDRAW)
 			state->redraw = 0;
 		return;
 	}
@@ -453,7 +453,8 @@ action_shift_tab(tty_interface_t *state)
 {
 	if (state->options->multi == 1) {
 		action_select(state);
-		state->redraw = -1; /* We want to redraw even if at the top. */
+		/* We want to redraw even if at the top of the list. */
+		state->redraw = FORCE_REDRAW;
 		action_prev(state);
 		state->redraw = 1;
 	}
@@ -464,7 +465,8 @@ action_tab(tty_interface_t *state)
 {
 	if (state->options->multi == 1) {
 		action_select(state);
-		state->redraw = -1; /* We want to redraw even if at the bottom. */
+		/* We want to redraw even if at the bottom of the list. */
+		state->redraw = FORCE_REDRAW;
 		action_next(state);
 		state->redraw = 1;
 		return;

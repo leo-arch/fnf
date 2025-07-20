@@ -57,6 +57,8 @@
 /* Time (in ms) to wait for additional bytes of an escape sequence */
 #define KEYTIMEOUT 25
 
+#define FORCE_REDRAW -1
+
 #ifdef __cplusplus
 extern "C" {
 #endif
