@@ -647,7 +647,6 @@ tty_interface_run(tty_interface_t *state)
 			}
 
 			if (state->options->reverse == 1 && state->redraw == 1) {
-//			if (state->options->reverse == 1) {
 				/* Hide cursor and move it up. */
 				tty_printf(state->tty, "\x1b[?25l\x1b[%dA\n",
 					state->options->num_lines + 1 + state->options->show_info);
