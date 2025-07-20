@@ -439,6 +439,15 @@ action_pagedown(tty_interface_t *state)
 }
 
 static void
+action_shift_tab(tty_interface_t *state)
+{
+	if (state->options->multi == 1) {
+		action_select(state);
+		action_prev(state);
+	}
+}
+
+static void
 action_tab(tty_interface_t *state)
 {
 	if (state->options->multi == 1) {
@@ -529,6 +538,7 @@ static const keybinding_t keybindings[] = {
 	{"\x1b[6~", action_pagedown},
 	{"\x1b[200~", action_ignore},
 	{"\x1b[201~", action_ignore},
+	{"\x1b[Z", action_shift_tab},
 	{NULL, NULL}
 };
 #undef KEY_CTRL
