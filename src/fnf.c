@@ -76,6 +76,13 @@ main(int argc, char *argv[])
 		if (options.num_lines > choices.size)
 			options.num_lines = choices.size;
 
+		if (options.scrolloff == -1) { /* --scroll-off=auto */
+			const size_t tty_lines = tty_getheight(&tty);
+			const size_t n = options.num_lines > tty_lines
+				? tty_lines : options.num_lines;
+			options.scrolloff = n >> 1; /* n / 2 */
+		}
+
 		const int num_lines_adjustment = 1 + options.show_info;
 
 		if (options.num_lines + num_lines_adjustment > tty_getheight(&tty))

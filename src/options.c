@@ -204,6 +204,8 @@ options_parse(options_t *options, int argc, char *argv[])
 		case 12:
 			if (optarg && *optarg >= '0' && *optarg <= '9')
 				options->scrolloff = atoi(optarg);
+			else if (optarg && *optarg == 'a' && strcmp(optarg, "auto") == 0)
+				options->scrolloff = -1;
 			break;
 		case 13: options->sort = 0; break;
 		case 'h': /* fallthrough */

@@ -47,7 +47,7 @@ typedef struct {
 	const char *pointer;
 	const char *marker;
 	unsigned int num_lines;
-	unsigned int scrolloff;
+	int scrolloff;
 	unsigned int workers;
 	int auto_lines;
 	int cycle;
