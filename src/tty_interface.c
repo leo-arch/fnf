@@ -120,6 +120,11 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 static void
 draw(tty_interface_t *state)
 {
+	if (state->no_redraw == 1) {
+		state->no_redraw = 0;
+		return;
+	}
+
 	tty_t *tty = state->tty;
 	choices_t *choices = state->choices;
 	options_t *options = state->options;
@@ -337,8 +342,10 @@ action_ignore(tty_interface_t *state)
 static void
 action_prev(tty_interface_t *state)
 {
-	if (state->options->cycle == 0 && state->choices->selection == 0)
+	if (state->options->cycle == 0 && state->choices->selection == 0) {
+		state->no_redraw = 1;
 		return;
+	}
 
 	update_state(state);
 	choices_prev(state->choices);
@@ -348,8 +355,10 @@ static void
 action_next(tty_interface_t *state)
 {
 	if (state->options->cycle == 0
-	&& state->choices->selection + 1 >= state->choices->available)
+	&& state->choices->selection + 1 >= state->choices->available) {
+		state->no_redraw = 1;
 		return;
+	}
 
 	update_state(state);
 	choices_next(state->choices);
@@ -486,6 +495,7 @@ tty_interface_init(tty_interface_t *state, tty_t *tty, choices_t *choices,
 	*state->search = '\0';
 	*state->last_search = '\0';
 	state->cursor = 0;
+	state->no_redraw = 0;
 
 	state->exit = -1;
 
@@ -630,7 +640,7 @@ tty_interface_run(tty_interface_t *state)
 				return state->exit;
 			}
 
-			if (state->options->reverse == 1) {
+			if (state->options->reverse == 1 && state->no_redraw == 0) {
 				/* Hide cursor and move it up. */
 				tty_printf(state->tty, "\x1b[?25l\x1b[%dA\n",
 					state->options->num_lines + 1 + state->options->show_info);
