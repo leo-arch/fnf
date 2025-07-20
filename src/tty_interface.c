@@ -591,8 +591,10 @@ tty_interface_run(tty_interface_t *state)
 {
 	if (state->options->no_color == 0)
 		set_colors(state);
-	if (state->options->auto_lines == 1)
-		state->options->num_lines = tty_getheight(state->tty) - 1;
+	if (state->options->auto_lines == 1) {
+		state->options->num_lines =
+			tty_getheight(state->tty) - 1 - state->options->show_info;
+	}
 	draw(state);
 
 	char curr_char[2] = "";
