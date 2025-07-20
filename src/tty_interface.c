@@ -431,8 +431,12 @@ action_pageup(tty_interface_t *state)
 	const unsigned int num_lines = state->options->num_lines;
 	const size_t selection = state->choices->selection;
 
-	for (size_t i = 0; i < num_lines && selection > 0; i++)
+	for (size_t i = 0; i < num_lines && selection > 0; i++) {
+		if (state->options->cycle == 0 && state->choices->selection == 0)
+			break;
+
 		choices_prev(state->choices);
+	}
 }
 
 static void
@@ -444,8 +448,13 @@ action_pagedown(tty_interface_t *state)
 	const size_t selection = state->choices->selection;
 	const size_t available = state->choices->available;
 
-	for (size_t i = 0; i < num_lines && selection < available - 1; i++)
+	for (size_t i = 0; i < num_lines && selection < available - 1; i++) {
+		if (state->options->cycle == 0
+		&& state->choices->selection + 1 >= state->choices->available)
+			break;
+
 		choices_next(state->choices);
+	}
 }
 
 static void
