@@ -537,46 +537,47 @@ tty_interface_init(tty_interface_t *state, tty_t *tty, choices_t *choices,
 
 typedef struct {
 	const char *key;
+	const size_t keylen;
 	void (*action)(tty_interface_t *);
 } keybinding_t;
 
 #define KEY_CTRL(key) ((const char[]){((key) - ('@')), '\0'})
 
 static const keybinding_t keybindings[] = {
-	{"\x1b[B", action_next},           /* DOWN */
-	{"\x1bOB", action_next},           /* DOWN */
-	{"\x1b[A", action_prev},           /* UP */
-	{"\x1bOA", action_prev},           /* UP */
-	{"\x1b", action_exit},             /* ESC */
-	{"\x7f", action_del_char},	       /* DEL */
-	{KEY_CTRL('H'), action_del_char},  /* Backspace (C-H) */
-	{KEY_CTRL('W'), action_del_word},  /* C-W */
-	{KEY_CTRL('U'), action_del_all},   /* C-U */
-	{KEY_CTRL('I'), action_tab},       /* TAB (C-I ) */
-	{KEY_CTRL('C'), action_exit},      /* C-C */
-	{KEY_CTRL('D'), action_exit},      /* C-D */
-	{KEY_CTRL('G'), action_exit},      /* C-G */
-	{KEY_CTRL('M'), action_emit},      /* CR */
-	{KEY_CTRL('P'), action_prev},      /* C-P */
-	{KEY_CTRL('N'), action_next},      /* C-N */
-	{KEY_CTRL('K'), action_prev},      /* C-K */
-	{KEY_CTRL('J'), action_next},      /* C-J */
-	{KEY_CTRL('A'), action_beginning}, /* C-A */
-	{KEY_CTRL('E'), action_end},   	   /* C-E */
-	{"\x1bOD", action_left},           /* LEFT */
-	{"\x1b[D", action_left},           /* LEFT */
-	{"\x1bOC", action_right},          /* RIGHT */
-	{"\x1b[C", action_right},          /* RIGHT */
-	{"\x1b[1~", action_beginning},     /* HOME */
-	{"\x1b[H", action_beginning},      /* HOME */
-	{"\x1b[4~", action_end},           /* END */
-	{"\x1b[F", action_end},            /* END */
-	{"\x1b[5~", action_pageup},
-	{"\x1b[6~", action_pagedown},
-	{"\x1b[200~", action_ignore},
-	{"\x1b[201~", action_ignore},
-	{"\x1b[Z", action_shift_tab},      /* Shift-TAB */
-	{NULL, NULL}
+	{"\x1b[B", 3, action_next},           /* DOWN */
+	{"\x1bOB", 3, action_next},           /* DOWN */
+	{"\x1b[A", 3, action_prev},           /* UP */
+	{"\x1bOA", 3, action_prev},           /* UP */
+	{"\x1b", 1, action_exit},             /* ESC */
+	{"\x7f", 1, action_del_char},	       /* DEL */
+	{KEY_CTRL('H'), 1, action_del_char},  /* Backspace (C-H) */
+	{KEY_CTRL('W'), 1, action_del_word},  /* C-W */
+	{KEY_CTRL('U'), 1, action_del_all},   /* C-U */
+	{KEY_CTRL('I'), 1, action_tab},       /* TAB (C-I ) */
+	{KEY_CTRL('C'), 1, action_exit},      /* C-C */
+	{KEY_CTRL('D'), 1, action_exit},      /* C-D */
+	{KEY_CTRL('G'), 1, action_exit},      /* C-G */
+	{KEY_CTRL('M'), 1, action_emit},      /* CR */
+	{KEY_CTRL('P'), 1, action_prev},      /* C-P */
+	{KEY_CTRL('N'), 1, action_next},      /* C-N */
+	{KEY_CTRL('K'), 1, action_prev},      /* C-K */
+	{KEY_CTRL('J'), 1, action_next},      /* C-J */
+	{KEY_CTRL('A'), 1, action_beginning}, /* C-A */
+	{KEY_CTRL('E'), 1, action_end},   	   /* C-E */
+	{"\x1bOD", 3, action_left},           /* LEFT */
+	{"\x1b[D", 3, action_left},           /* LEFT */
+	{"\x1bOC", 3, action_right},          /* RIGHT */
+	{"\x1b[C", 3, action_right},          /* RIGHT */
+	{"\x1b[1~", 4, action_beginning},     /* HOME */
+	{"\x1b[H", 3, action_beginning},      /* HOME */
+	{"\x1b[4~", 4, action_end},           /* END */
+	{"\x1b[F", 3, action_end},            /* END */
+	{"\x1b[5~", 4, action_pageup},
+	{"\x1b[6~", 4, action_pagedown},
+	{"\x1b[200~", 6, action_ignore},
+	{"\x1b[201~", 6, action_ignore},
+	{"\x1b[Z", 3, action_shift_tab},      /* Shift-TAB */
+	{NULL, 0, NULL}
 };
 #undef KEY_CTRL
 
@@ -600,7 +601,8 @@ handle_input(tty_interface_t *state, const char *s,
 		&& input[1] != keybindings[i].key[1]))
 			continue;
 
-		if (strcmp(input, keybindings[i].key) == 0)
+		if (keybindings[i].keylen == input_len
+		&& strcmp(input, keybindings[i].key) == 0)
 			found_keybinding = i;
 		else if (strncmp(input, keybindings[i].key, input_len) == 0)
 			in_middle = 1;
