@@ -231,20 +231,19 @@ update_state(tty_interface_t *state)
 
 /* Select the currently highighted/hovered entry if not already selected.
  * Otherwise, remove it from the selections list. */
-static int
+static void
 action_select(tty_interface_t *state)
 {
 	const char *p = choices_get(state->choices, state->choices->selection);
 	if (!p)
-		return EXIT_FAILURE;
+		return;
 
 	if (is_selected(p) == 1) {
 		deselect_entry(p);
-		return EXIT_FAILURE;
+		return;
 	}
 
 	save_selection(p);
-	return EXIT_SUCCESS;
 }
 
 static void
