@@ -430,9 +430,10 @@ action_pageup(tty_interface_t *state)
 
 	const unsigned int num_lines = state->options->num_lines;
 	const size_t selection = state->choices->selection;
+	const int cycle = state->options->cycle;
 
 	for (size_t i = 0; i < num_lines && selection > 0; i++) {
-		if (state->options->cycle == 0 && state->choices->selection == 0)
+		if (cycle == 0 && state->choices->selection == 0)
 			break;
 
 		choices_prev(state->choices);
@@ -447,10 +448,10 @@ action_pagedown(tty_interface_t *state)
 	const unsigned int num_lines = state->options->num_lines;
 	const size_t selection = state->choices->selection;
 	const size_t available = state->choices->available;
+	const int cycle = state->options->cycle;
 
 	for (size_t i = 0; i < num_lines && selection < available - 1; i++) {
-		if (state->options->cycle == 0
-		&& state->choices->selection + 1 >= state->choices->available)
+		if (cycle == 0 && state->choices->selection + 1 >= available)
 			break;
 
 		choices_next(state->choices);
