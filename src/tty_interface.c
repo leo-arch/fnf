@@ -125,19 +125,24 @@ build_pointer(const int current, const int selected, const options_t *options)
 	static char ptr_nocur_sel[MAX_POINTER_LEN];
 	static char ptr_nocur_nosel[MAX_POINTER_LEN];
 
+	/* Let's construct the pointer string only once */
 	if (!*ptr_cur_sel) {
+		/* Current (hovered) and selected */
 		snprintf(ptr_cur_sel, sizeof(ptr_cur_sel), "%*s%s%s%s%s%s%s",
 			options->pad, "", colors[SEL_BG_COLOR], colors[POINTER_COLOR],
 			options->pointer, colors[MARKER_COLOR], options->marker, RESET_ATTR);
 
+		/* Current (hovered) and not selected */
 		snprintf(ptr_cur_nosel, sizeof(ptr_cur_nosel), "%*s%s%s%s%s%s%s",
 			options->pad, "", colors[SEL_BG_COLOR], colors[POINTER_COLOR],
 			options->pointer, colors[MARKER_COLOR], " ", RESET_ATTR);
 
+		/* Not current (not hovered) and selected */
 		snprintf(ptr_nocur_sel, sizeof(ptr_nocur_sel), "%*s%s%s%s%s%s",
 			options->pad, "", colors[POINTER_COLOR], " ",
 			colors[MARKER_COLOR], options->marker, RESET_ATTR);
 
+		/* Not current (not hovered) and not selected */
 		snprintf(ptr_nocur_nosel, sizeof(ptr_nocur_nosel), "%*s%s%s%s%s%s",
 			options->pad, "", colors[POINTER_COLOR], " ",
 			colors[MARKER_COLOR], " ", RESET_ATTR);
