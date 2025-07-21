@@ -34,6 +34,9 @@
 
 #include <termios.h>
 
+#define DEFAULT_TERMINAL_COLS  80
+#define DEFAULT_TERMINAL_LINES 25
+
 #ifdef __cplusplus
 extern "C" {
 #endif

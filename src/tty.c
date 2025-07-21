@@ -89,13 +89,11 @@ tty_init(tty_t *tty, const char *tty_filename)
 
 	struct termios new_termios = tty->original_termios;
 
-	/*
-	 * Disable all of
+	 /* Disable all of
 	 * ICANON  Canonical input (erase and kill processing).
 	 * ECHO    Echo.
-	 * ISIG    Signals from control characters
-	 * ICRNL   Conversion of CR characters into NL
-	 */
+	 * ISIG    Signals from control characters.
+	 * ICRNL   Conversion of CR characters into NL. */
 	new_termios.c_iflag &= ~(ICRNL);
 	new_termios.c_lflag &= ~(ICANON | ECHO | ISIG);
 
@@ -112,8 +110,8 @@ tty_getwinsz(tty_t *tty)
 {
 	struct winsize ws;
 	if (ioctl(fileno(tty->fout), TIOCGWINSZ, &ws) == -1) {
-		tty->maxwidth = 80;
-		tty->maxheight = 25;
+		tty->maxwidth = DEFAULT_TERMINAL_COLS;
+		tty->maxheight = DEFAULT_TERMINAL_LINES;
 	} else {
 		tty->maxwidth = ws.ws_col;
 		tty->maxheight = ws.ws_row;
@@ -147,27 +145,21 @@ tty_input_ready(tty_t *tty, const long int timeout, const int return_on_signal)
 
 	sigset_t mask;
 	sigemptyset(&mask);
-	if (!return_on_signal)
+	if (return_on_signal == 0)
 		sigaddset(&mask, SIGWINCH);
 
-	int err = pselect(
-			tty->fdin + 1,
-			&readfs,
-			NULL,
-			NULL,
-			timeout < 0 ? NULL : &ts,
-			return_on_signal ? NULL : &mask);
+	const int err = pselect(tty->fdin + 1, &readfs, NULL, NULL,
+		timeout < 0 ? NULL : &ts, return_on_signal == 1 ? NULL : &mask);
 
 	if (err < 0) {
-		if (errno == EINTR) {
+		if (errno == EINTR)
 			return 0;
-		} else {
-			perror("select");
-			exit(EXIT_FAILURE);
-		}
-	} else {
-		return FD_ISSET(tty->fdin, &readfs);
+
+		perror("select");
+		exit(EXIT_FAILURE);
 	}
+
+	return FD_ISSET(tty->fdin, &readfs);
 }
 
 static void
