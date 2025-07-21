@@ -294,8 +294,10 @@ action_emit(tty_interface_t *state)
 static void
 action_del_char(tty_interface_t *state)
 {
-	if (state->cursor == 0)
+	if (state->cursor == 0) {
+		state->redraw = 0;
 		return;
+	}
 
 	const size_t length = strlen(state->search);
 	const size_t original_cursor = state->cursor;
@@ -311,6 +313,11 @@ action_del_char(tty_interface_t *state)
 static void
 action_del_word(tty_interface_t *state)
 {
+	if (!*state->search) {
+		state->redraw = 0;
+		return;
+	}
+
 	const size_t original_cursor = state->cursor;
 	size_t cursor = state->cursor;
 
@@ -328,6 +335,11 @@ action_del_word(tty_interface_t *state)
 static void
 action_del_all(tty_interface_t *state)
 {
+	if (!*state->search) {
+		state->redraw = 0;
+		return;
+	}
+
 	memmove(state->search, &state->search[state->cursor],
 		strlen(state->search) - state->cursor + 1);
 	state->cursor = 0;
@@ -393,6 +405,8 @@ action_left(tty_interface_t *state)
 		state->cursor--;
 		while (state->cursor > 0 && !is_boundary(state->search[state->cursor]))
 			state->cursor--;
+	} else {
+		state->redraw = 0;
 	}
 }
 
@@ -408,18 +422,30 @@ action_right(tty_interface_t *state)
 		state->cursor++;
 		while (!is_boundary(state->search[state->cursor]))
 			state->cursor++;
+	} else {
+		state->redraw = 0;
 	}
 }
 
 static void
 action_beginning(tty_interface_t *state)
 {
+	if (!*state->search) {
+		state->redraw = 0;
+		return;
+	}
+
 	state->cursor = 0;
 }
 
 static void
 action_end(tty_interface_t *state)
 {
+	if (!*state->search) {
+		state->redraw = 0;
+		return;
+	}
+
 	state->cursor = strlen(state->search);
 }
 
