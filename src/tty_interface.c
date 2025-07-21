@@ -171,14 +171,16 @@ draw(tty_interface_t *state)
 		const char *choice = choices_get(choices, i);
 		if (choice) {
 			const int multi_sel = (options_multi == 1 && is_selected(choice));
-			static char pointer[256];
-			snprintf(pointer, sizeof(pointer), "%*s%s%s%s%s%s",
-				options_pad, "", colors[POINTER_COLOR],
-				i == choices->selection ? options_pointer : " ",
+			const int is_current = (i == choices->selection);
+			static char pointer[MAX_POINTER_LEN];
+			snprintf(pointer, sizeof(pointer), "%*s%s%s%s%s%s%s",
+				options_pad, "", is_current == 1 ? colors[SEL_BG_COLOR] : "",
+				colors[POINTER_COLOR],
+				is_current == 1 ? options_pointer : " ",
 				colors[MARKER_COLOR],
 				multi_sel == 1 ? options_marker : " ", RESET_ATTR);
 
-			draw_match(state, choice, i == choices->selection, pointer);
+			draw_match(state, choice, is_current, pointer);
 		}
 
 		if (options_reverse == 1)
@@ -531,7 +533,6 @@ append_search(tty_interface_t *state, const char ch)
 		memmove(&search[state->cursor + 1], &search[state->cursor],
 			search_size - state->cursor + 1);
 		search[state->cursor] = ch;
-
 		state->cursor++;
 	}
 }
@@ -548,9 +549,9 @@ tty_interface_init(tty_interface_t *state, tty_t *tty, choices_t *choices,
 	*state->input = '\0';
 	*state->search = '\0';
 	*state->last_search = '\0';
+
 	state->cursor = 0;
 	state->redraw = 1;
-
 	state->exit = -1;
 
 	if (options->init_search) {

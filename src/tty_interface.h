@@ -54,6 +54,8 @@
 #define SEARCH_SIZE_MAX 4096
 #define SIG_INTERRUPT 130 /* 128 + SIGINT (usually 2) */
 
+#define MAX_POINTER_LEN 256
+
 /* Time (in ms) to wait for additional bytes of an escape sequence */
 #define KEYTIMEOUT 25
 

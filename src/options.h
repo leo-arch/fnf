@@ -47,7 +47,6 @@ typedef struct {
 	const char *pointer;
 	const char *marker;
 	unsigned int num_lines;
-	int scrolloff;
 	unsigned int workers;
 	int auto_lines;
 	int cycle;
@@ -58,6 +57,7 @@ typedef struct {
 	int print_null;
 	int reverse;
 	int right_accepts;
+	int scrolloff;
 	int show_scores;
 	int show_info;
 	int sort;
