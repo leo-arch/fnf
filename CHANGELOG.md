@@ -1,3 +1,23 @@
+## 0.3 (Jul 21, 2025)
+
+### BUG FIXES
+* Selection foreground color ignored when entry is already colorized.
+* Cursor flickering on VTE terminals when running with --reverse.
+* --show-info not working with --reverse.
+* Phantom lines when running with --reverse and --lines is set to cover the entire terminal screen.
+* --lines=auto not working with --show-info (phantom lines).
+* PgUp and PgDn do cycle even if cycling is disabled.
+
+### IMPROVEMENTS
+* Set custom colors (256/truecolor) using `--color` or **$FNF_COLORS** (see the manpage).
+* Default selection color changed to bold white on gray for enhanced contrast.
+* Allow the use of strings, including Unicode, for pointer and marker (e.g. `fnf --pointer="┃" --pointer="✔"`).
+* Default to Unicode decorations (disable with `--no-unicode`).
+* Add `--print-null` (print output delimited by NUL characters).
+* Minimize screen flickering.
+* Add `--no-sort` option to get unsorted results.
+* Use <kbd>Shift-TAB</kbd> (btab) to (un)mark the current item and select the previous item.
+
 ## 0.2 (Jul 9, 2025)
 
 ### BUG FIXES
