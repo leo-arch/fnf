@@ -117,6 +117,38 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 	tty_setnormal(tty);
 }
 
+static char *
+build_pointer(const int current, const int selected, const options_t *options)
+{
+	static char ptr_cur_sel[MAX_POINTER_LEN] = "";
+	static char ptr_cur_nosel[MAX_POINTER_LEN];
+	static char ptr_nocur_sel[MAX_POINTER_LEN];
+	static char ptr_nocur_nosel[MAX_POINTER_LEN];
+
+	if (!*ptr_cur_sel) {
+		snprintf(ptr_cur_sel, sizeof(ptr_cur_sel), "%*s%s%s%s%s%s%s",
+			options->pad, "", colors[SEL_BG_COLOR], colors[POINTER_COLOR],
+			options->pointer, colors[MARKER_COLOR], options->marker, RESET_ATTR);
+
+		snprintf(ptr_cur_nosel, sizeof(ptr_cur_nosel), "%*s%s%s%s%s%s%s",
+			options->pad, "", colors[SEL_BG_COLOR], colors[POINTER_COLOR],
+			options->pointer, colors[MARKER_COLOR], " ", RESET_ATTR);
+
+		snprintf(ptr_nocur_sel, sizeof(ptr_nocur_sel), "%*s%s%s%s%s%s",
+			options->pad, "", colors[POINTER_COLOR], " ",
+			colors[MARKER_COLOR], options->marker, RESET_ATTR);
+
+		snprintf(ptr_nocur_nosel, sizeof(ptr_nocur_nosel), "%*s%s%s%s%s%s",
+			options->pad, "", colors[POINTER_COLOR], " ",
+			colors[MARKER_COLOR], " ", RESET_ATTR);
+	}
+
+	if (current == 1)
+		return selected == 1 ? ptr_cur_sel : ptr_cur_nosel;
+
+	return selected == 1 ? ptr_nocur_sel : ptr_nocur_nosel;
+}
+
 static void
 draw(tty_interface_t *state)
 {
@@ -144,8 +176,6 @@ draw(tty_interface_t *state)
 	const int options_pad = options->pad;
 	const int options_reverse = options->reverse;
 	const int options_show_info = options->show_info;
-	const char *options_pointer = options->pointer;
-	const char *options_marker = options->marker;
 
 	tty_hide_cursor(tty);
 	tty_setnowrap(tty);
@@ -170,17 +200,11 @@ draw(tty_interface_t *state)
 
 		const char *choice = choices_get(choices, i);
 		if (choice) {
-			const int multi_sel = (options_multi == 1 && is_selected(choice));
-			const int is_current = (i == choices->selection);
-			static char pointer[MAX_POINTER_LEN];
-			snprintf(pointer, sizeof(pointer), "%*s%s%s%s%s%s%s",
-				options_pad, "", is_current == 1 ? colors[SEL_BG_COLOR] : "",
-				colors[POINTER_COLOR],
-				is_current == 1 ? options_pointer : " ",
-				colors[MARKER_COLOR],
-				multi_sel == 1 ? options_marker : " ", RESET_ATTR);
+			const int selected = (options_multi == 1 && is_selected(choice));
+			const int current = (i == choices->selection);
+			const char *pointer = build_pointer(current, selected, options);
 
-			draw_match(state, choice, is_current, pointer);
+			draw_match(state, choice, current, pointer);
 		}
 
 		if (options_reverse == 1)
