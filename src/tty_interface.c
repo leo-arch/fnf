@@ -645,8 +645,10 @@ handle_input(tty_interface_t *state, const char *s,
 	state->ambiguous_key_pending = 0;
 
 	char *input = state->input;
-	strcat(state->input, s);
-	const size_t input_len = strlen(state->input);
+	size_t input_len = *state->input ? strlen(state->input) : 0;
+	strncat(state->input, s, sizeof(state->input) - input_len - 1);
+	/* S is either a single byte or empty. If a single byte, increase INPUT_LEN. */
+	input_len += (*s != '\0');
 
 	/* Figure out if we have completed a keybinding and whether we're in the
 	 * middle of one (both can happen, because of Esc). */
