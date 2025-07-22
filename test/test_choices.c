@@ -73,11 +73,11 @@ TEST test_choices_empty() {
 TEST test_choices_1() {
 	choices_add(&choices, "tags");
 
-	choices_search(&choices, "");
+	choices_search(&choices, "", 1);
 	ASSERT_SIZE_T_EQ(1, choices.available);
 	ASSERT_SIZE_T_EQ(0, choices.selection);
 
-	choices_search(&choices, "t");
+	choices_search(&choices, "t", 1);
 	ASSERT_SIZE_T_EQ(1, choices.available);
 	ASSERT_SIZE_T_EQ(0, choices.selection);
 
@@ -98,7 +98,7 @@ TEST test_choices_2() {
 	choices_add(&choices, "test");
 
 	/* Empty search */
-	choices_search(&choices, "");
+	choices_search(&choices, "", 1);
 	ASSERT_SIZE_T_EQ(0, choices.selection);
 	ASSERT_SIZE_T_EQ(2, choices.available);
 
@@ -113,7 +113,7 @@ TEST test_choices_2() {
 	ASSERT_SIZE_T_EQ(0, choices.selection);
 
 	/* Filtered search */
-	choices_search(&choices, "te");
+	choices_search(&choices, "te", 1);
 	ASSERT_SIZE_T_EQ(1, choices.available);
 	ASSERT_SIZE_T_EQ(0, choices.selection);
 	ASSERT_STR_EQ("test", choices_get(&choices, 0));
@@ -125,12 +125,12 @@ TEST test_choices_2() {
 	ASSERT_SIZE_T_EQ(0, choices.selection);
 
 	/* No results */
-	choices_search(&choices, "foobar");
+	choices_search(&choices, "foobar", 1);
 	ASSERT_SIZE_T_EQ(0, choices.available);
 	ASSERT_SIZE_T_EQ(0, choices.selection);
 
 	/* Different order due to scoring */
-	choices_search(&choices, "ts");
+	choices_search(&choices, "ts", 1);
 	ASSERT_SIZE_T_EQ(2, choices.available);
 	ASSERT_SIZE_T_EQ(0, choices.selection);
 	ASSERT_STR_EQ("test", choices_get(&choices, 0));
@@ -160,7 +160,7 @@ TEST test_choices_without_search() {
 /* Regression test for segfault */
 TEST test_choices_unicode() {
 	choices_add(&choices, "Edmund Husserl - Méditations cartésiennes - Introduction a la phénoménologie.pdf");
-	choices_search(&choices, "e");
+	choices_search(&choices, "e", 1);
 
 	PASS();
 }
@@ -174,7 +174,7 @@ TEST test_choices_large_input() {
 		choices_add(&choices, strings[i]);
 	}
 
-	choices_search(&choices, "12");
+	choices_search(&choices, "12", 1);
 
 	/* Must match `seq 0 99999 | grep '.*1.*2.*' | wc -l` */
 	ASSERT_SIZE_T_EQ(8146, choices.available);
