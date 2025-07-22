@@ -53,6 +53,7 @@
 
 #define SEARCH_SIZE_MAX 4096
 #define SIG_INTERRUPT 130 /* 128 + SIGINT (usually 2) */
+#define PENDING_INPUT_MAX 32
 
 #define MAX_POINTER_LEN 256
 
@@ -75,7 +76,7 @@ typedef struct {
 	int redraw;
 	char search[SEARCH_SIZE_MAX + 1];
 	char last_search[SEARCH_SIZE_MAX + 1];
-	char input[32]; /* Pending input buffer */
+	char input[PENDING_INPUT_MAX]; /* Pending input buffer */
 } tty_interface_t;
 
 void tty_interface_init(tty_interface_t *state, tty_t *tty,

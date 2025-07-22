@@ -461,7 +461,7 @@ action_right(tty_interface_t *state)
 static void
 action_beginning(tty_interface_t *state)
 {
-	if (!*state->search) {
+	if (!*state->search || state->cursor == 0) {
 		state->redraw = 0;
 		return;
 	}
@@ -472,12 +472,13 @@ action_beginning(tty_interface_t *state)
 static void
 action_end(tty_interface_t *state)
 {
-	if (!*state->search) {
+	size_t len = 0;
+	if (!*state->search || (len = strlen(state->search)) == state->cursor) {
 		state->redraw = 0;
 		return;
 	}
 
-	state->cursor = strlen(state->search);
+	state->cursor = len;
 }
 
 static void
