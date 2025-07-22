@@ -15,7 +15,7 @@ Entering text narrows the items using fuzzy matching. Results are sorted using h
 .SH OPTIONS
 .TP
 .BR \-l ", " \-\-lines =\fILINES\fR
-How many lines of items to display (set to 'auto' to use the entire terminal screen). If unspecified, it defaults to 10 lines.
+How many lines of items to display (default: 10). Set to \fIauto\fR to use the entire terminal screen.
 .
 .TP
 .BR \-p ", " \-\-prompt =\fISTRING\fR
@@ -39,11 +39,11 @@ Use TTY instead of the default tty device (/dev/tty)
 .
 .TP
 .BR \-q ", " \-\-query =\fIQUERY\fR
-Use \fIQUERY\fR as the initial search query
+Use QUERY as the initial search query
 .
 .TP
 .BR \-e ", " \-\-show-matches =\fIQUERY\fR
-Non-interactive mode. Print the matches in sorted order for QUERY to stdout
+Non-interactive mode. Print the matches in sorted order for QUERY to stdout.
 .
 .TP
 .BR \-0 ", " \-\-read-null
@@ -71,7 +71,7 @@ Multi-select marker (default: "*")
 .
 .TP
 .BR \-\-color=\fICOLORSPEC\fR
-Set custom colors (consult the \fBCOLORS\fR section for more information)
+Set custom colors (consult the \fBCOLORS\fR section below for more information)
 .
 .TP
 .BR \-\-cycle
@@ -111,11 +111,8 @@ Disable Unicode decorations
 .BR "ENTER"
 Print the selected items to stdout and exit. If \fB\-\-right\-accepts\fR is set, the Right arrow key performs the same function. Equally, if \fB\-\-tab\-accepts\fR is set, the TAB key performs the same function.
 .TP
-.BR "ESC"
+.BR "ESC, Ctrl+c, Ctrl+d, Ctrl+g"
 Exit without printing any result. If \fB\-\-left\-aborts\fR is set, the Left arrow key performs the same function.
-.TP
-.BR "Ctrl+c, Ctrl+g, Esc"
-Exit without making a selection.
 .TP
 .BR "Up Arrow, Ctrl+p, Ctrl+k"
 Select the previous item.
@@ -124,10 +121,10 @@ Select the previous item.
 Select the next item.
 .TP
 .BR "TAB"
-If multi-selection is enabled (\fB-m, --multi\fR), (un)mark the selected entry and select the next item.
+If multi-selection is enabled (\fB-m, --multi\fR), (un)mark the selected item and select the next one.
 .TP
 .BR "Shift+TAB (btab)"
-If multi-selection enabled (\fB-m, --multi\fR), (un)mark the selected entry and select the previous item.
+If multi-selection enabled (\fB-m, --multi\fR), (un)mark the selected item and select the previous one.
 .TP
 .BR "Backspace, Ctrl+h"
 Delete the character before the cursor.
@@ -187,7 +184,7 @@ A single numbered attribute (\fB0-9\fR) can be added to colors. The meaning of t
 .sp
 .B EXAMPLE
 .sp
-In the line \fB--color="prompt:214:1,pointer:#87d700:2,marker:6,sel-fg:#ffff00"\fR, the prompt is set to bold orange (256-color), the pointer to a dimmed green (hex color), the marker to cyan (256-color), and the foreground color for selected entries to yellow (hex color).
+In the line \fB--color="prompt:214:1,pointer:#87d700:2,marker:6,sel-fg:#ffff00"\fR, the prompt is set to bold orange (256-color), the pointer to a dimmed green (hex color), the marker to cyan (256-color), and the foreground color for selected items to yellow (hex color).
 .sp
 You can also build a simple light theme as follows: \fB--color="prompt:4:1,marker:4:1,hl:1"\fR
 .sp
@@ -226,7 +223,7 @@ Same as above, but switching git branches.
 .sp 0
 \fB1\fR   No match
 .sp 0
-\fB130\fR Interrupted with \fBCtrl+c\fR, \fBCtrl+g\fR or \fBEsc\fR
+\fB130\fR Interrupted with \fBCtrl+c\fR, \fBCtrl+d\fR, \fBCtrl+g\fR or \fBEsc\fR
 .
 .SH AUTHORS
 .sp
