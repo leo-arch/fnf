@@ -2,11 +2,11 @@
 
 ### BUG FIXES
 * Selection foreground color ignored when entry is already colorized.
-* Cursor flickering on VTE terminals when running with --reverse.
-* --show-info not working with --reverse.
-* Phantom lines when running with --reverse and --lines is set to cover the entire terminal screen.
-* --lines=auto not working with --show-info (phantom lines).
-* PgUp and PgDn do cycle even if cycling is disabled.
+* Cursor flickering on VTE terminals when running with `--reverse`.
+* --show-info not working with `--reverse`.
+* Phantom lines when running with `--reverse` and `--lines` is set to cover the entire terminal screen.
+* `--lines=auto` not working with `--show-info` (phantom lines).
+* <kbd>PgUp</kbd> and <kbd>PgDn</kbd> do cycle even if cycling is disabled.
 
 ### IMPROVEMENTS
 * Set custom colors (256/truecolor) using `--color` or **$FNF_COLORS** (see the manpage).
