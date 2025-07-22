@@ -90,15 +90,23 @@ deselect_entry(const char *name)
 void
 save_selection(const char *name)
 {
-	selections = (struct selections_t *)realloc(
+	struct selections_t *tmp = (struct selections_t *)realloc(
 		selections, (seln + 2) * sizeof(struct selections_t));
-	if (!selections)
-		return;
+	if (!tmp) {
+		for (size_t i = 0; selections[i].name; i++)
+			free(selections[i].name);
+		free(selections);
+		fprintf(stderr, "Error: Cannot allocate memory\n");
+		abort();
+	}
+	selections = tmp;
 
 	const size_t len = strlen(name);
 	selections[seln].name = (char *)malloc((len + 1) * sizeof(char));
-	if (!selections[seln].name)
-		return;
+	if (!selections[seln].name) {
+		fprintf(stderr, "Error: Cannot allocate memory\n");
+		abort();
+	}
 
 	strcpy(selections[seln].name, name);
 	selections[seln].namelen = len;
