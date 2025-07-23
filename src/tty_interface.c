@@ -33,6 +33,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h> /* wc_xstrlen() */
+#include <locale.h> /* setlocale() */
 
 #include "colors.h"
 #include "config.h"
@@ -67,6 +69,31 @@ clear(const tty_interface_t *state)
 		tty_moveup(tty, line - 1);
 
 	tty_flush(tty);
+}
+
+/* A strlen implementation able to handle wide chars.
+ * Return the number of columns required to print the string STR (instead
+ * of the number of bytes required to store STR). */
+static size_t
+wc_xstrlen(const char *restrict str)
+{
+	static wchar_t wbuf[PATH_MAX];
+	const size_t len = mbstowcs(wbuf, str, (size_t)PATH_MAX);
+	if (len == (size_t)-1) /* Invalid multi-byte sequence found */
+		return 0;
+
+	const int width = wcswidth(wbuf, len);
+	if (width != -1)
+		return (size_t)width;
+
+	return 0; /* A non-printable wide char was found */
+}
+
+static size_t
+get_prompt_length(const char *prompt)
+{
+	setlocale(LC_ALL, "");
+	return wc_xstrlen(prompt);
 }
 
 static void
@@ -199,6 +226,7 @@ draw(tty_interface_t *state)
 		tty_fputs(tty, "\x1b[A\r\x1b[K");
 	}
 
+	/* Print matches */
 	const char *clear_line = options_reverse == 0 ? "\n"CLEAR_LINE : CLEAR_LINE;
 	for (size_t i = start; i < start + num_lines; i++) {
 		tty_fputs(tty, clear_line);
@@ -223,15 +251,16 @@ draw(tty_interface_t *state)
 		tty_printf(tty, "\x1b[%dG[%zu/%zu]%s\n", options_pad + 1,
 			choices->available, choices->size, CLEAR_LINE);
 
+	/* Let's draw the prompt */
 	static size_t prompt_len = (size_t)-1;
 	if (prompt_len == (size_t)-1)
-		prompt_len = strlen(options->prompt);
+		prompt_len = get_prompt_length(options->prompt);
 
-	size_t cursor_pos = prompt_len + options_pad;
+	size_t cursor_pos = prompt_len + options_pad + 1;
 	for (size_t i = 0; state->search[i] && i < state->cursor; i++)
 		cursor_pos += is_boundary(state->search[i]);
 
-	tty_printf(tty, "\x1b[K\x1b[%dG%s%s%s%s\x1b[999D\x1b[%dC",
+	tty_printf(tty, "%s\x1b[%dG%s%s%s%s\x1b[%dG", CLEAR_LINE,
 		options_pad + 1, colors[PROMPT_COLOR], options->prompt,
 		RESET_ATTR, state->search, cursor_pos);
 
