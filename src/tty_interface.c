@@ -181,6 +181,32 @@ build_pointer(const int current, const int selected, const options_t *options)
 	return selected == 1 ? ptr_nocur_sel : ptr_nocur_nosel;
 }
 
+static size_t
+get_cursor_position(const size_t base, tty_interface_t *state)
+{
+	if (!*state->search)
+		return base;
+
+	static wchar_t wbuf[SEARCH_SIZE_MAX * sizeof(wchar_t)];
+	const size_t ret = mbstowcs(wbuf, state->search, SEARCH_SIZE_MAX);
+	if (ret == (size_t)-1)
+		return base;
+
+	size_t wbuf_index = 0;
+	size_t cursor_position = base;
+
+	for (size_t i = 0; state->search[i] && i < state->cursor; i++) {
+		if (!is_boundary(state->search[i]))
+			continue;
+
+		const int w = wcwidth(wbuf[wbuf_index++]);
+		if (w > 0)
+			cursor_position += w;
+	}
+
+	return cursor_position;
+}
+
 static void
 draw(tty_interface_t *state)
 {
@@ -256,13 +282,12 @@ draw(tty_interface_t *state)
 	if (prompt_len == (size_t)-1)
 		prompt_len = get_prompt_length(options->prompt);
 
-	size_t cursor_pos = prompt_len + options_pad + 1;
-	for (size_t i = 0; state->search[i] && i < state->cursor; i++)
-		cursor_pos += is_boundary(state->search[i]);
+	const size_t cursor_position =
+		get_cursor_position(prompt_len + options_pad + 1, state);
 
 	tty_printf(tty, "%s\x1b[%dG%s%s%s%s\x1b[%dG", CLEAR_LINE,
 		options_pad + 1, colors[PROMPT_COLOR], options->prompt,
-		RESET_ATTR, state->search, cursor_pos);
+		RESET_ATTR, state->search, cursor_position);
 
 	tty_setwrap(tty);
 	tty_unhide_cursor(tty);
