@@ -181,11 +181,32 @@ build_pointer(const int current, const int selected, const options_t *options)
 	return selected == 1 ? ptr_nocur_sel : ptr_nocur_nosel;
 }
 
+static int
+contains_utf8(const char *str)
+{
+	while (*str) {
+		if ((unsigned char)*str >= 0x80)
+			return 1;
+		str++;
+	}
+
+	return 0;
+}
+
 static size_t
 get_cursor_position(const size_t base, tty_interface_t *state)
 {
 	if (!*state->search)
 		return base;
+
+	size_t cursor_position = base;
+
+	const int is_utf8 = contains_utf8(state->search);
+	if (is_utf8 == 0) {
+		for (size_t i = 0; state->search[i] && i < state->cursor; i++)
+			cursor_position += is_boundary(state->search[i]);
+		return cursor_position;
+	}
 
 	static wchar_t wbuf[SEARCH_SIZE_MAX * sizeof(wchar_t)];
 	const size_t ret = mbstowcs(wbuf, state->search, SEARCH_SIZE_MAX);
@@ -193,7 +214,6 @@ get_cursor_position(const size_t base, tty_interface_t *state)
 		return base;
 
 	size_t wbuf_index = 0;
-	size_t cursor_position = base;
 
 	for (size_t i = 0; state->search[i] && i < state->cursor; i++) {
 		if (!is_boundary(state->search[i]))
