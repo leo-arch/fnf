@@ -1,4 +1,4 @@
-.TH FNF 1 "Jul 21, 2025" "fnf 0.3"
+.TH FNF 1 "Jul 23, 2025" "fnf 0.3.1"
 .SH NAME
 fnf \- A simple fuzzy finder for the terminal.
 .SH SYNOPSIS
@@ -111,7 +111,7 @@ Disable Unicode decorations
 .BR "ENTER"
 Print the selected items to stdout and exit. If \fB\-\-right\-accepts\fR is set, the Right arrow key performs the same function. Equally, if \fB\-\-tab\-accepts\fR is set, the TAB key performs the same function.
 .TP
-.BR "ESC, Ctrl+c, Ctrl+d, Ctrl+g"
+.BR "ESC, Ctrl+c, Ctrl+g"
 Exit without printing any result. If \fB\-\-left\-aborts\fR is set, the Left arrow key performs the same function.
 .TP
 .BR "Up Arrow, Ctrl+p, Ctrl+k"
@@ -129,11 +129,17 @@ If multi-selection enabled (\fB-m, --multi\fR), (un)mark the selected item and s
 .BR "Backspace, Ctrl+h"
 Delete the character before the cursor.
 .TP
+.BR Del
+Delete the character next to the cursor.
+.TP
 .BR Ctrl+w
 Delete the word before the cursor.
 .TP
 .BR Ctrl+u
 Delete the entire line.
+.TP
+.BR Ctrl+d
+Same as \fBDel\fR (aborts \fBfnf\fR if the query is empty).
 .
 .SH COLORS
 Color configuration is made using the \fB--color\fR option, which takes a color string composed of one or more comma- or space-separated fields. Each field is a color definition with this general format: \fBCOLOR_NAME:ANSI_COLOR[:ATTRIBUTE]\fR.
