@@ -443,21 +443,10 @@ action_exit(tty_interface_t *state)
 static void
 action_ctrl_d(tty_interface_t *state)
 {
-	if (*state->search) {
+	if (*state->search)
 		action_del(state);
-		return;
-	}
-
-	if (state->options->reverse == 1) {
-		/* Move the cursor up and clear. */
-		tty_printf(state->tty, "\x1b[%dA\x1b[J",
-			state->options->num_lines + state->options->show_info);
-	}
-
-	clear(state);
-	tty_close(state->tty);
-
-	state->exit = SIG_INTERRUPT;
+	else
+		action_exit(state);
 }
 
 static void
