@@ -35,6 +35,7 @@
 #include <ctype.h>
 #include <limits.h>
 #include <unistd.h>
+#include <locale.h> /* setlocale() */
 
 #include "match.h"
 #include "tty.h"
@@ -47,6 +48,7 @@
 int
 main(int argc, char *argv[])
 {
+	setlocale(LC_ALL, "");
 	int ret = 0;
 
 	options_t options;

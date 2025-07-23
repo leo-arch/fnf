@@ -34,7 +34,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h> /* wc_xstrlen() */
-#include <locale.h> /* setlocale() */
 
 #include "colors.h"
 #include "config.h"
@@ -89,11 +88,50 @@ wc_xstrlen(const char *restrict str)
 	return 0; /* A non-printable wide char was found */
 }
 
-static size_t
-get_prompt_length(const char *prompt)
+static int
+contains_utf8(const char *str)
 {
-	setlocale(LC_ALL, "");
-	return wc_xstrlen(prompt);
+	while (*str) {
+		if ((unsigned char)*str >= 0x80)
+			return 1;
+		str++;
+	}
+
+	return 0;
+}
+
+static size_t
+get_cursor_position(const size_t base, tty_interface_t *state)
+{
+	if (!*state->search)
+		return base;
+
+	size_t cursor_position = base;
+
+	const int is_utf8 = contains_utf8(state->search);
+	if (is_utf8 == 0) {
+		for (size_t i = 0; state->search[i] && i < state->cursor; i++)
+			cursor_position += is_boundary(state->search[i]);
+		return cursor_position;
+	}
+
+	static wchar_t wbuf[SEARCH_SIZE_MAX * sizeof(wchar_t)];
+	const size_t ret = mbstowcs(wbuf, state->search, SEARCH_SIZE_MAX);
+	if (ret == (size_t)-1)
+		return base;
+
+	size_t wbuf_index = 0;
+
+	for (size_t i = 0; state->search[i] && i < state->cursor; i++) {
+		if (!is_boundary(state->search[i]))
+			continue;
+
+		const int w = wcwidth(wbuf[wbuf_index++]);
+		if (w > 0)
+			cursor_position += w;
+	}
+
+	return cursor_position;
 }
 
 static void
@@ -181,52 +219,6 @@ build_pointer(const int current, const int selected, const options_t *options)
 	return selected == 1 ? ptr_nocur_sel : ptr_nocur_nosel;
 }
 
-static int
-contains_utf8(const char *str)
-{
-	while (*str) {
-		if ((unsigned char)*str >= 0x80)
-			return 1;
-		str++;
-	}
-
-	return 0;
-}
-
-static size_t
-get_cursor_position(const size_t base, tty_interface_t *state)
-{
-	if (!*state->search)
-		return base;
-
-	size_t cursor_position = base;
-
-	const int is_utf8 = contains_utf8(state->search);
-	if (is_utf8 == 0) {
-		for (size_t i = 0; state->search[i] && i < state->cursor; i++)
-			cursor_position += is_boundary(state->search[i]);
-		return cursor_position;
-	}
-
-	static wchar_t wbuf[SEARCH_SIZE_MAX * sizeof(wchar_t)];
-	const size_t ret = mbstowcs(wbuf, state->search, SEARCH_SIZE_MAX);
-	if (ret == (size_t)-1)
-		return base;
-
-	size_t wbuf_index = 0;
-
-	for (size_t i = 0; state->search[i] && i < state->cursor; i++) {
-		if (!is_boundary(state->search[i]))
-			continue;
-
-		const int w = wcwidth(wbuf[wbuf_index++]);
-		if (w > 0)
-			cursor_position += w;
-	}
-
-	return cursor_position;
-}
-
 static void
 draw(tty_interface_t *state)
 {
@@ -300,7 +292,7 @@ draw(tty_interface_t *state)
 	/* Let's draw the prompt */
 	static size_t prompt_len = (size_t)-1;
 	if (prompt_len == (size_t)-1)
-		prompt_len = get_prompt_length(options->prompt);
+		prompt_len = wc_xstrlen(options->prompt);
 
 	const size_t cursor_position =
 		get_cursor_position(prompt_len + options_pad + 1, state);
