@@ -223,20 +223,17 @@ draw(tty_interface_t *state)
 		tty_printf(tty, "\x1b[%dG[%zu/%zu]%s\n", options_pad + 1,
 			choices->available, choices->size, CLEAR_LINE);
 
-	static char input_buf[SEARCH_SIZE_MAX + 1];
-	*input_buf = '\0';
-	size_t i, l = 0;
-	for (i = 0; state->search[i]; i++) {
-		if (i < state->cursor)
-			input_buf[l++] = state->search[i];
-	}
-	input_buf[l] = '\0';
+	static size_t prompt_len = (size_t)-1;
+	if (prompt_len == (size_t)-1)
+		prompt_len = strlen(options->prompt);
 
-	const size_t search_len = i;
-	tty_printf(tty, "\x1b[%dG%s%s%s%s%s", options_pad + 1,
-		colors[PROMPT_COLOR], options->prompt, RESET_ATTR, input_buf,
-		(options_reverse == 1 && state->cursor >= search_len)
-		? CLEAR_LINE : "");
+	size_t cursor_pos = prompt_len + options_pad;
+	for (size_t i = 0; state->search[i] && i < state->cursor; i++)
+		cursor_pos += is_boundary(state->search[i]);
+
+	tty_printf(tty, "\x1b[K\x1b[%dG%s%s%s%s\x1b[999D\x1b[%dC",
+		options_pad + 1, colors[PROMPT_COLOR], options->prompt,
+		RESET_ATTR, state->search, cursor_pos);
 
 	tty_setwrap(tty);
 	tty_unhide_cursor(tty);
@@ -323,7 +320,7 @@ action_emit(tty_interface_t *state)
 }
 
 static void
-action_del_char(tty_interface_t *state)
+action_backspace(tty_interface_t *state)
 {
 	if (state->cursor == 0) {
 		state->redraw = 0;
@@ -339,6 +336,25 @@ action_del_char(tty_interface_t *state)
 
 	memmove(&state->search[state->cursor], &state->search[original_cursor],
 		length - original_cursor + 1);
+}
+
+static void
+action_del(tty_interface_t *state)
+{
+	size_t length = strlen(state->search);
+	if (state->cursor >= length) {
+		state->redraw = 0;
+		return;
+	}
+
+	size_t cursor = state->cursor;
+
+	do {
+		cursor++;
+	} while (state->search[cursor] && !is_boundary(state->search[cursor]));
+
+	memmove(&state->search[state->cursor], &state->search[cursor],
+		length - cursor + 1);
 }
 
 static void
@@ -412,6 +428,26 @@ action_next(tty_interface_t *state)
 static void
 action_exit(tty_interface_t *state)
 {
+	if (state->options->reverse == 1) {
+		/* Move the cursor up and clear. */
+		tty_printf(state->tty, "\x1b[%dA\x1b[J",
+			state->options->num_lines + state->options->show_info);
+	}
+
+	clear(state);
+	tty_close(state->tty);
+
+	state->exit = SIG_INTERRUPT;
+}
+
+static void
+action_ctrl_d(tty_interface_t *state)
+{
+	if (*state->search) {
+		action_del(state);
+		return;
+	}
+
 	if (state->options->reverse == 1) {
 		/* Move the cursor up and clear. */
 		tty_printf(state->tty, "\x1b[%dA\x1b[J",
@@ -606,13 +642,13 @@ static const keybinding_t keybindings[] = {
 	{"\x1b[A", 3, action_prev},           /* UP */
 	{"\x1bOA", 3, action_prev},           /* UP */
 	{"\x1b", 1, action_exit},             /* ESC */
-	{"\x7f", 1, action_del_char},	       /* DEL */
-	{KEY_CTRL('H'), 1, action_del_char},  /* Backspace (C-H) */
+	{"\x7f", 1, action_backspace},	      /* Backspace */
+	{KEY_CTRL('H'), 1, action_backspace}, /* Backspace (C-H) */
 	{KEY_CTRL('W'), 1, action_del_word},  /* C-W */
 	{KEY_CTRL('U'), 1, action_del_all},   /* C-U */
 	{KEY_CTRL('I'), 1, action_tab},       /* TAB (C-I ) */
 	{KEY_CTRL('C'), 1, action_exit},      /* C-C */
-	{KEY_CTRL('D'), 1, action_exit},      /* C-D */
+	{KEY_CTRL('D'), 1, action_ctrl_d},    /* C-D */
 	{KEY_CTRL('G'), 1, action_exit},      /* C-G */
 	{KEY_CTRL('M'), 1, action_emit},      /* CR */
 	{KEY_CTRL('P'), 1, action_prev},      /* C-P */
@@ -620,14 +656,19 @@ static const keybinding_t keybindings[] = {
 	{KEY_CTRL('K'), 1, action_prev},      /* C-K */
 	{KEY_CTRL('J'), 1, action_next},      /* C-J */
 	{KEY_CTRL('A'), 1, action_beginning}, /* C-A */
-	{KEY_CTRL('E'), 1, action_end},   	   /* C-E */
+	{KEY_CTRL('E'), 1, action_end},   	  /* C-E */
+	{"\x1b[3~", 4, action_del},           /* DEL */
 	{"\x1bOD", 3, action_left},           /* LEFT */
 	{"\x1b[D", 3, action_left},           /* LEFT */
 	{"\x1bOC", 3, action_right},          /* RIGHT */
 	{"\x1b[C", 3, action_right},          /* RIGHT */
 	{"\x1b[1~", 4, action_beginning},     /* HOME */
+	{"\x1b[7~", 4, action_beginning},     /* HOME: rxvt */
 	{"\x1b[H", 3, action_beginning},      /* HOME */
+	{"\x1bOH", 3, action_beginning},      /* HOME: VTE */
+	{"\x1b[8~", 4, action_end},           /* END: rxvt */
 	{"\x1b[4~", 4, action_end},           /* END */
+	{"\x1bOF", 3, action_end},            /* END: VTE*/
 	{"\x1b[F", 3, action_end},            /* END */
 	{"\x1b[5~", 4, action_pageup},
 	{"\x1b[6~", 4, action_pagedown},
