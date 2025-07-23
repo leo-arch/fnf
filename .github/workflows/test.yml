@@ -37,15 +37,15 @@ jobs:
     strategy:
       matrix:
         arch: [armv7, aarch64, s390x, ppc64le]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - uses: uraimo/run-on-arch-action@v2.0.5
+      - uses: uraimo/run-on-arch-action@v3.0.1
         name: Compile and run tests
         id: test
         with:
           arch: ${{ matrix.arch }}
-          distro: ubuntu20.04
+          distro: ubuntu22.04
           githubToken: ${{ github.token }}
           install: |
             apt-get update -q -y
