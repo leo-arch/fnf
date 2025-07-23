@@ -77,7 +77,7 @@ clear(const tty_interface_t *state)
 static size_t
 wc_xstrlen(const char *restrict str)
 {
-	static wchar_t wbuf[PATH_MAX];
+	wchar_t wbuf[PATH_MAX];
 	const size_t len = mbstowcs(wbuf, str, (size_t)PATH_MAX);
 	if (len == (size_t)-1) /* Invalid multi-byte sequence found */
 		return 0;
