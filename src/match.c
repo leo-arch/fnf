@@ -44,7 +44,7 @@
 char *
 strcasechr(const char *s, char c)
 {
-	const char accept[3] = {c, TOUPPER(c), 0};
+	const char accept[3] = {c, toupper(c), '\0'};
 	return strpbrk(s, accept);
 }
 
@@ -62,7 +62,7 @@ has_match(const char *needle, const char *haystack)
 			return 0;
 	}
 
-	/* Set a pointer to the beginning of the last SGR sequence */
+	/* Set a pointer to the beginning of the last SGR sequence. */
 	const char *escape_key = haystack;
 	while (*escape_key) {
 		if (IS_SGR_START(escape_key))
@@ -70,7 +70,7 @@ has_match(const char *needle, const char *haystack)
 		escape_key++;
 	}
 
-	/* Inspect haystack up to the beginning of the last SGR sequence */
+	/* Inspect haystack up to the beginning of the last SGR sequence. */
 	while (*needle) {
 		const char nch = *needle++;
 		if (!(haystack = strcasechr(haystack, nch)) || haystack >= escape_key)
@@ -175,24 +175,19 @@ match(const char *needle, const char *haystack)
 	const int m = match.haystack_len;
 
 	if (m > MATCH_MAX_LEN || n > m) {
-		/*
-		 * Unreasonably large candidate: return no score
+		/* Unreasonably large candidate: return no score
 		 * If it is a valid match it will still be returned, it will
-		 * just be ranked below any reasonably sized candidates
-		 */
+		 * just be ranked below any reasonably sized candidates. */
 		return SCORE_MIN;
 	} else if (n == m) {
 		/* Since this method can only be called with a haystack which
 		 * matches needle. If the lengths of the strings are equal the
-		 * strings themselves must also be equal (ignoring case).
-		 */
+		 * strings themselves must also be equal (ignoring case). */
 		return SCORE_MAX;
 	}
 
-	/*
-	 * D[][] Stores the best score for this position ending with a match.
-	 * M[][] Stores the best possible score at this position.
-	 */
+	/* D[][] Stores the best score for this position ending with a match.
+	 * M[][] Stores the best possible score at this position. */
 	score_t D[2][MATCH_MAX_LEN], M[2][MATCH_MAX_LEN];
 
 	score_t *last_D, *last_M;
@@ -228,27 +223,22 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 	if (n == 0 || m == 0) {
 		return SCORE_MIN;
 	} else if (m > MATCH_MAX_LEN || n > m) {
-		/*
-		 * Unreasonably large candidate: return no score
+		/* Unreasonably large candidate: return no score
 		 * If it is a valid match it will still be returned, it will
-		 * just be ranked below any reasonably sized candidates.
-		 */
+		 * just be ranked below any reasonably sized candidates. */
 		return SCORE_MIN;
 	} else if (n == m) {
 		/* Since this method can only be called with a haystack which
 		 * matches needle. If the lengths of the strings are equal the
-		 * strings themselves must also be equal (ignoring case).
-		 */
+		 * strings themselves must also be equal (ignoring case). */
 		if (positions)
 			for (int i = 0; i < n; i++)
 				positions[i] = i;
 		return SCORE_MAX;
 	}
 
-	/*
-	 * D[][] Stores the best score for this position ending with a match.
-	 * M[][] Stores the best possible score at this position.
-	 */
+	/* D[][] Stores the best score for this position ending with a match.
+	 * M[][] Stores the best possible score at this position. */
 	score_t (*D)[MATCH_MAX_LEN], (*M)[MATCH_MAX_LEN];
 	M = calloc(n, sizeof(*M));
 	D = calloc(n, sizeof(*D));
@@ -266,25 +256,21 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 		last_M = curr_M;
 	}
 
-	/* backtrace to find the positions of optimal matching */
+	/* Backtrace to find the positions of optimal matching. */
 	if (positions) {
 		int match_required = 0;
 		for (int i = n - 1, j = m - 1; i >= 0; i--) {
 			for (; j >= 0; j--) {
-				/*
-				 * There may be multiple paths which result in
+				/* There may be multiple paths which result in
 				 * the optimal weight.
-				 *
 				 * For simplicity, we will pick the first one
 				 * we encounter, the latest in the candidate
-				 * string.
-				 */
+				 * string. */
 				if (D[i][j] != SCORE_MIN &&
 				    (match_required || D[i][j] == M[i][j])) {
 					/* If this score was determined using
 					 * SCORE_MATCH_CONSECUTIVE, the
-					 * previous character MUST be a match.
-					 */
+					 * previous character MUST be a match. */
 					match_required =
 					    i && j &&
 					    M[i][j] == D[i - 1][j - 1] + SCORE_MATCH_CONSECUTIVE;

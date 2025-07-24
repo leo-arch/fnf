@@ -44,9 +44,6 @@ typedef double score_t;
 
 #define MATCH_MAX_LEN 1024
 
-#define IS_ALPHA_LOW(c) ((unsigned int)(c) >= 'a' && (unsigned int)(c) <= 'z')
-#define TOUPPER(c)      (IS_ALPHA_LOW((c)) ? ((c) & ~0x20) : (c))
-
 int has_match(const char *needle, const char *haystack);
 score_t match_positions(const char *needle, const char *haystack,
 	size_t *positions);

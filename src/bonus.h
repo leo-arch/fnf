@@ -128,14 +128,9 @@ const score_t bonus_states[3][256] = {
 };
 
 const size_t bonus_index[256] = {
-	/* ['A' ... 'Z'] = 2 */
-	ASSIGN_UPPER(2),
-
-	/* ['a' ... 'z'] = 1 */
-	ASSIGN_LOWER(1),
-
-	/* ['0' ... '9'] = 1 */
-	ASSIGN_DIGIT(1)
+	ASSIGN_UPPER(2), /* ['A' ... 'Z'] = 2 */
+	ASSIGN_LOWER(1), /* ['a' ... 'z'] = 1 */
+	ASSIGN_DIGIT(1)  /* ['0' ... '9'] = 1 */
 };
 
 #define COMPUTE_BONUS(last_ch, ch) (bonus_states[bonus_index[(unsigned char)(ch)]][(unsigned char)(last_ch)])
