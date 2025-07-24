@@ -70,7 +70,7 @@ static void string_print_cb(FILE *f, void *instance, void *env) {
 	char *str = (char *)instance;
 	(void)env;
 	size_t size = strlen(str);
-	fprintf(f, "str[%zd]:\n    ", size);
+	fprintf(f, "str[%zu]:\n    ", size);
 	uint8_t bytes = 0;
 	for (size_t i = 0; i < size; i++) {
 		fprintf(f, "%02x", str[i]);
