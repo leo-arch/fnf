@@ -388,19 +388,15 @@ action_emit(tty_interface_t *state)
 {
 	update_state(state);
 	clear(state);
+	/* ttyout should be flushed before outputting on stdout. */
+	tty_close(state->tty);
 
 	if (state->options->multi == 1 && seln > 0) {
-		tty_close(state->tty);
-
 		print_selections(state);
 		free_selections(state);
-
 		state->exit = EXIT_SUCCESS;
 		return;
 	}
-
-	/* ttyout should be flushed before outputting on stdout. */
-	tty_close(state->tty);
 
 	const char *selection =
 		choices_get(state->choices, state->choices->selection);
