@@ -300,7 +300,7 @@ draw(tty_interface_t *state)
 
 		const char *choice = choices_get(choices, i);
 		if (choice) {
-			const int selected = (sel_num > 0 && is_selected(choice, sel_num));
+			const int selected = (sel_num > 0 && is_selected(choice));
 			const int current = (i == choices->selection);
 			const char *pointer = build_pointer(current, selected, options);
 
@@ -362,16 +362,16 @@ update_state(tty_interface_t *state)
 static void
 action_select(tty_interface_t *state)
 {
-	const char *p = choices_get(state->choices, state->choices->selection);
-	if (!p)
+	const char *choice = choices_get(state->choices, state->choices->selection);
+	if (!choice)
 		return;
 
-	if (is_selected(p, state->selection->selected) == 1) {
-		deselect_entry(p, state);
+	if (is_selected(choice) == 1) {
+		deselect_entry(choice, state);
 		return;
 	}
 
-	save_selection(p, state->selection);
+	save_selection(choice, state->selection);
 }
 
 static void

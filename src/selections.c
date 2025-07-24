@@ -44,9 +44,9 @@ static struct selections_t *selections = (struct selections_t *)NULL;
 /* Search for the string P in the selections array. If found, return 1,
  * otherwise zero. */
 int
-is_selected(const char *name, const size_t sel_num)
+is_selected(const char *name)
 {
-	if (!name || !*name || sel_num == 0)
+	if (!name || !*name || !selections)
 		return 0;
 
 	const size_t len = strlen(name);

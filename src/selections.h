@@ -38,7 +38,7 @@ extern "C" {
 
 void deselect_entry(const char *name, tty_interface_t *state);
 void free_selections(tty_interface_t *state);
-int  is_selected(const char *name, const size_t sel_num);
+int  is_selected(const char *name);
 void print_selections(tty_interface_t *state);
 void save_selection(const char *name, sel_t *selection);
 
