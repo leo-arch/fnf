@@ -110,8 +110,7 @@ get_cursor_position(const size_t start, tty_interface_t *state)
 	const size_t cursor = state->cursor;
 	const char *search = state->search;
 
-	const int is_utf8 = contains_utf8(search);
-	if (is_utf8 == 0) {
+	if (contains_utf8(search) == 0) {
 		for (size_t i = 0; i < cursor && search[i]; i++)
 			cursor_position += is_boundary(search[i]);
 		return cursor_position;
