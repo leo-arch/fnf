@@ -50,8 +50,8 @@ is_selected(const char *name, const size_t sel_num)
 		return 0;
 
 	const size_t len = strlen(name);
-	size_t i;
-	for (i = 0; selections[i].name; i++) {
+
+	for (size_t i = 0; selections[i].name; i++) {
 		if (*selections[i].name == *name && selections[i].namelen == len
 		&& strcmp(selections[i].name, name) == 0)
 			return 1;
