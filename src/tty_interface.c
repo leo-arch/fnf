@@ -108,23 +108,24 @@ get_cursor_position(const size_t start, tty_interface_t *state)
 
 	size_t cursor_position = start;
 	const size_t cursor = state->cursor;
+	const char *search = state->search;
 
-	const int is_utf8 = contains_utf8(state->search);
+	const int is_utf8 = contains_utf8(search);
 	if (is_utf8 == 0) {
-		for (size_t i = 0; i < cursor && state->search[i]; i++)
-			cursor_position += is_boundary(state->search[i]);
+		for (size_t i = 0; i < cursor && search[i]; i++)
+			cursor_position += is_boundary(search[i]);
 		return cursor_position;
 	}
 
 	static wchar_t wbuf[SEARCH_SIZE_MAX * sizeof(wchar_t)];
-	const size_t ret = mbstowcs(wbuf, state->search, SEARCH_SIZE_MAX);
+	const size_t ret = mbstowcs(wbuf, search, SEARCH_SIZE_MAX);
 	if (ret == (size_t)-1)
 		return start;
 
 	size_t wbuf_index = 0;
 
-	for (size_t i = 0; i < cursor && state->search[i]; i++) {
-		if (!is_boundary(state->search[i]))
+	for (size_t i = 0; i < cursor && search[i]; i++) {
+		if (!is_boundary(search[i]))
 			continue;
 
 		const int w = wcwidth(wbuf[wbuf_index++]);
