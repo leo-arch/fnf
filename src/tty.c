@@ -34,7 +34,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdarg.h>
-//#include <termios.h>
+#include <termios.h>
 #include <sys/ioctl.h>
 #include <sys/select.h>
 #include <signal.h>
