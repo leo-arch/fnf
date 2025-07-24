@@ -62,6 +62,7 @@ static const char *usage_str =
     "     --right-accepts      Right arrow key accepts\n"
     "     --left-aborts        Left arrow key aborts\n"
     "     --reverse            Display from top, prompt at bottom\n"
+    "     --no-clear           Do not clear the interface on exit\n"
     "     --no-unicode         Do not use Unicode decorations\n"
     "     --no-sort            Do not sort the result\n"
     "     --color=COLORSPEC    Set custom colors (consult the manpage)\n"
@@ -100,6 +101,7 @@ static struct option longopts[] = {
 	{"print-null", no_argument, NULL, 11},
 	{"scroll-off", required_argument, NULL, 12},
 	{"no-sort", no_argument, NULL, 13},
+	{"no-clear", no_argument, NULL, 14},
 	{NULL, 0, NULL, 0}
 };
 
@@ -108,6 +110,7 @@ void
 options_init(options_t *options)
 {
 	options->auto_lines      = DEFAULT_AUTO_LINES;
+	options->clear           = DEFAULT_CLEAR;
 	options->color           = NULL;
 	options->cycle           = DEFAULT_CYCLE;
 	options->filter          = DEFAULT_FILTER;
@@ -208,6 +211,7 @@ options_parse(options_t *options, int argc, char *argv[])
 				options->scrolloff = -1;
 			break;
 		case 13: options->sort = 0; break;
+		case 14: options->clear = 0; break;
 		case 'h': /* fallthrough */
 		default: usage(argv[0]); exit(EXIT_SUCCESS);
 		}

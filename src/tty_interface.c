@@ -54,17 +54,45 @@ is_boundary(const char c)
 }
 
 static void
+set_cursor_for_clear(const tty_interface_t *state)
+{
+	if (state->options->reverse == 1) {
+		if (state->options->clear == 1) {
+			/* Move the cursor up. */
+			tty_printf(state->tty, "\x1b[%dA",
+				state->options->num_lines + state->options->show_info);
+		} else {
+			tty_putc(state->tty, '\n');
+		}
+	} else if (state->options->clear == 0) {
+		/* Move the cursor down and print a new line. */
+		tty_printf(state->tty, "\x1b[%dB\n",
+			state->options->num_lines + state->options->show_info + 1);
+	}
+}
+
+/* Reset the tty as close as possible to the previous state. */
+static void
 clear(const tty_interface_t *state)
 {
+	set_cursor_for_clear(state);
+
+	if (state->options->clear == 0) {
+		tty_flush(state->tty);
+		return;
+	}
+
 	tty_t *tty = state->tty;
+	const size_t num_lines = state->options->num_lines;
+	const int show_info = state->options->show_info;
 
 	tty_setcol(tty, state->options->pad);
 	size_t line = 0;
-	while (line++ < state->options->num_lines + (state->options->show_info ? 1 : 0))
+	while (line++ < num_lines + (show_info ? 1 : 0))
 		tty_newline(tty);
 
 	tty_clearline(tty);
-	if (state->options->num_lines > 0)
+	if (num_lines > 0)
 		tty_moveup(tty, line - 1);
 
 	tty_flush(tty);
@@ -320,7 +348,7 @@ update_state(tty_interface_t *state)
 	if (*state->last_search != *state->search
 	|| strcmp(state->last_search, state->search) != 0) {
 		update_search(state);
-		if (state->options->reverse == 1) {
+		if (state->options->reverse == 1 && state->options->clear == 1) {
 			/* Hide cursor and move it up. */
 			tty_printf(state->tty, "\x1b[?25l\x1b[%dA\n",
 				state->options->num_lines + 1 + state->options->show_info);
@@ -347,28 +375,29 @@ action_select(tty_interface_t *state)
 }
 
 static void
+action_exit(tty_interface_t *state)
+{
+	clear(state);
+	tty_close(state->tty);
+
+	state->exit = SIG_INTERRUPT;
+}
+
+static void
 action_emit(tty_interface_t *state)
 {
 	update_state(state);
-
-	if (state->options->reverse == 1) {
-		/* Move the cursor up and clear. */
-		tty_printf(state->tty, "\x1b[%dA\x1b[J",
-			state->options->num_lines + state->options->show_info);
-	}
+	clear(state);
 
 	if (state->options->multi == 1 && seln > 0) {
-		clear(state);
 		tty_close(state->tty);
 
 		print_selections(state);
 		free_selections(state);
+
 		state->exit = EXIT_SUCCESS;
 		return;
 	}
-
-	/* Reset the tty as close as possible to the previous state. */
-	clear(state);
 
 	/* ttyout should be flushed before outputting on stdout. */
 	tty_close(state->tty);
@@ -490,21 +519,6 @@ action_next(tty_interface_t *state)
 
 	update_state(state);
 	choices_next(state->choices);
-}
-
-static void
-action_exit(tty_interface_t *state)
-{
-	if (state->options->reverse == 1) {
-		/* Move the cursor up and clear. */
-		tty_printf(state->tty, "\x1b[%dA\x1b[J",
-			state->options->num_lines + state->options->show_info);
-	}
-
-	clear(state);
-	tty_close(state->tty);
-
-	state->exit = SIG_INTERRUPT;
 }
 
 static void

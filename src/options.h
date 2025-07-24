@@ -32,7 +32,7 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
-#define VERSION "0.3.1"
+#define VERSION "0.3.2"
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,6 +49,7 @@ typedef struct {
 	unsigned int num_lines;
 	unsigned int workers;
 	int auto_lines;
+	int clear;
 	int cycle;
 	int left_aborts;
 	int multi;
