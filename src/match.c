@@ -31,10 +31,10 @@
 
 #include <ctype.h>
 #include <string.h>
-#include <strings.h>
-#include <stdio.h>
-#include <float.h>
-#include <math.h>
+//#include <strings.h>
+//#include <stdio.h>
+//#include <float.h>
+//#include <math.h>
 #include <stdlib.h>
 
 #include "match.h"
