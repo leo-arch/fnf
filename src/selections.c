@@ -33,7 +33,7 @@
 #include "colors.h"
 #include "selections.h"
 
-/* Struct to store selected/marked entries */
+/* Struct to store selected/marked entries. */
 struct selections_t {
 	char *name;
 	size_t namelen;
@@ -41,18 +41,12 @@ struct selections_t {
 
 static struct selections_t *selections = (struct selections_t *)NULL;
 
-/* SELN is the current size of the selections array, while SEL_COUNTER
- * is the current number of actually selected entries (i.e.
- * seln - deselected_entries, since deselected entries are nullyfied). */
-size_t seln = 0;
-static size_t sel_counter = 0;
-
 /* Search for the string P in the selections array. If found, return 1,
  * otherwise zero. */
 int
-is_selected(const char *name)
+is_selected(const char *name, const size_t sel_num)
 {
-	if (!name || !*name || sel_counter == 0)
+	if (!name || !*name || sel_num == 0)
 		return 0;
 
 	const size_t len = strlen(name);
@@ -69,9 +63,9 @@ is_selected(const char *name)
 /* Remote the entry NAME from the selections array by setting the first
  * byte of the corresponding array entry to NUL */
 void
-deselect_entry(const char *name)
+deselect_entry(const char *name, tty_interface_t *state)
 {
-	if (!name || !*name || sel_counter == 0)
+	if (!name || !*name || state->selection->selected == 0)
 		return;
 
 	const size_t len = strlen(name);
@@ -81,17 +75,20 @@ deselect_entry(const char *name)
 		|| strcmp(selections[i].name, name) != 0)
 			continue;
 		*selections[i].name = '\0';
-		sel_counter--;
+		state->selection->selected--;
 		break;
 	}
+
+	if (state->selection->selected == 0)
+		free_selections(state);
 }
 
 /* Save the string P into the selections array. */
 void
-save_selection(const char *name)
+save_selection(const char *name, sel_t *selection)
 {
 	struct selections_t *tmp = (struct selections_t *)realloc(
-		selections, (seln + 2) * sizeof(struct selections_t));
+		selections, (selection->size + 2) * sizeof(struct selections_t));
 	if (!tmp) {
 		for (size_t i = 0; selections[i].name; i++)
 			free(selections[i].name);
@@ -102,25 +99,25 @@ save_selection(const char *name)
 	selections = tmp;
 
 	const size_t len = strlen(name);
-	selections[seln].name = (char *)malloc((len + 1) * sizeof(char));
-	if (!selections[seln].name) {
+	selections[selection->size].name = (char *)malloc((len + 1) * sizeof(char));
+	if (!selections[selection->size].name) {
 		fprintf(stderr, "Error: Cannot allocate memory\n");
 		abort();
 	}
 
-	strcpy(selections[seln].name, name);
-	selections[seln].namelen = len;
-	seln++;
-	sel_counter++;
-	selections[seln].name = (char *)NULL;
-	selections[seln].namelen = 0;
+	strcpy(selections[selection->size].name, name);
+	selections[selection->size].namelen = len;
+	selection->size++;
+	selection->selected++;
+	selections[selection->size].name = (char *)NULL;
+	selections[selection->size].namelen = 0;
 }
 
 /* Print the list of selected/marked entries to STDOUT. */
 void
 print_selections(tty_interface_t *state)
 {
-	if (sel_counter == 0 || state->options->multi == 0)
+	if (state->selection->selected == 0 || state->options->multi == 0)
 		return;
 
 	const char end_char = state->options->print_null ? '\0' : '\n';
@@ -142,11 +139,15 @@ print_selections(tty_interface_t *state)
 void
 free_selections(tty_interface_t *state)
 {
-	if (state->options->multi == 0 || seln == 0 || !selections)
+	if (state->options->multi == 0 || state->selection->size == 0
+	|| !selections)
 		return;
 
 	for (size_t i = 0; selections[i].name; i++)
 		free(selections[i].name);
 	free(selections);
 	selections = (struct selections_t *)NULL;
+
+	state->selection->size = 0;
+	state->selection->selected = 0;
 }

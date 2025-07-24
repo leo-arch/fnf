@@ -67,9 +67,15 @@ extern "C" {
 #endif
 
 typedef struct {
+	size_t size; /* Size of the selections buffer */
+	size_t selected; /* Number of currently selected entries */
+} sel_t;
+
+typedef struct {
 	tty_t *tty;
 	choices_t *choices;
 	options_t *options;
+	sel_t *selection;
 	size_t cursor;
 	int ambiguous_key_pending;
 	int exit;
@@ -80,7 +86,7 @@ typedef struct {
 } tty_interface_t;
 
 void tty_interface_init(tty_interface_t *state, tty_t *tty,
-	choices_t *choices, options_t *options);
+	choices_t *choices, options_t *options, sel_t *selection);
 int tty_interface_run(tty_interface_t *state);
 
 #ifdef __cplusplus

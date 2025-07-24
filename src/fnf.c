@@ -57,6 +57,8 @@ main(int argc, char *argv[])
 	choices_t choices;
 	choices_init(&choices, &options);
 
+	sel_t selection = {0};
+
 	if (options.filter) { /* --show-matches */
 		choices_fread(&choices, stdin, options.input_delimiter);
 		choices_search(&choices, options.filter, options.sort);
@@ -91,7 +93,7 @@ main(int argc, char *argv[])
 			options.num_lines = tty_getheight(&tty) - num_lines_adjustment;
 
 		tty_interface_t tty_interface;
-		tty_interface_init(&tty_interface, &tty, &choices, &options);
+		tty_interface_init(&tty_interface, &tty, &choices, &options, &selection);
 		ret = tty_interface_run(&tty_interface);
 	}
 

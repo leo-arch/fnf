@@ -271,7 +271,7 @@ draw(tty_interface_t *state)
 			start = available - num_lines;
 	}
 
-	const int options_multi = options->multi;
+	const size_t sel_num = state->selection->selected;
 	const int options_pad = options->pad;
 	const int options_reverse = options->reverse;
 	const int options_show_info = options->show_info;
@@ -300,7 +300,7 @@ draw(tty_interface_t *state)
 
 		const char *choice = choices_get(choices, i);
 		if (choice) {
-			const int selected = (options_multi == 1 && is_selected(choice));
+			const int selected = (sel_num > 0 && is_selected(choice, sel_num));
 			const int current = (i == choices->selection);
 			const char *pointer = build_pointer(current, selected, options);
 
@@ -366,12 +366,12 @@ action_select(tty_interface_t *state)
 	if (!p)
 		return;
 
-	if (is_selected(p) == 1) {
-		deselect_entry(p);
+	if (is_selected(p, state->selection->selected) == 1) {
+		deselect_entry(p, state);
 		return;
 	}
 
-	save_selection(p);
+	save_selection(p, state->selection);
 }
 
 static void
@@ -379,7 +379,6 @@ action_exit(tty_interface_t *state)
 {
 	clear(state);
 	tty_close(state->tty);
-
 	state->exit = SIG_INTERRUPT;
 }
 
@@ -391,12 +390,15 @@ action_emit(tty_interface_t *state)
 	/* ttyout should be flushed before outputting on stdout. */
 	tty_close(state->tty);
 
-	if (state->options->multi == 1 && seln > 0) {
+	if (state->options->multi == 1 && state->selection->selected > 0) {
 		print_selections(state);
 		free_selections(state);
 		state->exit = EXIT_SUCCESS;
 		return;
 	}
+
+	if (state->selection->size > 0)
+		free_selections(state);
 
 	const char *selection =
 		choices_get(state->choices, state->choices->selection);
@@ -671,7 +673,7 @@ append_search(tty_interface_t *state, const char ch)
 
 void
 tty_interface_init(tty_interface_t *state, tty_t *tty, choices_t *choices,
-	options_t *options)
+	options_t *options, sel_t *selection)
 {
 	state->tty = tty;
 	state->choices = choices;
@@ -685,6 +687,7 @@ tty_interface_init(tty_interface_t *state, tty_t *tty, choices_t *choices,
 	state->cursor = 0;
 	state->redraw = 1;
 	state->exit = -1;
+	state->selection = selection;
 
 	if (options->init_search) {
 		strncpy(state->search, options->init_search, SEARCH_SIZE_MAX);
