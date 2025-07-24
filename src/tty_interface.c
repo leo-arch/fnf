@@ -297,7 +297,7 @@ draw(tty_interface_t *state)
 	const size_t cursor_position =
 		get_cursor_position(prompt_len + options_pad + 1, state);
 
-	tty_printf(tty, "%s\x1b[%dG%s%s%s%s\x1b[%dG", CLEAR_LINE,
+	tty_printf(tty, "%s\x1b[%dG%s%s%s%s\x1b[%zuG", CLEAR_LINE,
 		options_pad + 1, colors[PROMPT_COLOR], options->prompt,
 		RESET_ATTR, state->search, cursor_position);
 
