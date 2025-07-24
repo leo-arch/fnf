@@ -101,12 +101,12 @@ contains_utf8(const char *str)
 }
 
 static size_t
-get_cursor_position(const size_t base, tty_interface_t *state)
+get_cursor_position(const size_t start, tty_interface_t *state)
 {
 	if (!*state->search)
-		return base;
+		return start;
 
-	size_t cursor_position = base;
+	size_t cursor_position = start;
 
 	const int is_utf8 = contains_utf8(state->search);
 	if (is_utf8 == 0) {
@@ -118,7 +118,7 @@ get_cursor_position(const size_t base, tty_interface_t *state)
 	static wchar_t wbuf[SEARCH_SIZE_MAX * sizeof(wchar_t)];
 	const size_t ret = mbstowcs(wbuf, state->search, SEARCH_SIZE_MAX);
 	if (ret == (size_t)-1)
-		return base;
+		return start;
 
 	size_t wbuf_index = 0;
 
