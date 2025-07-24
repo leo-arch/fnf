@@ -105,10 +105,12 @@ save_selection(const char *name, sel_t *selection)
 		abort();
 	}
 
+	selection->selected++;
+
 	strcpy(selections[selection->size].name, name);
 	selections[selection->size].namelen = len;
+
 	selection->size++;
-	selection->selected++;
 	selections[selection->size].name = (char *)NULL;
 	selections[selection->size].namelen = 0;
 }

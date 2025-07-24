@@ -85,14 +85,12 @@ has_match(const char *needle, const char *haystack)
 #define SWAP(x, y, T) do { T SWAP = x; x = y; y = SWAP; } while (0)
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 
-struct match_struct {
-	int needle_len;
-	int haystack_len;
-
+struct match_t {
+	score_t match_bonus[MATCH_MAX_LEN];
 	char lower_needle[MATCH_MAX_LEN];
 	char lower_haystack[MATCH_MAX_LEN];
-
-	score_t match_bonus[MATCH_MAX_LEN];
+	int needle_len;
+	int haystack_len;
 };
 
 static void
@@ -108,7 +106,7 @@ precompute_bonus(const char *haystack, score_t *match_bonus)
 }
 
 static void
-setup_match_struct(struct match_struct *match, const char *needle,
+setup_match_struct(struct match_t *match, const char *needle,
 	const char *haystack)
 {
 	match->needle_len = strlen(needle);
@@ -128,7 +126,7 @@ setup_match_struct(struct match_struct *match, const char *needle,
 }
 
 static inline void
-match_row(const struct match_struct *match, int row, score_t *curr_D,
+match_row(const struct match_t *match, int row, score_t *curr_D,
 	score_t *curr_M, const score_t *last_D, const score_t *last_M)
 {
 	const int n = match->needle_len;
@@ -168,7 +166,7 @@ match(const char *needle, const char *haystack)
 	if (!*needle)
 		return SCORE_MIN;
 
-	struct match_struct match;
+	struct match_t match;
 	setup_match_struct(&match, needle, haystack);
 
 	const int n = match.needle_len;
@@ -214,7 +212,7 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 	if (!*needle)
 		return SCORE_MIN;
 
-	struct match_struct match;
+	struct match_t match;
 	setup_match_struct(&match, needle, haystack);
 
 	const int n = match.needle_len;
