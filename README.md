@@ -1,5 +1,5 @@
 
-<p align="center"><img src="https://i.postimg.cc/dQWM9xVW/fnf-logo.png" width="500" height="400"></p>
+<p align="center"><img src="https://i.postimg.cc/dQWM9xVW/fnf-logo.png" width="600" height="400"></p>
 <h2 align="center">A fast, simple fuzzy finder for the terminal</h2>
 
 <p align="center">
