@@ -1,3 +1,15 @@
+## 0.3.1 (Jul 24, 2025)
+
+### BUG FIXES
+* <kbd>Home</kbd> and <kbd>End</kbd> keys not working in VTE and rxvt terminals.
+* The <kbd>Del</kbd> key does not work.
+* Wide Unicode chacracters (like CJK) break the interface.
+
+### IMPROVEMENTS
+* <kbd>Ctrl+d</kbd> works the same as <kbd>Del</kbd>, but aborts fnf if the qeury is empty.
+
+---
+
 ## 0.3 (Jul 21, 2025)
 
 ### BUG FIXES
@@ -18,6 +30,8 @@
 * Add `--no-sort` option to get unsorted results.
 * Use <kbd>Shift-TAB</kbd> (btab) to (un)mark the current item and select the previous item.
 
+---
+
 ## 0.2 (Jul 9, 2025)
 
 ### BUG FIXES
@@ -25,6 +39,8 @@
 * Left and Right key not working in the prompt when running with --reverse
 * Prompt color ignored when running with --reverse
 * Several memory warnings
+
+---
 
 ## 0.1 (Jun 6, 2023)
 
