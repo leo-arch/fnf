@@ -30,6 +30,7 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h> /* exit() */
 #include <unistd.h>
 #include <locale.h> /* setlocale() */
 
@@ -64,8 +65,10 @@ main(int argc, char *argv[])
 			printf("%s\n", choices_get(&choices, i));
 		}
 	} else { /* Interactive */
-		if (isatty(STDIN_FILENO))
-			choices_fread(&choices, stdin, options.input_delimiter);
+		if (isatty(STDIN_FILENO)) {
+			fputs("fnf: Expected piped input (e.g. 'ls | fnf')\n", stderr);
+			exit(EXIT_FAILURE);
+		}
 
 		tty_t tty;
 		tty_init(&tty, options.tty_filename);
