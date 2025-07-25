@@ -1,6 +1,6 @@
 
 <p align="center"><img src="https://i.postimg.cc/dQWM9xVW/fnf-logo.png" width="500" height="250"></p>
-<h2 align="center">A general-purpose, interactive fuzzy finder for the terminal</h2>
+<h2 align="center">An interactive fuzzy finder for the terminal</h2>
 
 <p align="center">
 <a href="https://github.com/leo-arch/fnf/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-red?style=flat"/></a>
