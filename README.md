@@ -1,6 +1,6 @@
 
 <p align="center"><img src="https://i.postimg.cc/dQWM9xVW/fnf-logo.png" width="500" height="250"></p>
-<h2 align="center">A fast, simple fuzzy finder for the terminal</h2>
+<h2 align="center">A general-purpose, interactive fuzzy finder for the terminal</h2>
 
 <p align="center">
 <a href="https://github.com/leo-arch/fnf/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-red?style=flat"/></a>
@@ -16,8 +16,9 @@
 ---
 ## Description
 
-**Fnf** (short for **fnf's not fzy**) is a fork of the original [fzy tool](https://github.com/jhawthorn/fzy), which was initially designed to work with the [clifm file manager](https://github.com/leo-arch/clifm).
- This version introduces several new features, including support for 256  and 24-bit colors, customizable padding, and multi-selection capabilities. For detailed usage instructions and additional information, please refer to the manpage.
+**Fnf** (short for **fnf's not fzy**)<sup>1</sup> reads a list of newline-separated items from standard input and presents an incremental, interactive selection interface. As you type a query, **fnf** scores and filters candidates by fuzzy matching, highlighting matched characters and instantly updating the sorted list so you can quickly select the best match.
+
+<sup>1</sup> **Fnf** is a fork of the original [fzy tool](https://github.com/jhawthorn/fzy), which introduces several new features, such as support for 256  and 24-bit colors, customizable padding, and multi-selection capabilities. For detailed usage instructions and additional information, please refer to the manpage.
 
 ## Installation
 
