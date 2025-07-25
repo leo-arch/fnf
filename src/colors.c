@@ -341,7 +341,9 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 			p++;
 	}
 
+	if (l >= BUF_SIZE) l = BUF_SIZE;
 	buf[l] = '\0';
+
 	tty_printf(tty, "%s%s", pointer, buf);
 }
 
@@ -366,6 +368,8 @@ colorize_no_match(tty_t *tty, const char *sel_color, const char *name,
 
 	/* Append the choice to the buffer and null-terminate the string. */
 	l += snprintf(buf + l, BUF_SIZE - l, "%s", name);
+
+	if (l >= BUF_SIZE) l = BUF_SIZE;
 	buf[l] = '\0';
 
 	tty_printf(tty, "%s%s", pointer, buf);
