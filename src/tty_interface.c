@@ -293,9 +293,9 @@ draw(tty_interface_t *state)
 	}
 
 	/* Print matches */
-	const char *clear_line = options_reverse == 0 ? "\n"CLEAR_LINE : CLEAR_LINE;
 	for (size_t i = start; i < start + num_lines; i++) {
-		tty_fputs(tty, clear_line);
+		if (options_reverse == 0)
+			tty_putc(tty, '\n');
 
 		const char *choice = choices_get(choices, i);
 		if (choice) {

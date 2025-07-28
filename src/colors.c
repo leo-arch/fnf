@@ -344,7 +344,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 	if (l >= BUF_SIZE) l = BUF_SIZE;
 	buf[l] = '\0';
 
-	tty_printf(tty, "%s%s", pointer, buf);
+	tty_printf(tty, "%s%s%s", pointer, buf, CLEAR_LINE);
 }
 
 void
@@ -352,7 +352,7 @@ colorize_no_match(tty_t *tty, const char *sel_color, const char *name,
 	const char *pointer)
 {
 	if (!sel_color) { /* The entry is not selected */
-		tty_printf(tty, "%s%s", pointer, name);
+		tty_printf(tty, "%s%s%s", pointer, name, CLEAR_LINE);
 		return;
 	}
 
@@ -372,6 +372,6 @@ colorize_no_match(tty_t *tty, const char *sel_color, const char *name,
 	if (l >= BUF_SIZE) l = BUF_SIZE;
 	buf[l] = '\0';
 
-	tty_printf(tty, "%s%s", pointer, buf);
+	tty_printf(tty, "%s%s%s", pointer, buf, CLEAR_LINE);
 }
 #undef BUF_SIZE
