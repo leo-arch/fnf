@@ -304,6 +304,8 @@ draw(tty_interface_t *state)
 			const char *pointer = build_pointer(current, selected, options);
 
 			draw_match(state, choice, current, pointer);
+		} else {
+			tty_fputs(tty, CLEAR_LINE);
 		}
 
 		if (options_reverse == 1)
