@@ -353,6 +353,10 @@ update_state(tty_interface_t *state)
 				state->options->num_lines + 1 + state->options->show_info);
 		}
 		draw(state);
+		/* Prevent a double draw when modifying the search string. */
+		state->redraw = 0;
+	} else {
+		state->redraw = 1;
 	}
 }
 
