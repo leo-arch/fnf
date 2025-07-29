@@ -284,29 +284,31 @@ decolor_name(const char *name, char *color_buf)
 #define BUF_SIZE 8192
 void
 colorize_match(const tty_interface_t *state, const size_t *positions,
-	const char *name, const char *orig_color, const char *pointer,
+	const char *name, const char *original_color, const char *pointer,
 	const int selected)
 {
-	tty_t *tty = state->tty;
 	const int no_color = state->options->no_color;
-	const char *hl = colors[HIGHLIGHT_COLOR];
-	static char buf[BUF_SIZE];
+	const char *highlight = no_color == 1 ? UNDERLINE : colors[HIGHLIGHT_COLOR];
+	const char *orig_color = no_color == 1
+		? (selected == 1 ? RESET_ATTR INVERT : RESET_ATTR)
+		: ((original_color && *original_color) ? original_color : RESET_ATTR);
+
 	size_t l = 0; /* Current buffer length */
-	size_t p = 0; /* position in match */
+	size_t p = 0; /* Position in match */
 	int in_match = 0; /* Track whether we are currently in a match */
 
+	static char buf[BUF_SIZE];
 	l += snprintf(buf, sizeof(buf), "%s", pointer);
 
 	if (positions[p] != 0) {
 		/* If the first character is not a match, set the original color */
-		if (no_color == 1 || !orig_color || !*orig_color)
-			l += snprintf(buf + l, sizeof(buf) - l, RESET_ATTR);
-		else
-			l += snprintf(buf + l, sizeof(buf) - l, "%s", orig_color);
-	} else if (selected == 1 && *colors[SEL_BG_COLOR]) {
+		l += snprintf(buf + l, sizeof(buf) - l, "%s", orig_color);
+	} else if (selected == 1) {
 		/* The first character is a match. Let's copy the selection background
 		 * color to extend this color to the first character. */
-		l += snprintf(buf + l, sizeof(buf) - l, "%s", colors[SEL_BG_COLOR]);
+		l += snprintf(buf + l, sizeof(buf) - l, "%s",
+			no_color == 1 ? INVERT
+			: (*colors[SEL_BG_COLOR] ? colors[SEL_BG_COLOR] : ""));
 	}
 
 	for (size_t i = 0; name[i]; i++) {
@@ -314,27 +316,21 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 
 		if (is_match) {
 			if (!in_match) {
-				if (no_color == 1)
-					l += snprintf(buf + l, sizeof(buf) - l, UNDERLINE);
-				else
-					l += snprintf(buf + l, sizeof(buf) - l, "%s", hl); /* Highlight */
+				l += snprintf(buf + l, sizeof(buf) - l, "%s", highlight);
 				in_match = 1; /* Transition from non-match to match */
 			}
 		} else {
 			if (in_match) {
-				if (no_color == 1 || !orig_color || !*orig_color)
-					l += snprintf(buf + l, sizeof(buf) - l, RESET_ATTR);
-				else
-					l += snprintf(buf + l, sizeof(buf) - l, "%s", orig_color);
+				l += snprintf(buf + l, sizeof(buf) - l, "%s", orig_color);
 				in_match = 0; /* Transition from match to non-match */
 			}
 		}
 
-		/* Add the character to the buffer */
+		/* Append the current character to the buffer */
 		buf[l++] = (name[i] == '\n') ? ' ' : name[i];
 
 		if (l >= sizeof(buf) - 1)
-			break; /* Buffer is full, stop adding more characters */
+			break; /* Buffer is full: stop adding more characters */
 
 		/* Move to the next position if we are at a match */
 		if (is_match)
@@ -345,7 +341,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 	if (l >= sizeof(buf)) l = sizeof(buf);
 	buf[l] = '\0';
 
-	tty_fputs(tty, buf);
+	tty_fputs(state->tty, buf);
 }
 
 void

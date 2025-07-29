@@ -356,9 +356,9 @@ update_state(tty_interface_t *state)
 		}
 		draw(state);
 		/* Prevent a double draw when modifying the search string. */
-		state->redraw = 0;
-	} else {
-		state->redraw = 1;
+//		state->redraw = 0;
+//	} else {
+//		state->redraw = 1;
 	}
 }
 
