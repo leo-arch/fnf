@@ -278,8 +278,9 @@ draw(tty_interface_t *state)
 
 	if (options_reverse == 0) {
 		/* Set column, print prompt, and clear line. */
-		tty_printf(tty, "\x1b[%dG%s%s%s", options_pad + 1,
-			options->prompt, state->search, CLEAR_LINE);
+		tty_printf(tty, "\x1b[%dG%s%s%s%s", options_pad + 1,
+			colors[PROMPT_COLOR], options->prompt, RESET_ATTR,
+			state->search);
 
 		if (options_show_info == 1) {
 			tty_printf(tty, "\n[%zu/%zu]%s", choices->available,
@@ -325,9 +326,9 @@ draw(tty_interface_t *state)
 	const size_t cursor_position =
 		get_cursor_position(prompt_len + options_pad + 1, state);
 
-	tty_printf(tty, "%s\x1b[%dG%s%s%s%s\x1b[%zuG", CLEAR_LINE,
+	tty_printf(tty, "\x1b[%dG%s%s%s%s%s\x1b[%zuG",
 		options_pad + 1, colors[PROMPT_COLOR], options->prompt,
-		RESET_ATTR, state->search, cursor_position);
+		RESET_ATTR, state->search, CLEAR_LINE, cursor_position);
 
 	tty_setwrap(tty);
 	tty_unhide_cursor(tty);
