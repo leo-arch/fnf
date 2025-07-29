@@ -341,6 +341,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 	if (l >= sizeof(buf)) l = sizeof(buf);
 	buf[l] = '\0';
 
+	state->tty->fgcolor = TERM_FG_COLOR_RESET;
 	tty_fputs(state->tty, buf);
 }
 
@@ -356,20 +357,17 @@ colorize_no_match(tty_t *tty, const char *sel_color, const char *name,
 		return;
 	}
 
-	size_t l = snprintf(buf, sizeof(buf), "%s", pointer);
-
 	/* If selected, handle colors. */
-	if (*colors[SEL_FG_COLOR] || *colors[SEL_BG_COLOR])
-		l += snprintf(buf + l, sizeof(buf) - l, "%s", sel_color);
-	else /* If no specific colors, set invert. */
-		l += snprintf(buf + l, sizeof(buf) - l, INVERT);
-
-	/* Append the choice to the buffer and null-terminate the string. */
-	l += snprintf(buf + l, sizeof(buf) - l, "%s%s", name, RESET_ATTR CLEAR_LINE);
+	size_t l = snprintf(buf, sizeof(buf), "%s%s%s%s",
+		pointer,
+		*sel_color ? sel_color : INVERT,
+		name,
+		RESET_ATTR CLEAR_LINE);
 
 	if (l >= sizeof(buf)) l = sizeof(buf);
 	buf[l] = '\0';
 
+	tty->fgcolor = TERM_FG_COLOR_RESET;
 	tty_fputs(tty, buf);
 }
 #undef BUF_SIZE
