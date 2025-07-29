@@ -194,9 +194,9 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 
 	if (options->show_scores == 1) {
 		if (score == SCORE_MIN)
-			tty_fputs(tty, "(     ) ");
+			tty_printf(tty, "\x1b[%dG(     ) ", state->options->pad + 1);
 		else
-			tty_printf(tty, "(%5.2f) ", score);
+			tty_printf(tty, "\x1b[%dG(%5.2f) ", state->options->pad + 1, score);
 	}
 
 	if (positions[0] == (size_t)-1) { /* No matching result (or no query). */
@@ -215,27 +215,31 @@ build_pointer(const int current, const int selected, const options_t *options)
 	static char ptr_cur_nosel[MAX_POINTER_LEN];
 	static char ptr_nocur_sel[MAX_POINTER_LEN];
 	static char ptr_nocur_nosel[MAX_POINTER_LEN];
+	static int pad = -1;
+	if (pad == -1)
+		/* If --show-scores, padding is already done by draw_match() */
+		pad = options->show_scores == 1 ? 0 : options->pad;
 
 	/* Let's construct the pointer string only once */
 	if (!*ptr_cur_sel) {
 		/* Current (hovered) and selected */
 		snprintf(ptr_cur_sel, sizeof(ptr_cur_sel), "%*s%s%s%s%s%s%s",
-			options->pad, "", colors[SEL_BG_COLOR], colors[POINTER_COLOR],
+			pad, "", colors[SEL_BG_COLOR], colors[POINTER_COLOR],
 			options->pointer, colors[MARKER_COLOR], options->marker, RESET_ATTR);
 
 		/* Current (hovered) and not selected */
 		snprintf(ptr_cur_nosel, sizeof(ptr_cur_nosel), "%*s%s%s%s%s%s%s",
-			options->pad, "", colors[SEL_BG_COLOR], colors[POINTER_COLOR],
+			pad, "", colors[SEL_BG_COLOR], colors[POINTER_COLOR],
 			options->pointer, colors[MARKER_COLOR], " ", RESET_ATTR);
 
 		/* Not current (not hovered) and selected */
 		snprintf(ptr_nocur_sel, sizeof(ptr_nocur_sel), "%*s%s%s%s%s%s",
-			options->pad, "", colors[POINTER_COLOR], " ",
+			pad, "", colors[POINTER_COLOR], " ",
 			colors[MARKER_COLOR], options->marker, RESET_ATTR);
 
 		/* Not current (not hovered) and not selected */
 		snprintf(ptr_nocur_nosel, sizeof(ptr_nocur_nosel), "%*s%s%s%s%s%s",
-			options->pad, "", colors[POINTER_COLOR], " ",
+			pad, "", colors[POINTER_COLOR], " ",
 			colors[MARKER_COLOR], " ", RESET_ATTR);
 	}
 
@@ -246,7 +250,7 @@ build_pointer(const int current, const int selected, const options_t *options)
 }
 
 static void
-print_info(tty_t *tty, choices_t *choices, const int pad,
+print_info(const tty_t *tty, const choices_t *choices, const int pad,
 	const size_t sel_num, const int reverse)
 {
 	static char selected[32];
@@ -255,7 +259,7 @@ print_info(tty_t *tty, choices_t *choices, const int pad,
 	else
 		*selected = '\0';
 
-	static char buf[256];
+	static char buf[MAX_INFO_LINE_LEN];
 	snprintf(buf, sizeof(buf), "%s\x1b[%dG%s%zu/%zu%s%s%s",
 		reverse == 0 ? "\n" : "", pad, colors[INFO_COLOR],
 		choices->available, choices->size,

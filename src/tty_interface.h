@@ -55,7 +55,8 @@
 #define SIG_INTERRUPT 130 /* 128 + SIGINT (usually 2) */
 #define PENDING_INPUT_MAX 32
 
-#define MAX_POINTER_LEN 256
+#define MAX_POINTER_LEN   256
+#define MAX_INFO_LINE_LEN 256
 
 /* Time (in ms) to wait for additional bytes of an escape sequence */
 #define KEYTIMEOUT 25
