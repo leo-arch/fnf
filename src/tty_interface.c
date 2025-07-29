@@ -166,10 +166,10 @@ static void
 print_score(tty_t *tty, const score_t score, const int pad)
 {
 	if (score == SCORE_MIN)
-		tty_printf(tty, "\x1b[%dG%s(     )%s ",
+		tty_printf(tty, "\x1b[%dG%s[     ]%s ",
 			pad + 1, colors[SCORE_COLOR], RESET_ATTR);
 	else
-		tty_printf(tty, "\x1b[%dG%s(%5.2f)%s ",
+		tty_printf(tty, "\x1b[%dG%s[%5.2f]%s ",
 			pad + 1, colors[SCORE_COLOR], score, RESET_ATTR);
 }
 
