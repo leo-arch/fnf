@@ -283,8 +283,8 @@ draw(tty_interface_t *state)
 			state->search);
 
 		if (options_show_info == 1) {
-			tty_printf(tty, "\n[%zu/%zu]%s", choices->available,
-				choices->size, CLEAR_LINE);
+			tty_printf(tty, "\n\x1b[%dG[%zu/%zu]%s", options->pad + 1,
+				choices->available, choices->size, CLEAR_LINE);
 		}
 	} else if (num_lines + 1 + options_show_info >= tty->maxheight) {
 		/* Fix the phantom lines issue present in some terminals. */
