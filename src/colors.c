@@ -341,7 +341,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 	}
 
 	l += snprintf(buf + l, sizeof(buf) - l, "%s", RESET_ATTR CLEAR_LINE);
-	if (l >= sizeof(buf)) l = sizeof(buf);
+	if (l >= sizeof(buf)) l = sizeof(buf) - 1;
 	buf[l] = '\0';
 
 	state->tty->fgcolor = TERM_FG_COLOR_RESET;
@@ -367,7 +367,7 @@ colorize_no_match(tty_t *tty, const char *sel_color, const char *name,
 		name,
 		RESET_ATTR CLEAR_LINE);
 
-	if (l >= sizeof(buf)) l = sizeof(buf);
+	if (l >= sizeof(buf)) l = sizeof(buf) - 1;
 	buf[l] = '\0';
 
 	tty->fgcolor = TERM_FG_COLOR_RESET;

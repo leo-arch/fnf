@@ -246,6 +246,25 @@ build_pointer(const int current, const int selected, const options_t *options)
 }
 
 static void
+print_info(tty_t *tty, choices_t *choices, const int pad,
+	const size_t sel_num, const int reverse)
+{
+	static char selected[32];
+	if (sel_num > 0)
+		snprintf(selected, sizeof(selected), " (%zu)", sel_num);
+	else
+		*selected = '\0';
+
+	static char buf[256];
+	snprintf(buf, sizeof(buf), "%s\x1b[%dG%s%zu/%zu%s%s%s",
+		reverse == 0 ? "\n" : "", pad, colors[INFO_COLOR],
+		choices->available, choices->size,
+		selected, RESET_ATTR CLEAR_LINE, reverse == 1 ? "\n" : "");
+
+	tty_fputs(tty, buf);
+}
+
+static void
 draw(tty_interface_t *state)
 {
 	if (state->redraw == 0) {
@@ -282,11 +301,8 @@ draw(tty_interface_t *state)
 			colors[PROMPT_COLOR], options->prompt, RESET_ATTR,
 			state->search);
 
-		if (options_show_info == 1) {
-			tty_printf(tty, "\n\x1b[%dG%s[%zu/%zu]%s", options->pad + 1,
-				colors[INFO_COLOR],
-				choices->available, choices->size, CLEAR_LINE);
-		}
+		if (options_show_info == 1)
+			print_info(tty, choices, options_pad + 1, sel_num, 0);
 	} else if (num_lines + 1 + options_show_info >= tty->maxheight) {
 		/* Fix the phantom lines issue present in some terminals. */
 		tty_fputs(tty, "\x1b[A\r\x1b[K");
@@ -316,9 +332,7 @@ draw(tty_interface_t *state)
 		tty_moveup(tty, num_lines + options_show_info);
 
 	if (options_reverse == 1 && options_show_info == 1)
-		tty_printf(tty, "\x1b[%dG%s[%zu/%zu]%s\n", options_pad + 1,
-			colors[INFO_COLOR],
-			choices->available, choices->size, RESET_ATTR CLEAR_LINE);
+		print_info(tty, choices, options_pad + 1, sel_num, 1);
 
 	/* Let's draw the prompt */
 	static size_t prompt_len = (size_t)-1;
