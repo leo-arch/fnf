@@ -341,7 +341,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 			p++;
 	}
 
-	l += snprintf(buf + l, sizeof(buf) - l, "%s", CLEAR_LINE);
+	l += snprintf(buf + l, sizeof(buf) - l, "%s", RESET_ATTR CLEAR_LINE);
 	if (l >= sizeof(buf)) l = sizeof(buf);
 	buf[l] = '\0';
 
@@ -369,7 +369,7 @@ colorize_no_match(tty_t *tty, const char *sel_color, const char *name,
 		l += snprintf(buf + l, sizeof(buf) - l, INVERT);
 
 	/* Append the choice to the buffer and null-terminate the string. */
-	l += snprintf(buf + l, sizeof(buf) - l, "%s%s", name, CLEAR_LINE);
+	l += snprintf(buf + l, sizeof(buf) - l, "%s%s", name, RESET_ATTR CLEAR_LINE);
 
 	if (l >= sizeof(buf)) l = sizeof(buf);
 	buf[l] = '\0';
