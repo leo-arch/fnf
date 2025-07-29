@@ -39,7 +39,9 @@
 #define HIGHLIGHT_COLOR 5
 #define INFO_COLOR      6
 #define SCORE_COLOR     7
-#define COLOR_ITEMS_NUM 8
+#define FG_COLOR        8
+#define QUERY_COLOR     9
+#define COLOR_ITEMS_NUM 10
 
 #define MAX_COLOR_LEN 64
 

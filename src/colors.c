@@ -172,7 +172,9 @@ set_color(const int code, char *color)
 	if (!color || !*color)
 		return;
 
-	if (*color == '#')
+	if (*color == '-' && color[1] == '1' && !color[2])
+		strncpy(colors[code], RESET_ATTR, MAX_COLOR_LEN);
+	else if (*color == '#')
 		set_hex_color(code, color + 1);
 	else
 		set_256_color(code, color);
@@ -200,6 +202,10 @@ parse_color_field(char *field)
 		set_color(INFO_COLOR, field + 5);
 	else if (*field == 's' && strncmp(field, "score:", 6) == 0)
 		set_color(SCORE_COLOR, field + 6);
+	else if (*field == 'f' && strncmp(field, "fg:", 3) == 0)
+		set_color(FG_COLOR, field + 3);
+	else if (*field == 'q' && strncmp(field, "query:", 6) == 0)
+		set_color(QUERY_COLOR, field + 6);
 }
 
 static void

@@ -165,12 +165,13 @@ get_cursor_position(const size_t start, tty_interface_t *state)
 static void
 print_score(tty_t *tty, const score_t score, const int pad)
 {
-	if (score == SCORE_MIN)
+	if (score == SCORE_MIN) {
 		tty_printf(tty, "\x1b[%dG%s[     ]%s ",
 			pad + 1, colors[SCORE_COLOR], RESET_ATTR);
-	else
+	} else {
 		tty_printf(tty, "\x1b[%dG%s[%5.2f]%s ",
 			pad + 1, colors[SCORE_COLOR], score, RESET_ATTR);
+	}
 }
 
 static void
@@ -188,11 +189,13 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 			*colors[SEL_BG_COLOR] ? colors[SEL_BG_COLOR] : "");
 	}
 
-	static char orig_color[MAX_COLOR_LEN + 1];
-	*orig_color = '\0';
+	static char original_color[MAX_COLOR_LEN + 1]; *original_color = '\0';
+	char *orig_color = original_color;
 	const char *dchoice = choice;
 	if (*choice == KEY_ESC || strchr(choice, KEY_ESC))
-		dchoice = decolor_name(choice, search ? orig_color : NULL);
+		dchoice = decolor_name(choice, search ? original_color : NULL);
+	else
+		orig_color = *colors[FG_COLOR] ? colors[FG_COLOR] : NULL;
 
 	score_t score = SCORE_MIN;
 	static size_t positions[MATCH_MAX_LEN];
@@ -207,7 +210,7 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 		print_score(tty, score, state->options->pad);
 
 	if (positions[0] == (size_t)-1) { /* No matching result (or no query). */
-		colorize_no_match(tty, selected == 0 ? NULL : sel_color,
+		colorize_no_match(tty, selected == 0 ? orig_color : sel_color,
 			selected == 0 ? choice : dchoice, pointer);
 	} else { /* We have matches (and a query). */
 		colorize_match(state, positions, dchoice, selected == 0
@@ -308,9 +311,9 @@ draw(tty_interface_t *state)
 
 	if (options_reverse == 0) {
 		/* Set column, print prompt, and clear line. */
-		tty_printf(tty, "\x1b[%dG%s%s%s%s", options_pad + 1,
+		tty_printf(tty, "\x1b[%dG%s%s%s%s%s%s", options_pad + 1,
 			colors[PROMPT_COLOR], options->prompt, RESET_ATTR,
-			state->search);
+			colors[QUERY_COLOR], state->search, RESET_ATTR);
 
 		if (options_show_info == 1)
 			print_info(tty, choices, options_pad + 1, sel_num, 0);
@@ -353,9 +356,10 @@ draw(tty_interface_t *state)
 	const size_t cursor_position =
 		get_cursor_position(prompt_len + options_pad + 1, state);
 
-	tty_printf(tty, "\x1b[%dG%s%s%s%s%s\x1b[%zuG",
+	tty_printf(tty, "\x1b[%dG%s%s%s%s%s%s\x1b[%zuG",
 		options_pad + 1, colors[PROMPT_COLOR], options->prompt,
-		RESET_ATTR, state->search, CLEAR_LINE, cursor_position);
+		RESET_ATTR, colors[QUERY_COLOR], state->search,
+		RESET_ATTR CLEAR_LINE, cursor_position);
 
 	tty_setwrap(tty);
 	tty_unhide_cursor(tty);

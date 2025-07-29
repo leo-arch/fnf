@@ -43,7 +43,7 @@
 
 #define DEFAULT_AUTO_LINES 0
 #define DEFAULT_CLEAR 1
-#define DEFAULT_COLORS "prompt:6:1,pointer:1:1,marker:2:1,sel-fg:7:1,sel-bg:236,hl:2,info:144,score:102"
+#define DEFAULT_COLORS "fg:-1,query:208:1,prompt:6:1,pointer:1:1,marker:2:1,sel-fg:7:1,sel-bg:236,hl:2,info:144,score:102"
 #define DEFAULT_CYCLE 0
 #define DEFAULT_DELIMITER '\n'
 #define DEFAULT_FILTER NULL
