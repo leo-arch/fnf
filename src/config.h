@@ -70,4 +70,8 @@
 #define DEFAULT_UNICODE 1
 #define DEFAULT_WORKERS 0
 
+/* If running without colors (--no-color or NO_COLOR) */
+#define SELECTION_NOCOLOR "\x1b[7m" /* Invert */
+#define HIGHLIGHT_NOCOLOR "\x1b[4m" /* Underline */
+
 #endif /* CONFIG_H */

@@ -44,8 +44,6 @@
 #define TERM_FG_COLOR_RESET 9
 #define RESET_ATTR "\x1b[0m" /* Reset attributes */
 #define CLEAR_LINE "\x1b[K"
-#define UNDERLINE  "\x1b[4m"
-#define INVERT     "\x1b[7m"
 
 #define COLOR_FIELD_SEP ':'
 #define KEY_ESC 27

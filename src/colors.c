@@ -288,9 +288,10 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 	const int selected)
 {
 	const int no_color = state->options->no_color;
-	const char *highlight = no_color == 1 ? UNDERLINE : colors[HIGHLIGHT_COLOR];
+	const char *highlight =
+		no_color == 1 ? HIGHLIGHT_NOCOLOR : colors[HIGHLIGHT_COLOR];
 	const char *orig_color = no_color == 1
-		? (selected == 1 ? RESET_ATTR INVERT : RESET_ATTR)
+		? (selected == 1 ? RESET_ATTR SELECTION_NOCOLOR : RESET_ATTR)
 		: ((original_color && *original_color) ? original_color : RESET_ATTR);
 
 	size_t l = 0; /* Current buffer length */
@@ -307,7 +308,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 		/* The first character is a match. Let's copy the selection background
 		 * color to extend this color to the first character. */
 		l += snprintf(buf + l, sizeof(buf) - l, "%s",
-			no_color == 1 ? INVERT
+			no_color == 1 ? SELECTION_NOCOLOR
 			: (*colors[SEL_BG_COLOR] ? colors[SEL_BG_COLOR] : ""));
 	}
 
@@ -360,7 +361,7 @@ colorize_no_match(tty_t *tty, const char *sel_color, const char *name,
 	/* If selected, handle colors. */
 	size_t l = snprintf(buf, sizeof(buf), "%s%s%s%s",
 		pointer,
-		*sel_color ? sel_color : INVERT,
+		*sel_color ? sel_color : SELECTION_NOCOLOR,
 		name,
 		RESET_ATTR CLEAR_LINE);
 
