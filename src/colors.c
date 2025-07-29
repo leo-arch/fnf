@@ -173,7 +173,7 @@ set_color(const int code, char *color)
 		return;
 
 	if (*color == '-' && color[1] == '1' && !color[2])
-		strncpy(colors[code], RESET_ATTR, MAX_COLOR_LEN);
+		memcpy(colors[code], RESET_ATTR, sizeof(RESET_ATTR));
 	else if (*color == '#')
 		set_hex_color(code, color + 1);
 	else
@@ -362,7 +362,7 @@ colorize_no_match(tty_t *tty, const char *sel_color, const char *name,
 {
 	static char buf[BUF_SIZE];
 
-	if (!sel_color) { /* The entry is not selected */
+	if (!sel_color || IS_SGR0(sel_color)) { /* The entry is not selected */
 		snprintf(buf, sizeof(buf), "%s%s%s", pointer, name, CLEAR_LINE);
 		tty_fputs(tty, buf);
 		return;
