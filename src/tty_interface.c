@@ -163,6 +163,17 @@ get_cursor_position(const size_t start, tty_interface_t *state)
 }
 
 static void
+print_score(tty_t *tty, const score_t score, const int pad)
+{
+	if (score == SCORE_MIN)
+		tty_printf(tty, "\x1b[%dG%s(     )%s ",
+			pad + 1, colors[SCORE_COLOR], RESET_ATTR);
+	else
+		tty_printf(tty, "\x1b[%dG%s(%5.2f)%s ",
+			pad + 1, colors[SCORE_COLOR], score, RESET_ATTR);
+}
+
+static void
 draw_match(tty_interface_t *state, const char *choice, const int selected,
 	const char *pointer)
 {
@@ -192,12 +203,8 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 		positions[0] = (size_t)-1;
 	}
 
-	if (options->show_scores == 1) {
-		if (score == SCORE_MIN)
-			tty_printf(tty, "\x1b[%dG(     ) ", state->options->pad + 1);
-		else
-			tty_printf(tty, "\x1b[%dG(%5.2f) ", state->options->pad + 1, score);
-	}
+	if (options->show_scores == 1)
+		print_score(tty, score, state->options->pad);
 
 	if (positions[0] == (size_t)-1) { /* No matching result (or no query). */
 		colorize_no_match(tty, selected == 0 ? NULL : sel_color,

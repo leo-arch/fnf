@@ -198,6 +198,8 @@ parse_color_field(char *field)
 		set_color(SEL_BG_COLOR, field + 7);
 	else if (*field == 'i' && strncmp(field, "info:", 5) == 0)
 		set_color(INFO_COLOR, field + 5);
+	else if (*field == 's' && strncmp(field, "score:", 6) == 0)
+		set_color(SCORE_COLOR, field + 6);
 }
 
 static void

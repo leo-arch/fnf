@@ -38,7 +38,8 @@
 #define SEL_BG_COLOR    4
 #define HIGHLIGHT_COLOR 5
 #define INFO_COLOR      6
-#define COLOR_ITEMS_NUM 7
+#define SCORE_COLOR     7
+#define COLOR_ITEMS_NUM 8
 
 #define MAX_COLOR_LEN 64
 
