@@ -1,4 +1,4 @@
-.TH FNF 1 "Jul 24, 2025" "fnf 0.3.3"
+.TH FNF 1 "Jul 29, 2025" "fnf 0.3.4"
 .SH NAME
 fnf \- A general-purpose, interactive fuzzy finder for the terminal.
 .SH SYNOPSIS
@@ -157,7 +157,10 @@ Available color names (or interface elements) are:
  \fBsel-bg\fR   Selected line  background
 .sp 0
  \fBhl\fR       Highlighted substrings in the selected line
+.sp 0
+ \fBinfo\fR     Info line
 .sp
+
 .B ANSI COLORS
 .sp
 Colors are defined either as an ANSI 256 color (\fB0-255\fR) or as a hexadecimal color (\fB#RRGGBB\fR).
@@ -198,7 +201,7 @@ The \fBFNF_COLORS\fR environment variable can also be used just as with the \fB-
 .sp 0
  \fB$ ls | fnf\fR
 .sp
-Colors default to \fB"prompt:6:1,pointer:1:1,marker:2:1,sel-fg:7:1,sel-bg:236,hl:2"\fR.
+Colors default to \fB"prompt:6:1,pointer:1:1,marker:2:1,sel-fg:7:1,sel-bg:236,hl:2,info:144"\fR.
 .sp
 .
 .SH USAGE EXAMPLES

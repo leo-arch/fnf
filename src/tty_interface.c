@@ -283,7 +283,8 @@ draw(tty_interface_t *state)
 			state->search);
 
 		if (options_show_info == 1) {
-			tty_printf(tty, "\n\x1b[%dG[%zu/%zu]%s", options->pad + 1,
+			tty_printf(tty, "\n\x1b[%dG%s[%zu/%zu]%s", options->pad + 1,
+				colors[INFO_COLOR],
 				choices->available, choices->size, CLEAR_LINE);
 		}
 	} else if (num_lines + 1 + options_show_info >= tty->maxheight) {
@@ -315,8 +316,9 @@ draw(tty_interface_t *state)
 		tty_moveup(tty, num_lines + options_show_info);
 
 	if (options_reverse == 1 && options_show_info == 1)
-		tty_printf(tty, "\x1b[%dG[%zu/%zu]%s\n", options_pad + 1,
-			choices->available, choices->size, CLEAR_LINE);
+		tty_printf(tty, "\x1b[%dG%s[%zu/%zu]%s\n", options_pad + 1,
+			colors[INFO_COLOR],
+			choices->available, choices->size, RESET_ATTR CLEAR_LINE);
 
 	/* Let's draw the prompt */
 	static size_t prompt_len = (size_t)-1;
