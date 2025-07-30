@@ -107,6 +107,7 @@ Disable Unicode decorations
 .
 .TP
 .BR "ENTER"
+.sp 0
 Print the selected items to stdout and exit. If \fB\-\-right\-accepts\fR is set, the Right arrow key performs the same function. Equally, if \fB\-\-tab\-accepts\fR is set, the TAB key performs the same function.
 .TP
 .BR "ESC, Ctrl+c, Ctrl+g"
@@ -118,7 +119,14 @@ Select the previous item.
 .BR "Down Arrow, Ctrl+n, Ctrl+j"
 Select the next item.
 .TP
+.BR "PgDn / PgUp"
+Advance/go-back one page.
+.TP
+.BR "Ctrl+PgDn / Ctrl+PgUp"
+Jump to the first/last available item.
+.TP
 .BR "TAB"
+.sp 0
 If multi-selection is enabled (\fB-m, --multi\fR), (un)mark the selected item and select the next one.
 .TP
 .BR "Shift+TAB (btab)"
@@ -128,15 +136,19 @@ If multi-selection enabled (\fB-m, --multi\fR), (un)mark the selected item and s
 Delete the character before the cursor.
 .TP
 .BR Del
+.sp 0
 Delete the character next to the cursor.
 .TP
 .BR Ctrl+w
+.sp 0
 Delete the word before the cursor.
 .TP
 .BR Ctrl+u
+.sp 0
 Delete the entire line.
 .TP
 .BR Ctrl+d
+.sp 0
 Same as \fBDel\fR (aborts \fBfnf\fR if the query is empty).
 .
 .SH COLORS
