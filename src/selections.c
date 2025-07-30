@@ -69,11 +69,11 @@ deselect_entry(const char *name, tty_interface_t *state)
 		return;
 
 	const size_t len = strlen(name);
-	size_t i;
-	for (i = 0; selections[i].name; i++) {
+	for (size_t i = 0; selections[i].name; i++) {
 		if (*selections[i].name != *name || selections[i].namelen != len
 		|| strcmp(selections[i].name, name) != 0)
 			continue;
+
 		*selections[i].name = '\0';
 		state->selection->selected--;
 		break;
