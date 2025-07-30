@@ -229,6 +229,11 @@ build_pointer(const int current, const int selected, const options_t *options)
 		/* If --show-scores, padding is already done by draw_match() */
 		pad = options->show_scores == 1 ? 0 : options->pad;
 
+	static char *gutter_color = NULL;
+	if (!gutter_color)
+		gutter_color =
+			!IS_SGR0(colors[GUTTER_COLOR]) ? colors[GUTTER_COLOR] : "";
+
 	/* Let's construct the pointer string only once */
 	if (!*ptr_cur_sel) {
 		/* Current (hovered) and selected */
@@ -242,11 +247,13 @@ build_pointer(const int current, const int selected, const options_t *options)
 			options->pointer);
 
 		/* Not current (not hovered) and selected */
-		snprintf(ptr_nocur_sel, sizeof(ptr_nocur_sel), "%*s %s%s%s",
-			pad, "", colors[MARKER_COLOR], options->marker, RESET_ATTR);
+		snprintf(ptr_nocur_sel, sizeof(ptr_nocur_sel), "%*s%s %s%s%s%s",
+			pad, "", gutter_color, gutter_color ? RESET_ATTR : "",
+			colors[MARKER_COLOR], options->marker, RESET_ATTR);
 
 		/* Not current (not hovered) and not selected */
-		snprintf(ptr_nocur_nosel, sizeof(ptr_nocur_nosel), "%*s  ", pad, "");
+		snprintf(ptr_nocur_nosel, sizeof(ptr_nocur_nosel), "%*s%s %s ",
+			pad, "", gutter_color, gutter_color ? RESET_ATTR : "");
 	}
 
 	if (current == 1)

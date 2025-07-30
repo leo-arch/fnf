@@ -206,6 +206,8 @@ parse_color_field(char *field)
 		set_color(FG_COLOR, field + 3);
 	else if (*field == 'q' && strncmp(field, "query:", 6) == 0)
 		set_color(QUERY_COLOR, field + 6);
+	else if (*field == 'g' && strncmp(field, "gutter:", 7) == 0)
+		set_color(GUTTER_COLOR, field + 7);
 }
 
 static void

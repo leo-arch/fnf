@@ -41,7 +41,8 @@
 #define SCORE_COLOR     7
 #define FG_COLOR        8
 #define QUERY_COLOR     9
-#define COLOR_ITEMS_NUM 10
+#define GUTTER_COLOR    10
+#define COLOR_ITEMS_NUM 11
 
 #define MAX_COLOR_LEN 64
 
@@ -56,7 +57,7 @@
 #define IS_SGR_START(s) (*(s) == KEY_ESC && (s)[1] == '[')
 #define IS_SGR0(s)      ((*s) == KEY_ESC && (s)[1] == '[' && (s)[2] == '0' \
 	&& (s)[3] == 'm' && !(s)[4])
-#define IS_BG_COLOR(n)  ((n) == SEL_BG_COLOR)
+#define IS_BG_COLOR(n)  ((n) == SEL_BG_COLOR || (n) == GUTTER_COLOR)
 
 #include "tty_interface.h"
 
