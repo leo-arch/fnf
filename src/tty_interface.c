@@ -796,6 +796,8 @@ static const keybinding_t keybindings[] = {
 	{KEY_CTRL('J'), 1, action_next},      /* Ctrl-J */
 	{KEY_CTRL('A'), 1, action_beginning}, /* Ctrl-A */
 	{KEY_CTRL('E'), 1, action_end},   	  /* Ctrl-E */
+	{KEY_CTRL('F'), 1, action_right},     /* Ctrl-F */
+	{KEY_CTRL('B'), 1, action_left},      /* Ctrl-B */
 	{"\x1b[3~", 4, action_del},           /* DEL */
 	{"\x1bOD", 3, action_left},           /* LEFT */
 	{"\x1b[D", 3, action_left},           /* LEFT */
