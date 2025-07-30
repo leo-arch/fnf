@@ -4,7 +4,7 @@
 # 
 # Copyright
 # (C) 2014-2022 John Hawthorn
-# (C) 2022-2023, L. Abramovich <leo.clifm@outlook.com>
+# (C) 2022-2025, L. Abramovich <leo.clifm@outlook.com>
 # All rights reserved.
 #
 # The MIT License (MIT)

@@ -480,7 +480,7 @@ static theft_progress_callback_res report_on_failure(theft *t,
     int arity = info->arity;
     fprintf(t->out, "\n\n -- Counter-Example: %s\n",
         info->name ? info-> name : "");
-    fprintf(t->out, "    Trial %u, Seed 0x%016llu\n", ti->trial,
+    fprintf(t->out, "    Trial %u, Seed 0x%016lu\n", ti->trial,
         (uint64_t)ti->seed);
     for (int i = 0; i < arity; i++) {
         theft_print_cb *print = info->type_info[i]->print;
