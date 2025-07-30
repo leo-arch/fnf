@@ -539,8 +539,12 @@ action_prev(tty_interface_t *state)
 		return;
 	}
 
+	if (state->options->cycle == 1)
+		choices_prev(state->choices);
+	else
+		state->choices->selection--;
+
 	update_state(state);
-	choices_prev(state->choices);
 }
 
 static void
@@ -553,8 +557,12 @@ action_next(tty_interface_t *state)
 		return;
 	}
 
+	if (state->options->cycle == 1)
+		choices_next(state->choices);
+	else
+		state->choices->selection++;
+
 	update_state(state);
-	choices_next(state->choices);
 }
 
 static void
@@ -621,6 +629,30 @@ action_end(tty_interface_t *state)
 	}
 
 	state->cursor = len;
+}
+
+static void
+action_first(tty_interface_t *state)
+{
+	if (state->choices->selection == 0) {
+		state->redraw = 0;
+		return;
+	}
+
+	state->choices->selection = 0;
+	update_state(state);
+}
+
+static void
+action_last(tty_interface_t *state)
+{
+	if (state->choices->selection == state->choices->available - 1) {
+		state->redraw = 0;
+		return;
+	}
+
+	state->choices->selection = state->choices->available - 1;
+	update_state(state);
 }
 
 static void
@@ -751,19 +783,19 @@ static const keybinding_t keybindings[] = {
 	{"\x1b", 1, action_exit},             /* ESC */
 	{"\x7f", 1, action_backspace},	      /* Backspace */
 	{KEY_CTRL('H'), 1, action_backspace}, /* Backspace (C-H) */
-	{KEY_CTRL('W'), 1, action_del_word},  /* C-W */
-	{KEY_CTRL('U'), 1, action_del_all},   /* C-U */
-	{KEY_CTRL('I'), 1, action_tab},       /* TAB (C-I ) */
-	{KEY_CTRL('C'), 1, action_exit},      /* C-C */
-	{KEY_CTRL('D'), 1, action_ctrl_d},    /* C-D */
-	{KEY_CTRL('G'), 1, action_exit},      /* C-G */
-	{KEY_CTRL('M'), 1, action_emit},      /* CR */
-	{KEY_CTRL('P'), 1, action_prev},      /* C-P */
-	{KEY_CTRL('N'), 1, action_next},      /* C-N */
-	{KEY_CTRL('K'), 1, action_prev},      /* C-K */
-	{KEY_CTRL('J'), 1, action_next},      /* C-J */
-	{KEY_CTRL('A'), 1, action_beginning}, /* C-A */
-	{KEY_CTRL('E'), 1, action_end},   	  /* C-E */
+	{KEY_CTRL('W'), 1, action_del_word},  /* Ctrl-W */
+	{KEY_CTRL('U'), 1, action_del_all},   /* Ctrl-U */
+	{KEY_CTRL('I'), 1, action_tab},       /* TAB (Ctrl-I ) */
+	{KEY_CTRL('C'), 1, action_exit},      /* Ctrl-C */
+	{KEY_CTRL('D'), 1, action_ctrl_d},    /* Ctrl-D */
+	{KEY_CTRL('G'), 1, action_exit},      /* Ctrl-G */
+	{KEY_CTRL('M'), 1, action_emit},      /* CR (Enter) */
+	{KEY_CTRL('P'), 1, action_prev},      /* Ctrl-P */
+	{KEY_CTRL('N'), 1, action_next},      /* Ctrl-N */
+	{KEY_CTRL('K'), 1, action_prev},      /* Ctrl-K */
+	{KEY_CTRL('J'), 1, action_next},      /* Ctrl-J */
+	{KEY_CTRL('A'), 1, action_beginning}, /* Ctrl-A */
+	{KEY_CTRL('E'), 1, action_end},   	  /* Ctrl-E */
 	{"\x1b[3~", 4, action_del},           /* DEL */
 	{"\x1bOD", 3, action_left},           /* LEFT */
 	{"\x1b[D", 3, action_left},           /* LEFT */
@@ -782,6 +814,10 @@ static const keybinding_t keybindings[] = {
 	{"\x1b[200~", 6, action_ignore},
 	{"\x1b[201~", 6, action_ignore},
 	{"\x1b[Z", 3, action_shift_tab},      /* Shift-TAB */
+	{"\x1b[5;5~", 6, action_first},       /* Ctrl-Home */
+	{"\x1b[6;5~", 6, action_last},        /* Ctrl-End */
+	{"\x1b[5^", 4, action_first},         /* Ctrl-Home (rxvt) */
+	{"\x1b[6^", 4, action_last},          /* Ctrl-End (rxvt) */
 	{NULL, 0, NULL}
 };
 #undef KEY_CTRL
