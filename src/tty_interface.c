@@ -184,9 +184,8 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 
 	static char sel_color[(MAX_COLOR_LEN * 2) + 1] = "";
 	if (!*sel_color) {
-		snprintf(sel_color, sizeof(sel_color), "%s%s",
-			*colors[SEL_FG_COLOR] ? colors[SEL_FG_COLOR] : "",
-			*colors[SEL_BG_COLOR] ? colors[SEL_BG_COLOR] : "");
+		snprintf(sel_color, sizeof(sel_color), "%s",
+			*colors[SEL_FG_COLOR] ? colors[SEL_FG_COLOR] : "");
 	}
 
 	static char original_color[MAX_COLOR_LEN + 1]; *original_color = '\0';
@@ -233,21 +232,21 @@ build_pointer(const int current, const int selected, const options_t *options)
 	/* Let's construct the pointer string only once */
 	if (!*ptr_cur_sel) {
 		/* Current (hovered) and selected */
-		snprintf(ptr_cur_sel, sizeof(ptr_cur_sel), "%*s%s%s%s%s%s%s",
+		snprintf(ptr_cur_sel, sizeof(ptr_cur_sel), "%*s%s%s%s%s%s",
 			pad, "", colors[SEL_BG_COLOR], colors[POINTER_COLOR],
-			options->pointer, colors[MARKER_COLOR], options->marker, RESET_ATTR);
+			options->pointer, colors[MARKER_COLOR], options->marker);
 
 		/* Current (hovered) and not selected */
 		snprintf(ptr_cur_nosel, sizeof(ptr_cur_nosel), "%*s%s%s%s ",
-			pad, "", colors[POINTER_COLOR], options->pointer, RESET_ATTR);
+			pad, "", colors[SEL_BG_COLOR], colors[POINTER_COLOR],
+			options->pointer);
 
 		/* Not current (not hovered) and selected */
 		snprintf(ptr_nocur_sel, sizeof(ptr_nocur_sel), "%*s %s%s%s",
 			pad, "", colors[MARKER_COLOR], options->marker, RESET_ATTR);
 
 		/* Not current (not hovered) and not selected */
-		snprintf(ptr_nocur_nosel, sizeof(ptr_nocur_nosel), "%*s%s  ",
-			pad, "", RESET_ATTR);
+		snprintf(ptr_nocur_nosel, sizeof(ptr_nocur_nosel), "%*s  ", pad, "");
 	}
 
 	if (current == 1)

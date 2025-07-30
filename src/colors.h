@@ -54,9 +54,9 @@
 #define IS_DIGIT(c)     ((c) >= '0' && (c) <= '9')
 #define IS_SGR_CHAR(c)  (IS_DIGIT((c)) || (c) == ';' || (c) == '[')
 #define IS_SGR_START(s) (*(s) == KEY_ESC && (s)[1] == '[')
-#define IS_BG_COLOR(n)  ((n) == SEL_BG_COLOR)
 #define IS_SGR0(s)      ((*s) == KEY_ESC && (s)[1] == '[' && (s)[2] == '0' \
 	&& (s)[3] == 'm' && !(s)[4])
+#define IS_BG_COLOR(n)  ((n) == SEL_BG_COLOR)
 
 #include "tty_interface.h"
 
