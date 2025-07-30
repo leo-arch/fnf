@@ -302,7 +302,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 		no_color == 1 ? HIGHLIGHT_NOCOLOR : colors[HIGHLIGHT_COLOR];
 	const char *orig_color = no_color == 1
 		? (selected == 1 ? RESET_ATTR SELECTION_NOCOLOR : RESET_ATTR)
-		: ((original_color && *original_color) ? original_color : RESET_ATTR);
+		: ((original_color && *original_color) ? original_color : "");
 
 	size_t l = 0; /* Current buffer length */
 	size_t p = 0; /* Position in match */
@@ -346,7 +346,9 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 			p++;
 	}
 
-	l += snprintf(buf + l, sizeof(buf) - l, "%s", RESET_ATTR CLEAR_LINE);
+	l += snprintf(buf + l, sizeof(buf) - l, "%s",
+		(*orig_color && (no_color == 1 || !IS_SGR0(orig_color)))
+		? RESET_ATTR CLEAR_LINE : CLEAR_LINE);
 
 	if (l >= sizeof(buf)) l = sizeof(buf) - 1;
 	buf[l] = '\0';
