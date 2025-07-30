@@ -248,12 +248,12 @@ build_pointer(const int current, const int selected, const options_t *options)
 
 		/* Not current (not hovered) and selected */
 		snprintf(ptr_nocur_sel, sizeof(ptr_nocur_sel), "%*s%s %s%s%s%s",
-			pad, "", gutter_color, gutter_color ? RESET_ATTR : "",
+			pad, "", gutter_color, *gutter_color ? RESET_ATTR : "",
 			colors[MARKER_COLOR], options->marker, RESET_ATTR);
 
 		/* Not current (not hovered) and not selected */
 		snprintf(ptr_nocur_nosel, sizeof(ptr_nocur_nosel), "%*s%s %s ",
-			pad, "", gutter_color, gutter_color ? RESET_ATTR : "");
+			pad, "", gutter_color, *gutter_color ? RESET_ATTR : "");
 	}
 
 	if (current == 1)
