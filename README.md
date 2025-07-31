@@ -39,7 +39,7 @@ The `PREFIX` environment variable can be used to specify the install location (t
 > [!NOTE]
 > If not running on Linux, you may need to use `gmake` instead of `make`.
 
-### Use with [clifm](https://github.com/leo-arch/clifm)
+## Use with [clifm](https://github.com/leo-arch/clifm)
 
 Just run **clifm** as follows:
 
@@ -49,6 +49,10 @@ clifm --fnftab
 
 > [!NOTE]
 > You need at least **clifm** 1.12.9.
+
+## Color schemes
+
+Consult [this gist](https://gist.github.com/leo-arch/68ba6206858850123e1458342146545e) for details.
 
 ## Sorting
 
