@@ -179,7 +179,7 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 	const char *pointer)
 {
 	tty_t *tty = state->tty;
-	options_t *options = state->options;
+	const options_t *options = state->options;
 	const char *search = state->last_search;
 
 	static char sel_color[(MAX_COLOR_LEN * 2) + 1] = "";
@@ -206,7 +206,7 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 	}
 
 	if (options->show_scores == 1)
-		print_score(tty, score, state->options->pad);
+		print_score(tty, score, options->pad);
 
 	if (positions[0] == (size_t)-1) { /* No matching result (or no query). */
 		colorize_no_match(tty, selected == 0 ? orig_color : sel_color,
