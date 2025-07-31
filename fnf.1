@@ -215,15 +215,20 @@ A single numbered attribute (\fB0-9\fR) can be added to colors. The meaning of t
 .sp
 In the line \fB--color="prompt:214:1,pointer:#87d700:2,marker:6,sel-fg:#ffff00"\fR, the prompt is set to bold orange (256-color), the pointer to a dimmed green (hex color), the marker to cyan (256-color), and the foreground color for selected items to yellow (hex color).
 .sp
-You can also build a simple light theme as follows: \fB--color="prompt:4:1,marker:2:2,hl:1,info:236,score:236"\fR
+A few color schemes:
+.sp
+ \fBdark\fR:    fg:-1,guttter:-1,hl:216,info:144,marker:72,pointer:124,prompt:74:1,query:-1,sel-bg:236,sel-fg:7:1,score:102
+ \fBlight\fR:   prompt:4:1,marker:2:2,hl:1,info:236,score:236
+ \fB16\fR:      hl:6,info:2,marker:2,prompt:6:1,pointer:1,query:7,sel-bg:0,sel-fg:7:1,score:8
+ \fBnocolor\fR: Run with \fB--no-color\fR
+.sp
+The default color scheme is \fBdark\fR. If a color is not specified in the command line, the default value is used. For example, \fB--color=prompt:172\fR sets the prompt to the specified color, and uses the default values (those in \fBdark\fR) for everything else.
 .sp
 The \fBFNF_COLORS\fR environment variable can also be used just as with the \fB--color\fR option. E.g.:
 .sp
- \fB$ export FNF_COLORS="prompt:214:1,pointer:#87d700:2,marker:6,sel-fg:#ffff0"
+ \fB$ export FNF_COLORS="prompt:214:1,pointer:#87D700:2,marker:6,sel-fg:#FFFF00"
 .sp 0
  \fB$ ls | fnf\fR
-.sp
-Default colors: \fB"fg:-1,guttter:-1,hl:216,info:144,marker:72,pointer:124,prompt:74:1,query:-1,sel-bg:236,sel-fg:7:1,score:102"\fR
 .sp
 .
 .SH USAGE EXAMPLES
