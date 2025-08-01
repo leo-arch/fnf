@@ -40,6 +40,8 @@
 #include "tty_interface.h"
 #include "selections.h"
 
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
 static int
 isprint_unicode(const char c)
 {
@@ -297,11 +299,14 @@ draw(tty_interface_t *state)
 	const size_t current_selection = choices->selection;
 	size_t start = 0;
 
-	if (current_selection + options->scrolloff >= num_lines) {
-		start = current_selection + options->scrolloff - num_lines + 1;
+	const size_t items = MIN(num_lines, choices->available);
+	const size_t scrolloff = items >> 1; /* items / 2 */
+
+	if (current_selection + scrolloff >= items) {
+		start = current_selection + scrolloff - items + 1;
 		const size_t available = choices_available(choices);
-		if (start + num_lines >= available && available > 0)
-			start = available - num_lines;
+		if (start + items >= available && available > 0)
+			start = available - items;
 	}
 
 	const size_t sel_num = state->selection->selected;
