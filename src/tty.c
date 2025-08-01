@@ -121,7 +121,7 @@ char
 tty_getchar(tty_t *tty)
 {
 	char ch;
-	const int size = read(tty->fdin, &ch, 1);
+	const int size = read(tty->fdin, &ch, 1); /* flawfinder: ignore */
 	if (size < 0) {
 		perror("error reading from tty");
 		exit(EXIT_FAILURE);

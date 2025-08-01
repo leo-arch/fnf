@@ -232,7 +232,7 @@ set_scrolloff(options_t *options, const char *optarg)
 static void
 print_version(void)
 {
-	printf("%s\n", VERSION);
+	puts(VERSION);
 	exit(EXIT_SUCCESS);
 }
 
