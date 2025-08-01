@@ -775,7 +775,8 @@ tty_interface_init(tty_interface_t *state, tty_t *tty, choices_t *choices,
 	state->selection = selection;
 
 	if (options->init_search) {
-		strncpy(state->search, options->init_search, SEARCH_SIZE_MAX);
+		strncpy(state->search, options->init_search, SEARCH_SIZE_MAX); /* flawfinder: ignore */
+		state->search[SEARCH_SIZE_MAX - 1] = '\0';
 		state->cursor = strlen(state->search);
 	}
 
