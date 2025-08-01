@@ -243,7 +243,7 @@ set_colors(tty_interface_t *state)
 	char def_colors[sizeof(DEFAULT_COLORS)];
 	env = getenv("FNF_COLORS");
 	if (!env || !*env) {
-		strncpy(def_colors, DEFAULT_COLORS, sizeof(def_colors));
+		memcpy(def_colors, DEFAULT_COLORS, sizeof(def_colors));
 		env = def_colors;
 	}
 
