@@ -40,8 +40,6 @@
 #include "tty_interface.h"
 #include "selections.h"
 
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-
 static int
 isprint_unicode(const char c)
 {
@@ -283,6 +281,29 @@ print_info(const tty_t *tty, const choices_t *choices, const int pad,
 	tty_fputs(tty, buf);
 }
 
+static size_t
+get_starting_item(const choices_t *choices, const options_t *options)
+{
+	size_t start = 0;
+	size_t items = options->num_lines;
+	const size_t current_selection = choices->selection;
+	const size_t available = choices->available;
+
+	int scrolloff = options->scrolloff;
+	if (scrolloff == -1) {
+		items = items < available ? items : available;
+		scrolloff = items >> 1; /* items / 2 */
+	}
+
+	if (current_selection + scrolloff >= items) {
+		start = current_selection + scrolloff - items + 1;
+		if (start + items >= available && available > 0)
+			start = available - items;
+	}
+
+	return start;
+}
+
 static void
 draw(tty_interface_t *state)
 {
@@ -295,19 +316,8 @@ draw(tty_interface_t *state)
 	choices_t *choices = state->choices;
 	options_t *options = state->options;
 
-	const unsigned int num_lines = options->num_lines;
-	const size_t current_selection = choices->selection;
-	size_t start = 0;
-
-	const size_t items = MIN(num_lines, choices->available);
-	const size_t scrolloff = items >> 1; /* items / 2 */
-
-	if (current_selection + scrolloff >= items) {
-		start = current_selection + scrolloff - items + 1;
-		const size_t available = choices_available(choices);
-		if (start + items >= available && available > 0)
-			start = available - items;
-	}
+	const size_t num_lines = options->num_lines;
+	const size_t start = get_starting_item(choices, options);
 
 	const size_t sel_num = state->selection->selected;
 	const int options_pad = options->pad;

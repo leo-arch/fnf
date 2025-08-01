@@ -46,8 +46,8 @@ typedef struct {
 	const char *prompt;
 	const char *pointer;
 	const char *marker;
-	unsigned int num_lines;
-	unsigned int workers;
+	size_t num_lines;
+	size_t workers;
 	int auto_lines;
 	int clear;
 	int cycle;

@@ -61,7 +61,7 @@ struct search_job {
 struct worker {
 	pthread_t thread_id;
 	struct search_job *job;
-	unsigned int worker_num;
+	size_t worker_num;
 	unsigned int sort;
 	struct result_list result;
 };
@@ -173,10 +173,12 @@ choices_init(choices_t *c, const options_t *options)
 	c->capacity = c->size = 0;
 	choices_resize(c, INITIAL_CHOICE_CAPACITY);
 
-	if (options->workers)
+	if (options->workers) {
 		c->worker_count = options->workers;
-	else
-		c->worker_count = (int)sysconf(_SC_NPROCESSORS_ONLN);
+	} else {
+		const long n = sysconf(_SC_NPROCESSORS_ONLN);
+		c->worker_count = n == -1 ? 1 : (size_t)n;
+	}
 
 	choices_reset_search(c);
 }

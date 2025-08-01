@@ -55,7 +55,7 @@ typedef struct {
 	size_t size;
 	size_t available;
 	size_t selection;
-	unsigned int worker_count;
+	size_t worker_count;
 } choices_t;
 
 void choices_init(choices_t *c, const options_t *options);

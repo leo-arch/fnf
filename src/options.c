@@ -168,7 +168,7 @@ options_parse(options_t *options, int argc, char *argv[])
 				options->pad = atoi(optarg);
 			break;
 		case 'j':
-			if (sscanf(optarg, "%u", &options->workers) != 1) {
+			if (sscanf(optarg, "%zu", &options->workers) != 1) {
 				usage(argv[0]);
 				exit(EXIT_FAILURE);
 			}
