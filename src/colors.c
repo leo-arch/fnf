@@ -290,7 +290,7 @@ decolor_name(const char *name, char *color_buf)
 	if (color_buf != NULL) {
 		/* Copy the removed color into the COLOR_BUF buffer. */
 		if (sgr_end > 0 && sgr_end < MAX_COLOR_LEN) {
-			strncpy(color_buf, name, sgr_end);
+			strncpy(color_buf, name, sgr_end); /* flawfinder: ignore */
 			color_buf[sgr_end] = '\0';
 		} else {
 			color_buf[0] = '\0';
