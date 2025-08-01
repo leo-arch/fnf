@@ -42,6 +42,8 @@
 
 #include "config.h"
 
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
 int
 main(int argc, char *argv[])
 {
@@ -83,8 +85,8 @@ main(int argc, char *argv[])
 
 		if (options.scrolloff == -1) { /* --scroll-off=auto */
 			const size_t tty_lines = tty_getheight(&tty);
-			const size_t n = options.num_lines > tty_lines
-				? tty_lines : options.num_lines;
+			const size_t items = MIN(options.num_lines, choices.available);
+			const size_t n = items > tty_lines ? tty_lines : items;
 			options.scrolloff = n >> 1; /* n / 2 */
 		}
 
