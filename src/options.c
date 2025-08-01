@@ -45,9 +45,10 @@ static const char *usage_str =
     " -e, --show-matches=QUERY Display the sorted matches of QUERY and exit\n"
     " -h, --help               Display this help and exit\n"
     " -i, --show-info          Show selection info line\n"
-    " -j, --workers=NUM        Use NUM workers for searching. (default: # of CPUs)\n"
+    " -j, --workers=NUM        Use NUM workers for searching (default: # of CPUs)\n"
     " -l, --lines=LINES        Specify how many lines of results to show (default: 10)\n"
     " -m, --multi              Enable multi-selection\n"
+    " -M, --max-items=NUM      Load only up to NUM items (default: unlimited)\n"
     " -p, --prompt=PROMPT      Input prompt (default: \"> \")\n"
     " -P, --pad=NUM            Left pad the list of matches NUM places (default: 0)\n"
     " -q, --query=QUERY        Use QUERY as the initial search string\n"
@@ -88,6 +89,7 @@ static struct option longopts[] = {
 	{"help", no_argument, NULL, 'h'},
 	{"pad", required_argument, NULL, 'P'},
 	{"multi", no_argument, NULL, 'm'},
+	{"max-items", required_argument, NULL, 'M'},
 	{"pointer", required_argument, NULL, 1},
 	{"marker", required_argument, NULL, 2},
 	{"cycle", no_argument, NULL, 3},
@@ -102,7 +104,6 @@ static struct option longopts[] = {
 	{"scroll-off", required_argument, NULL, 12},
 	{"no-sort", no_argument, NULL, 13},
 	{"no-clear", no_argument, NULL, 14},
-	{"max-items", required_argument, NULL, 15},
 	{NULL, 0, NULL, 0}
 };
 
@@ -147,13 +148,17 @@ options_parse(options_t *options, int argc, char *argv[])
 	int marker_set = 0;
 
 	int c;
-	while ((c = getopt_long(argc, argv, "mvhs0e:q:l:t:p:P:j:i",
+	while ((c = getopt_long(argc, argv, "mM:vhs0e:q:l:t:p:P:j:i",
 	longopts, NULL)) != -1) {
 		switch (c) {
 		case 'v': printf("%s\n", VERSION); exit(EXIT_SUCCESS);
 		case 's': options->show_scores = 1;	break;
 		case '0': options->input_delimiter = '\0'; break;
 		case 'm': options->multi = 1; break;
+		case 'M':
+			if (optarg && *optarg >= '0' && *optarg <= '9')
+				options->max_items = atoi(optarg);
+			break;
 		case 'q': options->init_search = optarg; break;
 		case 'e': options->filter = optarg; break;
 		case 't': options->tty_filename = optarg; break;
@@ -185,6 +190,7 @@ options_parse(options_t *options, int argc, char *argv[])
 			options->num_lines = l;
 		} break;
 		case 'i': options->show_info = 1; break;
+
 		case 1:
 			if (optarg && *optarg) {
 				pointer_set = 1;
@@ -214,10 +220,6 @@ options_parse(options_t *options, int argc, char *argv[])
 			break;
 		case 13: options->sort = 0; break;
 		case 14: options->clear = 0; break;
-		case 15:
-			if (optarg && *optarg >= '0' && *optarg <= '9')
-				options->max_items = atoi(optarg);
-			break;
 		case 'h': /* fallthrough */
 		default: usage(argv[0]); exit(EXIT_SUCCESS);
 		}
