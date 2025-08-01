@@ -34,7 +34,6 @@
 #include <unistd.h>
 #include <locale.h> /* setlocale() */
 
-#include "match.h"
 #include "tty.h"
 #include "choices.h"
 #include "options.h"
