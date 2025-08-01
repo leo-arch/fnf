@@ -848,9 +848,18 @@ handle_input(tty_interface_t *state, const char *s,
 
 	char *input = state->input;
 	size_t input_len = *state->input ? strlen(state->input) : 0;
-	strncat(state->input, s, sizeof(state->input) - input_len - 1);
-	/* S is either a single byte or empty. If a single byte, increase INPUT_LEN. */
-	input_len += (*s != '\0');
+
+	if (s && input_len < sizeof(state->input) - 1) {
+		/* Append the current input byte. */
+		state->input[input_len] = *s;
+		state->input[input_len + 1] = '\0';
+		/* S is either a single byte or empty. If a single byte,
+		 * increase INPUT_LEN. */
+		input_len += (*s != '\0');
+	} else {
+		*input = '\0';
+		return;
+	}
 
 	/* Figure out if we have completed a keybinding and whether we're in the
 	 * middle of one (both can happen, because of Esc). */
