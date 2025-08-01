@@ -130,6 +130,11 @@ set_hex_color(const int code, const char *hex)
 	if (get_rgb(hex, &attr, &r, &g, &b) == -1)
 		return;
 
+	/* This is just a workaround: disable attributes for highlight color
+	 * to avoid losing the original color when the entry is selected. */
+	if (code == HIGHLIGHT_COLOR)
+		attr = -1;
+
 	const int bgfg = IS_BG_COLOR(code) ? 48 : 38;
 	const size_t l = sizeof(colors[code]);
 
@@ -149,7 +154,9 @@ set_256_color(const int code, char *color)
 	char *field_sep = strchr(color, COLOR_FIELD_SEP);
 	if (field_sep && field_sep[1]) {
 		*field_sep = '\0';
-		if (IS_DIGIT(field_sep[1]))
+		/* This is just a workaround: disable attributes for highlight color
+		 * to avoid losing the original color when the entry is selected. */
+		if (IS_DIGIT(field_sep[1]) && code != HIGHLIGHT_COLOR)
 			attr = field_sep[1] - '0';
 	}
 
