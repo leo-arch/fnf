@@ -290,7 +290,7 @@ get_starting_item(const choices_t *choices, const options_t *options)
 	const size_t available = choices->available;
 
 	int scrolloff = options->scrolloff;
-	if (scrolloff == -1) {
+	if (scrolloff == -1) { /* --scroll-off=auto (default) */
 		items = items < available ? items : available;
 		scrolloff = items >> 1; /* items / 2 */
 	}
@@ -374,10 +374,10 @@ draw(tty_interface_t *state)
 	const size_t cursor_position =
 		get_cursor_position(prompt_len + options_pad + 1, state);
 
-	tty_printf(tty, "\x1b[%dG%s%s%s%s%s%s\x1b[%zuG",
-		options_pad + 1, colors[PROMPT_COLOR], options->prompt,
-		RESET_ATTR, colors[QUERY_COLOR], state->search,
-		RESET_ATTR CLEAR_LINE, cursor_position);
+	tty_printf(tty, "\x1b[%dG%s%s%s%s%s%s\x1b[%zuG", options_pad + 1,
+		colors[PROMPT_COLOR], options->prompt, RESET_ATTR,
+		colors[QUERY_COLOR], state->search, RESET_ATTR CLEAR_LINE,
+		cursor_position);
 
 	tty_setwrap(tty);
 	tty_unhide_cursor(tty);
