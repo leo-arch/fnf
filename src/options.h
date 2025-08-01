@@ -52,6 +52,7 @@ typedef struct {
 	int clear;
 	int cycle;
 	int left_aborts;
+	int max_items;
 	int multi;
 	int no_color;
 	int pad;

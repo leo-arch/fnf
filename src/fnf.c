@@ -57,7 +57,8 @@ main(int argc, char *argv[])
 	sel_t selection = {0};
 
 	if (options.filter) { /* --show-matches */
-		choices_fread(&choices, stdin, options.input_delimiter);
+		choices_fread(&choices, stdin, options.input_delimiter,
+			options.max_items);
 		choices_search(&choices, options.filter, options.sort);
 		for (size_t i = 0; i < choices_available(&choices); i++) {
 			if (options.show_scores)
@@ -74,7 +75,8 @@ main(int argc, char *argv[])
 		tty_init(&tty, options.tty_filename);
 
 		if (!isatty(STDIN_FILENO))
-			choices_fread(&choices, stdin, options.input_delimiter);
+			choices_fread(&choices, stdin, options.input_delimiter,
+				options.max_items);
 
 		if (options.num_lines > choices.size)
 			options.num_lines = choices.size;

@@ -100,10 +100,11 @@ safe_realloc(void *buffer, const size_t size)
 }
 
 void
-choices_fread(choices_t *c, FILE *file, const char input_delimiter)
+choices_fread(choices_t *c, FILE *file, const char input_delimiter,
+	const int max_choices)
 {
 	/* Save current position for parsing later */
-	size_t buffer_start = c->buffer_size;
+	const size_t buffer_start = c->buffer_size;
 
 	/* Resize buffer to at least one byte more capacity than our current
 	 * size. This uses a power of two of INITIAL_BUFFER_CAPACITY.
@@ -125,6 +126,7 @@ choices_fread(choices_t *c, FILE *file, const char input_delimiter)
 	/* Truncate buffer to used size, (maybe) freeing some memory for
 	 * future allocations. */
 
+	int choices_count = 0;
 	/* Tokenize input and add to choices. */
 	const char *line_end = c->buffer + c->buffer_size;
 	char *line = c->buffer + buffer_start;
@@ -134,8 +136,11 @@ choices_fread(choices_t *c, FILE *file, const char input_delimiter)
 			*nl++ = '\0';
 
 		/* Skip empty lines. */
-		if (*line)
+		if (*line) {
+			if (max_choices != -1 && ++choices_count > max_choices)
+				break;
 			choices_add(c, line);
+		}
 
 		line = nl;
 	} while (line && line < line_end);

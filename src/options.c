@@ -102,6 +102,7 @@ static struct option longopts[] = {
 	{"scroll-off", required_argument, NULL, 12},
 	{"no-sort", no_argument, NULL, 13},
 	{"no-clear", no_argument, NULL, 14},
+	{"max-items", required_argument, NULL, 15},
 	{NULL, 0, NULL, 0}
 };
 
@@ -118,6 +119,7 @@ options_init(options_t *options)
 	options->input_delimiter = DEFAULT_DELIMITER;
 	options->left_aborts     = DEFAULT_LEFT_ABORTS;
 	options->marker          = DEFAULT_MARKER;
+	options->max_items       = DEFAULT_MAX_ITEMS;
 	options->multi           = DEFAULT_MULTI;
 	options->no_color        = DEFAULT_NO_COLOR;
 	options->num_lines       = DEFAULT_NUM_LINES;
@@ -212,6 +214,10 @@ options_parse(options_t *options, int argc, char *argv[])
 			break;
 		case 13: options->sort = 0; break;
 		case 14: options->clear = 0; break;
+		case 15:
+			if (optarg && *optarg >= '0' && *optarg <= '9')
+				options->max_items = atoi(optarg);
+			break;
 		case 'h': /* fallthrough */
 		default: usage(argv[0]); exit(EXIT_SUCCESS);
 		}
