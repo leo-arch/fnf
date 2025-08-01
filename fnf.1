@@ -9,8 +9,36 @@ fnf \- A general-purpose, interactive fuzzy finder for the terminal.
 .
 .SH OPTIONS
 .TP
+.BR \-0 ", " \-\-read-null
+Read input delimited by ASCII NUL characters
+.
+.TP
+.BR \-e ", " \-\-show-matches =\fIQUERY\fR
+Non-interactive mode. Print the matches in sorted order for QUERY to stdout.
+.
+.TP
+.BR \-h ", " \-\-help
+Print help and exit
+.
+.TP
+.BR \-i ", " \-\-show\-info
+Show selection info line
+.
+.TP
+.BR \-j ", " \-\-workers =\fINUM\fR
+Use NUM workers for searching (default: # of CPUs)
+.
+.TP
 .BR \-l ", " \-\-lines =\fILINES\fR
 How many lines of items to display (default: 10). Set to \fIauto\fR to use the entire terminal screen.
+.
+.TP
+.BR \-m ", " \-\-multi
+Enable multi-selection
+.
+.TP
+.BR \-M ", " \-\-max\-items =\fINUM\fR
+Load only up to NUM items (default: unlimited)
 .
 .TP
 .BR \-p ", " \-\-prompt =\fISTRING\fR
@@ -21,11 +49,11 @@ Input prompt (default: "> ")
 Left pad the list of matches NUM places (default: 0)
 .
 .TP
-.BR \-m ", " \-\-multi
-Enable multi-selection
+.BR \-q ", " \-\-query =\fIQUERY\fR
+Use QUERY as the initial search query
 .
 .TP
-.BR \-s ", " \-\-show-scores
+.BR \-s ", " \-\-show\-scores
 Show the scores for each item
 .
 .TP
@@ -33,36 +61,8 @@ Show the scores for each item
 Use TTY instead of the default tty device (/dev/tty)
 .
 .TP
-.BR \-q ", " \-\-query =\fIQUERY\fR
-Use QUERY as the initial search query
-.
-.TP
-.BR \-e ", " \-\-show-matches =\fIQUERY\fR
-Non-interactive mode. Print the matches in sorted order for QUERY to stdout.
-.
-.TP
-.BR \-0 ", " \-\-read-null
-Read input delimited by ASCII NUL characters
-.
-.TP
-.BR \-h ", " \-\-help
-Print help and exit
-.
-.TP
 .BR \-v ", " \-\-version
 Print version and exit
-.
-.TP
-.BR \-\-print\-null
-Print output delimited by ASCII NUL characters
-.
-.TP
-.BR \-\-pointer =\fISTRING\fR
-Pointer to highlighted match (default: ">")
-.
-.TP
-.BR \-\-marker =\fISTRING\fR
-Multi-select marker (default: "*")
 .
 .TP
 .BR \-\-color=\fICOLORSPEC\fR
@@ -73,24 +73,8 @@ Set custom colors (consult the \fBCOLORS\fR section below for more information)
 Enable cyclic scrolling
 .
 .TP
-.BR \-\-tab-accepts
-TAB accepts: print selection and exit
-.
-.TP
-.BR \-\-right-accepts
-Right arrow key accepts: print selection and exit
-.
-.TP
-.BR \-\-left-aborts
-Left arrow key aborts: cancel selection and exit
-.
-.TP
-.BR \-\-reverse
-List from top, prompt at bottom
-.
-.TP
-.BR \-\-no\-sort
-Do not sort the result
+.BR \-\-marker =\fISTRING\fR
+Multi-select marker (default: "*")
 .
 .TP
 .BR \-\-no\-clear
@@ -100,9 +84,37 @@ Do not clear the interface on exit
 Disable colors
 .
 .TP
+.BR \-\-no\-sort
+Do not sort the result
+.
+.TP
 .BR \-\-no\-unicode
 Disable Unicode decorations
 .
+.TP
+.BR \-\-pointer =\fISTRING\fR
+Pointer to highlighted match (default: ">")
+.
+.TP
+.BR \-\-print\-null
+Print output delimited by ASCII NUL characters
+.
+.TP
+.BR \-\-reverse
+List from top, prompt at bottom
+.
+.TP
+.BR \-\-right-accepts
+Right arrow key accepts: print selection and exit
+.
+.TP
+.BR \-\-tab-accepts
+TAB accepts: print selection and exit
+.
+.TP
+.BR \-\-left-aborts
+Left arrow key aborts: cancel selection and exit
+
 .SH KEY BINDINGS
 .
 .TP
