@@ -1,4 +1,4 @@
-.TH FNF 1 "Jul 29, 2025" "fnf 0.3.5"
+.TH FNF 1 "Aug 1, 2025" "fnf 0.3.6"
 .SH NAME
 fnf \- A general-purpose, interactive fuzzy finder for the terminal.
 .SH SYNOPSIS
@@ -253,16 +253,16 @@ Present a menu of items in the current directory
 Same as above, but show 25 lines of items
 .TP
 .BR "vi $(find \-type f | fnf)"
-List files under the current directory and open the one selected in vi.
+List files under the current directory and open the one selected in vi
 .TP
 .BR "cd $(find \-type d | fnf)"
-Present all directories under current path, and change to the one selected.
+Present all directories under current path, and change to the one selected
 .TP
 .BR "ps aux | fnf | awk '{ print $2 }' | xargs kill"
 List running processes, kill the selected process
 .TP
 .BR "git checkout $(git branch | cut \-c 3\- | fnf)"
-Same as above, but switching git branches.
+Same as above, but switching git branches
 .
 .SH EXIT STATUS
 \fB0\fR   Normal exit
