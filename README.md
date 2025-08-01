@@ -48,7 +48,7 @@ clifm --fnftab
 ```
 
 > [!NOTE]
-> You need at least **clifm** 1.12.9.
+> You need at least **clifm** 1.12.9. Since version 1.26.1, the proper option is `--tabmode=fnf`.
 
 ## Color schemes
 
