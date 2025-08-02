@@ -269,8 +269,8 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 	}
 
 	/* Backtrace to find the positions of optimal matching. */
-	int p = 0; /* Current positions index. */
 	if (positions) {
+		int p = 0; /* Current positions index. */
 		int match_required = 0;
 		for (int i = 0, j = 0; i < n; i++) {
 			for (; j < m; j++) {
