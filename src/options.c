@@ -87,7 +87,7 @@ static const char *usage_str =
 static void
 usage(void)
 {
-	fprintf(stderr, usage_str);
+	fprintf(stderr, "%s", usage_str);
 }
 
 static struct option longopts[] = {

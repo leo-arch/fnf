@@ -346,6 +346,9 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 
 		/* Append the current character to the buffer */
 		buf[l++] = (name[i] == '\n') ? ' ' : name[i];
+		/* If multi-byte char, append the remaining bytes */
+		while (IS_UTF8_CONT_BYTE(name[i + 1]))
+			buf[l++] = name[++i];
 
 		if (l >= sizeof(buf) - 1)
 			break; /* Buffer is full: stop adding more characters */

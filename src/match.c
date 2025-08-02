@@ -32,6 +32,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h> /* uint8_t */
 
 #include "match.h"
 #include "bonus.h"
@@ -202,6 +203,23 @@ match(const char *needle, const char *haystack)
 	return last_M[m - 1];
 }
 
+/* Return the length of a UTF-8 character */
+static size_t
+utf8_char_len(const uint8_t *byte) {
+	if ((*byte & 0x80) == 0) return 1;    /* 1-byte character */
+	if ((*byte & 0xE0) == 0xC0) return 2; /* 2-byte character */
+	if ((*byte & 0xF0) == 0xE0) return 3; /* 3-byte character */
+	if ((*byte & 0xF8) == 0xF0) return 4; /* 4-byte character */
+	return 0; /* Invalid byte */
+}
+
+/* Return 1 if HAYSTACK starts with NEEDLE, or 0 otherwise. */
+static int
+compare_utf8_chars(const char *haystack, const char *needle) {
+	const size_t needle_len = utf8_char_len((const uint8_t *)needle);
+	return (memcmp(haystack, needle, needle_len) == 0);
+}
+
 score_t
 match_positions(const char *needle, const char *haystack, size_t *positions)
 {
@@ -251,6 +269,7 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 	}
 
 	/* Backtrace to find the positions of optimal matching. */
+	int p = 0; /* Current positions index. */
 	if (positions) {
 		int match_required = 0;
 		for (int i = 0, j = 0; i < n; i++) {
@@ -267,8 +286,27 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 					 * next character MUST be a match. */
 					match_required = i && j &&
 						M[i][j] == D[i - 1][j - 1] + SCORE_MATCH_CONSECUTIVE;
-					positions[i] = j++;
-					break;
+
+					/* Check if the current char in haystack matches needle. */
+					if (!IS_UTF8_CHAR(haystack[j])) { /* ASCII character */
+						positions[p++] = j++;
+						break;
+					}
+
+					if (compare_utf8_chars(&haystack[j], &needle[i])) {
+						/* Mark the position of the first byte of the
+						 * matching multi-byte character. */
+						positions[p++] = j;
+
+						/* Skip remaining bytes of the multi-byte character,
+						 * both in haystack (j) and in needle (i). */
+						size_t char_len =
+							utf8_char_len((const uint8_t *)&haystack[j]);
+						j += char_len;
+						/* -1 because the main for-loop will increment i */
+						i += char_len - 1;
+						break;
+					}
 				}
 			}
 		}

@@ -59,6 +59,10 @@
 	&& (s)[3] == 'm' && !(s)[4])
 #define IS_BG_COLOR(n)  ((n) == SEL_BG_COLOR || (n) == GUTTER_COLOR)
 
+#define IS_UTF8_LEAD_BYTE(c) (((c) & 0xc0) == 0xc0)
+#define IS_UTF8_CONT_BYTE(c) (((c) & 0xc0) == 0x80)
+#define IS_UTF8_CHAR(c)      (IS_UTF8_LEAD_BYTE((c)) || IS_UTF8_CONT_BYTE((c)))
+
 #include "tty_interface.h"
 
 #ifdef __cplusplus
