@@ -37,7 +37,7 @@
 #include "bonus.h"
 #include "colors.h"
 
-char *
+static char *
 strcasechr(const char *s, char c)
 {
 	const char accept[3] = {c, toupper(c), '\0'};
@@ -79,7 +79,7 @@ has_match(const char *needle, const char *haystack)
 }
 
 #define SWAP(x, y, T) do { T SWAP = x; x = y; y = SWAP; } while (0)
-#define max(a, b) (((a) > (b)) ? (a) : (b))
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
 struct match_t {
 	score_t match_bonus[MATCH_MAX_LEN];
@@ -142,13 +142,13 @@ match_row(const struct match_t *match, int row, score_t *curr_D,
 			if (!i) {
 				score = (j * SCORE_GAP_LEADING) + match_bonus[j];
 			} else if (j) { /* i > 0 && j > 0*/
-				score = max(
+				score = MAX(
 					last_M[j - 1] + match_bonus[j],
 					/* consecutive match, doesn't stack with match_bonus */
 					last_D[j - 1] + SCORE_MATCH_CONSECUTIVE);
 			}
 			curr_D[j] = score;
-			curr_M[j] = prev_score = max(score, prev_score + gap_score);
+			curr_M[j] = prev_score = MAX(score, prev_score + gap_score);
 		} else {
 			curr_D[j] = SCORE_MIN;
 			curr_M[j] = prev_score = prev_score + gap_score;
@@ -253,22 +253,21 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 	/* Backtrace to find the positions of optimal matching. */
 	if (positions) {
 		int match_required = 0;
-		for (int i = n - 1, j = m - 1; i >= 0; i--) {
-			for (; j >= 0; j--) {
+		for (int i = 0, j = 0; i < n; i++) {
+			for (; j < m; j++) {
 				/* There may be multiple paths which result in
 				 * the optimal weight.
 				 * For simplicity, we will pick the first one
-				 * we encounter, the latest in the candidate
+				 * we encounter, the first in the candidate
 				 * string. */
 				if (D[i][j] != SCORE_MIN &&
-				    (match_required || D[i][j] == M[i][j])) {
+					(match_required || D[i][j] == M[i][j])) {
 					/* If this score was determined using
 					 * SCORE_MATCH_CONSECUTIVE, the
-					 * previous character MUST be a match. */
-					match_required =
-					    i && j &&
-					    M[i][j] == D[i - 1][j - 1] + SCORE_MATCH_CONSECUTIVE;
-					positions[i] = j--;
+					 * next character MUST be a match. */
+					match_required = i && j &&
+						M[i][j] == D[i - 1][j - 1] + SCORE_MATCH_CONSECUTIVE;
+					positions[i] = j++;
 					break;
 				}
 			}
