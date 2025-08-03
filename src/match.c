@@ -203,10 +203,37 @@ match(const char *needle, const char *haystack)
 	return last_M[m - 1];
 }
 
+static uint8_t
+is_utf8_name(const char *name)
+{
+	static const unsigned char utf8_chars[256] = {
+		[192] = 1, [193] = 1, [194] = 1, [195] = 1, [196] = 1, [197] = 1,
+		[198] = 1, [199] = 1, [200] = 1, [201] = 1, [202] = 1, [203] = 1,
+		[204] = 1, [205] = 1, [206] = 1, [207] = 1, [208] = 1, [209] = 1,
+		[210] = 1, [211] = 1, [212] = 1, [213] = 1, [214] = 1, [215] = 1,
+		[216] = 1, [217] = 1, [218] = 1, [219] = 1, [220] = 1, [221] = 1,
+		[222] = 1, [223] = 1, [224] = 1, [225] = 1, [226] = 1, [227] = 1,
+		[228] = 1, [229] = 1, [230] = 1, [231] = 1, [232] = 1, [233] = 1,
+		[234] = 1, [235] = 1, [236] = 1, [237] = 1, [238] = 1, [239] = 1,
+		[240] = 1, [241] = 1, [242] = 1, [243] = 1, [244] = 1, [245] = 1,
+		[246] = 1, [247] = 1, [248] = 1, [249] = 1, [250] = 1, [251] = 1,
+		[252] = 1, [253] = 1, [254] = 1, [255] = 1
+	};
+
+	const unsigned char *n = (const unsigned char *)name;
+	while (*n) {
+		if (utf8_chars[*n] == 1)
+			return 1;
+		n++;
+	}
+
+	return 0;
+}
+
 /* Return the length of a UTF-8 character */
 static size_t
 utf8_char_len(const uint8_t *byte) {
-	if ((*byte & 0x80) == 0) return 1;    /* 1-byte character */
+	if ((*byte & 0x80) == 0)    return 1; /* 1-byte character */
 	if ((*byte & 0xE0) == 0xC0) return 2; /* 2-byte character */
 	if ((*byte & 0xF0) == 0xE0) return 3; /* 3-byte character */
 	if ((*byte & 0xF8) == 0xF0) return 4; /* 4-byte character */
@@ -217,7 +244,12 @@ utf8_char_len(const uint8_t *byte) {
 static int
 compare_utf8_chars(const char *haystack, const char *needle) {
 	const size_t needle_len = utf8_char_len((const uint8_t *)needle);
-	return (memcmp(haystack, needle, needle_len) == 0);
+	for (size_t i = 0; i < needle_len; i++) {
+		if (haystack[i] != needle[i])
+			return 0;
+	}
+
+	return 1;
 }
 
 score_t
@@ -239,10 +271,10 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 		 * If it is a valid match it will still be returned, it will
 		 * just be ranked below any reasonably sized candidates. */
 		return SCORE_MIN;
-	} else if (n == m) {
+	} else if (n == m && !is_utf8_name(needle)) {
 		/* Since this method can only be called with a haystack which
-		 * matches needle. If the lengths of the strings are equal the
-		 * strings themselves must also be equal (ignoring case). */
+		 * matches needle, if the lengths of the strings are equal, then
+		 * the strings themselves must also be equal (ignoring case). */
 		if (positions)
 			for (int i = 0; i < n; i++)
 				positions[i] = i;
