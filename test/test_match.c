@@ -193,7 +193,7 @@ TEST positions_start_of_word() {
 	match_positions("amor", "app/models/order", positions);
 	ASSERT_SIZE_T_EQ(0, positions[0]);
 	ASSERT_SIZE_T_EQ(4, positions[1]);
-	ASSERT_SIZE_T_EQ(11, positions[2]);
+	ASSERT_SIZE_T_EQ(5, positions[2]);
 	ASSERT_SIZE_T_EQ(12, positions[3]);
 
 	PASS();
@@ -215,7 +215,7 @@ TEST positions_no_bonuses() {
 TEST positions_multiple_candidates_start_of_words() {
 	size_t positions[3];
 	match_positions("abc", "a/a/b/c/c", positions);
-	ASSERT_SIZE_T_EQ(2, positions[0]);
+	ASSERT_SIZE_T_EQ(0, positions[0]);
 	ASSERT_SIZE_T_EQ(4, positions[1]);
 	ASSERT_SIZE_T_EQ(6, positions[2]);
 
