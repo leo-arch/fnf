@@ -222,7 +222,8 @@ init_utf8_len_table(void)
 	}
 }
 
-/* Return 1 if HAYSTACK begins with NEEDLE, or 0 otherwise. */
+/* Return 1 if the first wide character in HAYSTACK matches the first wide
+ * character in NEEDLE, or 0 otherwise. */
 static inline int
 compare_utf8_chars(const char *haystack, const char *needle)
 {
@@ -241,8 +242,10 @@ compare_utf8_chars(const char *haystack, const char *needle)
 /* Return the score indicating the degree of match between HAYSTAK and NEEDLE.
  * A higher score indicates a better match.
  * The POSITIONS array is populated with the positions (indices) of the
- * matching characters in HAYSTACK. In case of UTF-8 strings, only the position
- * of the first byte of each matching multi-byte character is added to the array. */
+ * matching characters in HAYSTACK. In case of UTF-8 strings, only the
+ * position of the first byte of each matching multi-byte character is added
+ * to the POSITIONS array.
+ * All parameters are guaranteed to be non-null. */
 score_t
 match_positions(const char *needle, const char *haystack, size_t *positions)
 {
@@ -250,7 +253,6 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 	if (utf8_len_table[0] == 0)
 		init_utf8_len_table();
 
-	/* All parameters are guaranteed to be non-null. */
 	if (!*needle)
 		return SCORE_MIN;
 
@@ -318,7 +320,8 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 			match_required = i && j &&
 				M[i][j] == D[i - 1][j - 1] + SCORE_MATCH_CONSECUTIVE;
 
-			/* Check if the current char in haystack matches needle. */
+			/* Check if the current char in haystack matches the current
+			 * char in needle. */
 			const size_t char_len = utf8_len_table[(uint8_t)haystack[j]];
 			if (char_len < 2) { /* ASCII character (or invalid) */
 				positions[p++] = j++;
