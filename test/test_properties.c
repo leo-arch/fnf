@@ -167,7 +167,7 @@ prop_positions_should_match_characters_in_string(char *needle, char *haystack)
 	/* Must be increasing */
 /*	for (size_t i = 0; i < n && positions[i] != (size_t)-1; i++) {
 		if (positions[i] >= positions[i + 1]) {
-			printf("%zu->%zu - %zu->%zu\n", i, positions[i], i + 1, positions[i + 1]);
+//			printf("%zu->%zu - %zu->%zu\n", i, positions[i], i + 1, positions[i + 1]);
 			return THEFT_TRIAL_FAIL;
 		}
 	} */

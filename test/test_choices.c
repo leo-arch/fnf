@@ -16,10 +16,10 @@
 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 * copies of the Software, and to permit persons to whom the Software is
 * furnished to do so, subject to the following conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be included in
 * all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -170,7 +170,7 @@ TEST test_choices_large_input() {
 	char *strings[100000];
 
 	for(int i = 0; i < N; i++) {
-		asprintf(&strings[i], "%i", i);
+		(void)asprintf(&strings[i], "%i", i);
 		choices_add(&choices, strings[i]);
 	}
 
@@ -181,9 +181,8 @@ TEST test_choices_large_input() {
 
 	ASSERT_STR_EQ("12", choices_get(&choices, 0));
 
-	for(int i = 0; i < N; i++) {
+	for(int i = 0; i < N; i++)
 		free(strings[i]);
-	}
 
 	PASS();
 }
