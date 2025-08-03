@@ -222,22 +222,8 @@ init_utf8_len_table(void)
 	}
 }
 
-/* Return 1 if NAME contains at least one multi-byte character, or 0 otherwise. */
-static int
-is_utf8_name(const char *name)
-{
-	const uint8_t *n = (const uint8_t *)name;
-	while (*n) {
-		if (utf8_len_table[*n] > 1)
-			return 1;
-		n++;
-	}
-
-	return 0;
-}
-
 /* Return 1 if HAYSTACK begins with NEEDLE, or 0 otherwise. */
-static int
+static inline int
 compare_utf8_chars(const char *haystack, const char *needle)
 {
 	const size_t needle_len = utf8_len_table[(uint8_t)*needle];
@@ -281,12 +267,17 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 		 * If it is a valid match it will still be returned, it will
 		 * just be ranked below any reasonably sized candidates. */
 		return SCORE_MIN;
-	} else if (n == m && !is_utf8_name(needle)) {
+	} else if (n == m) {
 		/* Since this method can only be called with a haystack which
 		 * matches needle, if the lengths of the strings are equal, then
 		 * the strings themselves must also be equal (ignoring case). */
-		for (size_t i = 0; i < n; i++)
-			positions[i] = i;
+		size_t p = 0;
+		for (size_t i = 0; i < n; i++) {
+			positions[p++] = i;
+			const size_t l = utf8_len_table[(uint8_t)needle[i]];
+			if (l >= 2) /* Multi-byte character */
+				i += l - 1;	/* -1 because the for-loop will increment i */
+		}
 		return SCORE_MAX;
 	}
 
