@@ -12,7 +12,7 @@
  * (This will only be used if all property types have hash
  * callbacks defined.) The bloom filter can also be disabled
  * by setting BLOOM_BITS to THEFT_BLOOM_DISABLE.
- * 
+ *
  * Returns a NULL if malloc fails or BLOOM_BITS is out of bounds. */
 struct theft *theft_init(uint8_t bloom_bits) {
     if ((bloom_bits != 0 && (bloom_bits < THEFT_BLOOM_BITS_MIN))
@@ -124,7 +124,7 @@ theft_run_internal(struct theft *t, struct theft_propfun_info *info,
     struct theft_trial_report fake_report;
     if (r == NULL) { r = &fake_report; }
     memset(r, 0, sizeof(*r));
-    
+
     infer_arity(info);
     if (info->arity == 0) {
         return THEFT_RUN_ERROR_BAD_ARGS;
@@ -134,7 +134,7 @@ theft_run_internal(struct theft *t, struct theft_propfun_info *info,
         || info->arity == 0) {
         return THEFT_RUN_ERROR_BAD_ARGS;
     }
-    
+
     bool all_hashable = false;
     if (!check_all_args(info, &all_hashable)) {
         return THEFT_RUN_ERROR_MISSING_CALLBACK;
@@ -152,14 +152,14 @@ theft_run_internal(struct theft *t, struct theft_propfun_info *info,
             t->bloom = theft_bloom_init(t->requested_bloom_bits);
         }
     }
-    
+
     theft_seed seed = t->seed;
     theft_seed initial_seed = t->seed;
     int always_seeds = info->always_seed_count;
     if (info->always_seeds == NULL) { always_seeds = 0; }
 
     void *args[THEFT_MAX_ARITY];
-    
+
     theft_progress_callback_res cres = THEFT_PROGRESS_CONTINUE;
 
     for (int trial = 0; trial < trials; trial++) {
@@ -356,7 +356,7 @@ gen_all_args(theft *t, struct theft_propfun_info *info,
     if (t->bloom && check_called(t, info, args, env)) {
         return ALL_GEN_DUP;
     }
-    
+
     return ALL_GEN_OK;
 }
 
@@ -412,7 +412,7 @@ attempt_to_shrink_arg(theft *t, struct theft_propfun_info *info,
         } else if (nv == THEFT_DEAD_END) {
             continue;   /* try next tactic */
         }
-        
+
         args[ai] = nv;
         if (t->bloom) {
             if (check_called(t, info, args, env)) {
@@ -425,7 +425,7 @@ attempt_to_shrink_arg(theft *t, struct theft_propfun_info *info,
             }
         }
         theft_trial_res res = call_fun(info, args);
-        
+
         switch (res) {
         case THEFT_TRIAL_PASS:
         case THEFT_TRIAL_SKIP:
@@ -450,7 +450,7 @@ static void get_arg_hash_buffer(theft_hash *buffer,
         struct theft_propfun_info *info, void **args, void *env) {
     for (int i = 0; i < info->arity; i++) {
         buffer[i] = info->type_info[i]->hash(args[i], env);
-    }    
+    }
 }
 
 /* Mark the tuple of argument instances as called in the bloom filter. */
@@ -480,8 +480,8 @@ static theft_progress_callback_res report_on_failure(theft *t,
     int arity = info->arity;
     fprintf(t->out, "\n\n -- Counter-Example: %s\n",
         info->name ? info-> name : "");
-    fprintf(t->out, "    Trial %u, Seed 0x%016llu\n", ti->trial,
-        (uint64_t)ti->seed);
+    fprintf(t->out, "    Trial %u, Seed 0x%016ju\n", ti->trial,
+        (uintmax_t)ti->seed);
     for (int i = 0; i < arity; i++) {
         theft_print_cb *print = info->type_info[i]->print;
         if (print) {
