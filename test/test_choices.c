@@ -170,7 +170,8 @@ TEST test_choices_large_input() {
 	char *strings[100000];
 
 	for(int i = 0; i < N; i++) {
-		(void)asprintf(&strings[i], "%i", i);
+		const int ret = asprintf(&strings[i], "%i", i);
+		(void)ret;
 		choices_add(&choices, strings[i]);
 	}
 
