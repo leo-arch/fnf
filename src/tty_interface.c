@@ -58,14 +58,14 @@ set_cursor_for_clear(const tty_interface_t *state)
 	if (state->options->reverse == 1) {
 		if (state->options->clear == 1) {
 			/* Move the cursor up. */
-			tty_printf(state->tty, "\x1b[%dA",
+			tty_printf(state->tty, "\x1b[%zuA",
 				state->options->num_lines + state->options->show_info);
 		} else {
 			tty_putc(state->tty, '\n');
 		}
 	} else if (state->options->clear == 0) {
 		/* Move the cursor down and print a new line. */
-		tty_printf(state->tty, "\x1b[%dB\n",
+		tty_printf(state->tty, "\x1b[%zuB\n",
 			state->options->num_lines + state->options->show_info + 1);
 	}
 }
@@ -399,7 +399,7 @@ update_state(tty_interface_t *state)
 		update_search(state);
 		if (state->options->reverse == 1) {
 			/* Hide cursor and move it up. */
-			tty_printf(state->tty, "\x1b[?25l\x1b[%dA\n",
+			tty_printf(state->tty, "\x1b[?25l\x1b[%zuA\n",
 				state->options->num_lines + 1 + state->options->show_info);
 		}
 		draw(state);
@@ -942,7 +942,7 @@ tty_interface_run(tty_interface_t *state)
 
 			if (state->options->reverse == 1 && state->redraw == 1) {
 				/* Hide cursor and move it up. */
-				tty_printf(state->tty, "\x1b[?25l\x1b[%dA\n",
+				tty_printf(state->tty, "\x1b[?25l\x1b[%zuA\n",
 					state->options->num_lines + 1 + state->options->show_info);
 			}
 
