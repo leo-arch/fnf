@@ -203,26 +203,31 @@ match(const char *needle, const char *haystack)
 	return last_M[m - 1];
 }
 
-static uint8_t
+static uint8_t utf8_len_table[256] = {0};
+
+static void
+init_utf8_len_table(void)
+{
+	for (int i = 0; i < 256; i++) {
+		if (i < 128)
+			utf8_len_table[i] = 1;
+		else if (i >= 192 && i <= 223)
+			utf8_len_table[i] = 2;
+		else if (i >= 224 && i <= 239)
+			utf8_len_table[i] = 3;
+		else if (i >= 240 && i <= 247)
+			utf8_len_table[i] = 4;
+		else
+			utf8_len_table[i] = 0;
+	}
+}
+
+static int
 is_utf8_name(const char *name)
 {
-	static const unsigned char utf8_chars[256] = {
-		[192] = 1, [193] = 1, [194] = 1, [195] = 1, [196] = 1, [197] = 1,
-		[198] = 1, [199] = 1, [200] = 1, [201] = 1, [202] = 1, [203] = 1,
-		[204] = 1, [205] = 1, [206] = 1, [207] = 1, [208] = 1, [209] = 1,
-		[210] = 1, [211] = 1, [212] = 1, [213] = 1, [214] = 1, [215] = 1,
-		[216] = 1, [217] = 1, [218] = 1, [219] = 1, [220] = 1, [221] = 1,
-		[222] = 1, [223] = 1, [224] = 1, [225] = 1, [226] = 1, [227] = 1,
-		[228] = 1, [229] = 1, [230] = 1, [231] = 1, [232] = 1, [233] = 1,
-		[234] = 1, [235] = 1, [236] = 1, [237] = 1, [238] = 1, [239] = 1,
-		[240] = 1, [241] = 1, [242] = 1, [243] = 1, [244] = 1, [245] = 1,
-		[246] = 1, [247] = 1, [248] = 1, [249] = 1, [250] = 1, [251] = 1,
-		[252] = 1, [253] = 1, [254] = 1, [255] = 1
-	};
-
-	const unsigned char *n = (const unsigned char *)name;
+	const uint8_t *n = (const uint8_t *)name;
 	while (*n) {
-		if (utf8_chars[*n] == 1)
+		if (utf8_len_table[*n] > 1)
 			return 1;
 		n++;
 	}
@@ -230,20 +235,11 @@ is_utf8_name(const char *name)
 	return 0;
 }
 
-/* Return the length of a UTF-8 character */
-static size_t
-utf8_char_len(const uint8_t *byte) {
-	if ((*byte & 0x80) == 0)    return 1; /* 1-byte character */
-	if ((*byte & 0xE0) == 0xC0) return 2; /* 2-byte character */
-	if ((*byte & 0xF0) == 0xE0) return 3; /* 3-byte character */
-	if ((*byte & 0xF8) == 0xF0) return 4; /* 4-byte character */
-	return 0; /* Invalid byte */
-}
-
-/* Return 1 if HAYSTACK starts with NEEDLE, or 0 otherwise. */
+/* Return 1 if HAYSTACK begins with NEEDLE, or 0 otherwise. */
 static int
-compare_utf8_chars(const char *haystack, const char *needle) {
-	const size_t needle_len = utf8_char_len((const uint8_t *)needle);
+compare_utf8_chars(const char *haystack, const char *needle)
+{
+	const size_t needle_len = utf8_len_table[(uint8_t)*needle];
 	for (size_t i = 0; i < needle_len; i++) {
 		if (haystack[i] != needle[i])
 			return 0;
@@ -255,6 +251,10 @@ compare_utf8_chars(const char *haystack, const char *needle) {
 score_t
 match_positions(const char *needle, const char *haystack, size_t *positions)
 {
+	/* When initialized, utf8_len_table[0] is 1 */
+	if (utf8_len_table[0] == 0)
+		init_utf8_len_table();
+
 	if (!*needle)
 		return SCORE_MIN;
 
@@ -332,8 +332,8 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 
 						/* Skip remaining bytes of the multi-byte character,
 						 * both in haystack (j) and in needle (i). */
-						size_t char_len =
-							utf8_char_len((const uint8_t *)&haystack[j]);
+						const size_t char_len =
+							utf8_len_table[(uint8_t)haystack[j]];
 						j += char_len;
 						/* -1 because the main for-loop will increment i */
 						i += char_len - 1;
