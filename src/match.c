@@ -258,6 +258,7 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 	if (utf8_len_table[0] == 0)
 		init_utf8_len_table();
 
+	/* All parameters are guaranteed to be non-null. */
 	if (!*needle)
 		return SCORE_MIN;
 
@@ -278,9 +279,8 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 		/* Since this method can only be called with a haystack which
 		 * matches needle, if the lengths of the strings are equal, then
 		 * the strings themselves must also be equal (ignoring case). */
-		if (positions)
-			for (size_t i = 0; i < n; i++)
-				positions[i] = i;
+		for (size_t i = 0; i < n; i++)
+			positions[i] = i;
 		return SCORE_MAX;
 	}
 
@@ -309,38 +309,36 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 
 	for (size_t i = 0, j = 0; i < n; i++) {
 		for (; j < m; j++) {
-			/* There may be multiple paths which result in
-			 * the optimal weight.
-			 * For simplicity, we will pick the first one
-			 * we encounter, the first in the candidate
-			 * string. */
-			if (D[i][j] != SCORE_MIN &&
-				(match_required || D[i][j] == M[i][j])) {
-				/* If this score was determined using
-				 * SCORE_MATCH_CONSECUTIVE, the
-				 * next character MUST be a match. */
-				match_required = i && j &&
-					M[i][j] == D[i - 1][j - 1] + SCORE_MATCH_CONSECUTIVE;
+			/* There may be multiple paths which result in the optimal weight.
+			 * For simplicity, we will pick the first one we encounter, the
+			 * first in the candidate string. */
+			if (D[i][j] == SCORE_MIN ||
+			(!match_required && D[i][j] != M[i][j]))
+				continue;
 
-				/* Check if the current char in haystack matches needle. */
-				const size_t char_len = utf8_len_table[(uint8_t)haystack[j]];
-				if (char_len < 2) { /* ASCII character (or invalid) */
-					positions[p++] = j++;
-					break;
-				}
+			/* If this score was determined using SCORE_MATCH_CONSECUTIVE, the
+			 * next character MUST be a match. */
+			match_required = i && j &&
+				M[i][j] == D[i - 1][j - 1] + SCORE_MATCH_CONSECUTIVE;
 
-				if (compare_utf8_chars(&haystack[j], &needle[i])) {
-					/* Mark the position of the first byte of the
-					 * matching multi-byte character. */
-					positions[p++] = j;
+			/* Check if the current char in haystack matches needle. */
+			const size_t char_len = utf8_len_table[(uint8_t)haystack[j]];
+			if (char_len < 2) { /* ASCII character (or invalid) */
+				positions[p++] = j++;
+				break;
+			}
 
-					/* Skip remaining bytes of the multi-byte character,
-					 * both in haystack (j) and in needle (i). */
-					j += char_len;
-					/* -1 because the main for-loop will increment i */
-					i += char_len - 1;
-					break;
-				}
+			if (compare_utf8_chars(&haystack[j], &needle[i])) {
+				/* Mark the position of the first byte of the
+				 * matching multi-byte character. */
+				positions[p++] = j;
+
+				/* Skip remaining bytes of the multi-byte character,
+				 * both in haystack (j) and in needle (i). */
+				j += char_len;
+				/* -1 because the main for-loop will increment i */
+				i += char_len - 1;
+				break;
 			}
 		}
 	}
