@@ -222,6 +222,7 @@ init_utf8_len_table(void)
 	}
 }
 
+/* Return 1 if NAME contains at least one multi-byte character, or 0 otherwise. */
 static int
 is_utf8_name(const char *name)
 {
@@ -251,6 +252,11 @@ compare_utf8_chars(const char *haystack, const char *needle)
 	return 1;
 }
 
+/* Return the score indicating the degree of match between HAYSTAK and NEEDLE.
+ * A higher score indicates a better match.
+ * The POSITIONS array is populated with the positions (indices) of the
+ * matching characters in HAYSTACK. In case of UTF-8 strings, only the position
+ * of the first byte of each matching multi-byte character is added to the array. */
 score_t
 match_positions(const char *needle, const char *haystack, size_t *positions)
 {
