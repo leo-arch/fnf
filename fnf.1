@@ -1,4 +1,4 @@
-.TH FNF 1 "Aug 3, 2025" "fnf 0.3.7"
+.TH FNF 1 "Aug 4, 2025" "fnf 0.3.7"
 .SH NAME
 fnf \- A general-purpose, interactive fuzzy finder for the terminal.
 .SH SYNOPSIS
@@ -11,6 +11,10 @@ fnf \- A general-purpose, interactive fuzzy finder for the terminal.
 .TP
 .BR \-0 ", " \-\-read-null
 Read input delimited by ASCII NUL characters
+.
+.TP
+.BR \-c ", " \-\-cycle
+Enable cyclic scrolling
 .
 .TP
 .BR \-e ", " \-\-show-matches =\fIQUERY\fR
@@ -53,6 +57,10 @@ Left pad the list of matches NUM places (default: 0)
 Use QUERY as the initial search query
 .
 .TP
+.BR \-r ", " \-\-reverse
+List from top, prompt at bottom
+.
+.TP
 .BR \-s ", " \-\-show\-scores
 Show the scores for each item
 .
@@ -67,10 +75,6 @@ Print version and exit
 .TP
 .BR \-\-color=\fICOLORSPEC\fR
 Set custom colors (consult the \fBCOLORS\fR section below for more information)
-.
-.TP
-.BR \-\-cycle
-Enable cyclic scrolling
 .
 .TP
 .BR \-\-marker =\fISTRING\fR
@@ -98,10 +102,6 @@ Pointer to highlighted match (default: ">")
 .TP
 .BR \-\-print\-null
 Print output delimited by ASCII NUL characters
-.
-.TP
-.BR \-\-reverse
-List from top, prompt at bottom
 .
 .TP
 .BR \-\-right-accepts
