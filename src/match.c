@@ -265,8 +265,8 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 	if (n == 0 || m == 0) {
 		return SCORE_MIN;
 	} else if (m > MATCH_MAX_LEN || n > m) {
-		/* Unreasonably large candidate: return no score
-		 * If it is a valid match it will still be returned, it will
+		/* Unreasonably large candidate: return no score.
+		 * If it is a valid match, it will still be returned, it will
 		 * just be ranked below any reasonably sized candidates. */
 		return SCORE_MIN;
 	} else if (n == m) {

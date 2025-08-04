@@ -40,23 +40,22 @@
 
 #define OPT_POINTER       1
 #define OPT_MARKER        2
-#define OPT_CYCLE         3
-#define OPT_TAB_ACCEPTS   4
-#define OPT_RIGHT_ACCEPTS 5
-#define OPT_LEFT_ABORTS   6
-#define OPT_NO_COLOR      7
-#define OPT_REVERSE       8
-#define OPT_NO_UNICODE    9
-#define OPT_COLOR         10
-#define OPT_PRINT_NULL    11
-#define OPT_SCROLLOFF     12
-#define OPT_NO_SORT       13
-#define OPT_NO_CLEAR      14
+#define OPT_TAB_ACCEPTS   3
+#define OPT_RIGHT_ACCEPTS 4
+#define OPT_LEFT_ABORTS   5
+#define OPT_NO_COLOR      6
+#define OPT_NO_UNICODE    7
+#define OPT_COLOR         8
+#define OPT_PRINT_NULL    9
+#define OPT_SCROLLOFF     10
+#define OPT_NO_SORT       11
+#define OPT_NO_CLEAR      12
 
 static const char *usage_str =
     ""
     "Usage: fnf [OPTION]...\n"
     " -0, --read-null          Read input delimited by ASCII NUL characters\n"
+    " -c, --cycle              Enable cyclic scrolling\n"
     " -e, --show-matches=QUERY Display the sorted matches of QUERY and exit\n"
     " -h, --help               Display this help and exit\n"
     " -i, --show-info          Show selection info line\n"
@@ -67,11 +66,11 @@ static const char *usage_str =
     " -p, --prompt=PROMPT      Input prompt (default: \"> \")\n"
     " -P, --pad=NUM            Left pad the list of matches NUM places (default: 0)\n"
     " -q, --query=QUERY        Use QUERY as the initial search string\n"
+    " -r, --reverse            Display from top, prompt at bottom\n"
     " -s, --show-scores        Show the scores of each match\n"
     " -t, --tty=TTY            Specify the file to use as TTY device (default: /dev/tty)\n"
     " -v, --version            Output version information and exit\n"
     "     --color=COLORSPEC    Set custom colors (consult the manpage)\n"
-    "     --cycle              Enable cyclic scrolling\n"
     "     --marker=STRING      Multi-select marker (default: \"*\")\n"
     "     --no-clear           Do not clear the interface on exit\n"
     "     --no-color           Disable colors\n"
@@ -79,7 +78,6 @@ static const char *usage_str =
     "     --no-unicode         Do not use Unicode decorations\n"
     "     --pointer=STRING     Pointer to highlighted match (default: \">\")\n"
     "     --print-null         Print ouput delimited by ASCII NUL characters\n"
-    "     --reverse            Display from top, prompt at bottom\n"
     "     --right-accepts      Right arrow key accepts\n"
     "     --tab-accepts        TAB accepts\n"
     "     --left-aborts        Left arrow key aborts\n";
@@ -92,6 +90,7 @@ usage(void)
 
 static struct option longopts[] = {
 	{"read-null", no_argument, NULL, '0'},
+	{"cycle", no_argument, NULL, 'c'},
 	{"show-matches", required_argument, NULL, 'e'},
 	{"help", no_argument, NULL, 'h'},
 	{"show-info", no_argument, NULL, 'i'},
@@ -102,11 +101,11 @@ static struct option longopts[] = {
 	{"prompt", required_argument, NULL, 'p'},
 	{"pad", required_argument, NULL, 'P'},
 	{"query", required_argument, NULL, 'q'},
+	{"reverse", no_argument, NULL, 'r'},
 	{"show-scores", no_argument, NULL, 's'},
 	{"tty", required_argument, NULL, 't'},
 	{"version", no_argument, NULL, 'v'},
 	{"color", required_argument, NULL, OPT_COLOR},
-	{"cycle", no_argument, NULL, OPT_CYCLE},
 	{"left-aborts", no_argument, NULL, OPT_LEFT_ABORTS},
 	{"marker", required_argument, NULL, OPT_MARKER},
 	{"no-clear", no_argument, NULL, OPT_NO_CLEAR},
@@ -115,7 +114,6 @@ static struct option longopts[] = {
 	{"no-unicode", no_argument, NULL, OPT_NO_UNICODE},
 	{"pointer", required_argument, NULL, OPT_POINTER},
 	{"print-null", no_argument, NULL, OPT_PRINT_NULL},
-	{"reverse", no_argument, NULL, OPT_REVERSE},
 	{"right-accepts", no_argument, NULL, OPT_RIGHT_ACCEPTS},
 	{"scroll-off", required_argument, NULL, OPT_SCROLLOFF},
 	{"tab-accepts", no_argument, NULL, OPT_TAB_ACCEPTS},
@@ -244,10 +242,11 @@ options_parse(options_t *options, int argc, char *argv[])
 	int marker_set = 0;
 
 	int c;
-	while ((c = getopt_long(argc, argv, "0e:hij:l:mM:q:p:P:t:sv",
+	while ((c = getopt_long(argc, argv, "0ce:hij:l:mM:p:P:q:rt:sv",
 	longopts, NULL)) != -1) {
 		switch (c) {
 		case '0': options->input_delimiter = '\0'; break;
+		case 'c': options->cycle = 1; break;
 		case 'e': options->filter = optarg; break;
 		case 'h': usage(); exit(EXIT_SUCCESS);
 		case 'i': options->show_info = 1; break;
@@ -255,14 +254,14 @@ options_parse(options_t *options, int argc, char *argv[])
 		case 'l': set_lines(options, optarg); break;
 		case 'm': options->multi = 1; break;
 		case 'M': set_max_items(options, optarg); break;
-		case 'q': options->init_search = optarg; break;
 		case 'p': options->prompt = optarg; break;
 		case 'P': set_padding(options, optarg); break;
+		case 'q': options->init_search = optarg; break;
+		case 'r': options->reverse = 1; break;
 		case 't': options->tty_filename = optarg; break;
 		case 's': options->show_scores = 1;	break;
 		case 'v': print_version(); break;
 		case OPT_COLOR: options->color = optarg; break;
-		case OPT_CYCLE: options->cycle = 1;	break;
 		case OPT_LEFT_ABORTS: options->left_aborts = 1; break;
 		case OPT_MARKER: marker_set = set_marker(options, optarg); break;
 		case OPT_NO_CLEAR: options->clear = 0; break;
@@ -271,7 +270,6 @@ options_parse(options_t *options, int argc, char *argv[])
 		case OPT_NO_UNICODE: options->unicode = 0; break;
 		case OPT_POINTER: pointer_set = set_pointer(options, optarg); break;
 		case OPT_PRINT_NULL: options->print_null = 1; break;
-		case OPT_REVERSE: options->reverse = 1; break;
 		case OPT_RIGHT_ACCEPTS: options->right_accepts = 1; break;
 		case OPT_SCROLLOFF: set_scrolloff(options, optarg); break;
 		case OPT_TAB_ACCEPTS: options->tab_accepts = 1; break;
