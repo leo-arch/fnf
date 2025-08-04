@@ -684,7 +684,7 @@ action_pageup(tty_interface_t *state)
 
 	update_state(state);
 
-	for (size_t i = 0; i < num_lines && selection > 0; i++) {
+	for (size_t i = 0; i < num_lines; i++) {
 		if (cycle == 0 && state->choices->selection == 0)
 			break;
 
@@ -707,7 +707,7 @@ action_pagedown(tty_interface_t *state)
 
 	update_state(state);
 
-	for (size_t i = 0; i < num_lines && selection < available - 1; i++) {
+	for (size_t i = 0; i < num_lines && selection <= available - 1; i++) {
 		if (cycle == 0 && state->choices->selection + 1 >= available)
 			break;
 
