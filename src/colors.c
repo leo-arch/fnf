@@ -323,10 +323,11 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 	if (positions[p] != 0) {
 		/* If the first character is not a match, set the original color */
 		l += snprintf(buf + l, sizeof(buf) - l, "%s", orig_color);
-	} else if (selected == 1 && no_color == 1) {
-		/* The first character is a match. Let's copy the selection background
-		 * color to extend this color to the first character. */
-		l += snprintf(buf + l, sizeof(buf) - l, "%s", SELECTION_NOCOLOR);
+	} else if (selected == 1) {
+		/* The first character is a match. Let's copy the selection color
+		 * to extend wathever attribute it has to the first character. */
+		l += snprintf(buf + l, sizeof(buf) - l, "%s", no_color == 1 ?
+		SELECTION_NOCOLOR : colors[SEL_FG_COLOR]);
 	}
 
 	for (size_t i = 0; name[i]; i++) {
@@ -346,7 +347,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 
 		/* Append the current character to the buffer */
 		buf[l++] = (name[i] == '\n') ? ' ' : name[i];
-		/* If multi-byte char, append the remaining bytes */
+		/* If a multi-byte character, append the remaining bytes */
 		while (IS_UTF8_CONT_BYTE(name[i + 1]))
 			buf[l++] = name[++i];
 
