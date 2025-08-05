@@ -165,13 +165,20 @@ get_cursor_position(const size_t start, tty_interface_t *state)
 static void
 print_score(tty_t *tty, const score_t score, const int pad)
 {
+	static score_t prev_score = 0;
+
 	if (score == SCORE_MIN) {
 		tty_printf(tty, "\x1b[%dG%s[     ]%s ",
 			pad + 1, colors[SCORE_COLOR], RESET_ATTR);
+	} else if (score == SCORE_MAX) {
+		tty_printf(tty, "\x1b[%dG%s[%5.2f]%s ",
+			pad + 1, colors[SCORE_COLOR], prev_score + 1, RESET_ATTR);
 	} else {
 		tty_printf(tty, "\x1b[%dG%s[%5.2f]%s ",
 			pad + 1, colors[SCORE_COLOR], score, RESET_ATTR);
 	}
+
+	prev_score = score == SCORE_MIN ? 0 : score;
 }
 
 static void
