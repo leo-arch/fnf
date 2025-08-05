@@ -185,13 +185,10 @@ match(const char *needle, const char *haystack)
 	 * M[][] Stores the best possible score at this position. */
 	score_t D[2][MATCH_MAX_LEN], M[2][MATCH_MAX_LEN];
 
-	score_t *last_D, *last_M;
-	score_t *curr_D, *curr_M;
-
-	last_D = D[0];
-	last_M = M[0];
-	curr_D = D[1];
-	curr_M = M[1];
+	score_t *last_D = D[0];
+	score_t *last_M = M[0];
+	score_t *curr_D = D[1];
+	score_t *curr_M = M[1];
 
 	for (size_t i = 0; i < n; i++) {
 		match_row(&match, i, curr_D, curr_M, last_D, last_M);
@@ -291,7 +288,6 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 		free(D); free(M);
 		return SCORE_MIN;
 	}
-
 
 	score_t *last_D = NULL, *last_M = NULL;
 	score_t *curr_D = NULL, *curr_M = NULL;
