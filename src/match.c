@@ -285,9 +285,13 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 
 	/* D[][] Stores the best score for this position ending with a match.
 	 * M[][] Stores the best possible score at this position. */
-	score_t (*D)[MATCH_MAX_LEN], (*M)[MATCH_MAX_LEN];
-	M = calloc(n, sizeof(*M));
-	D = calloc(n, sizeof(*D));
+	score_t (*D)[MATCH_MAX_LEN] = calloc(n, sizeof(*D));
+	score_t (*M)[MATCH_MAX_LEN] = calloc(n, sizeof(*M));
+	if (!M || !D) {
+		free(D); free(M);
+		return SCORE_MIN;
+	}
+
 
 	score_t *last_D = NULL, *last_M = NULL;
 	score_t *curr_D = NULL, *curr_M = NULL;
