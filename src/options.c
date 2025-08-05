@@ -60,11 +60,11 @@ static const char *usage_str =
     " -h, --help               Display this help and exit\n"
     " -i, --show-info          Show selection info line\n"
     " -j, --workers=NUM        Use NUM workers for searching (default: # of CPUs)\n"
-    " -l, --lines=LINES        Specify how many lines of results to show (default: 10)\n"
+    " -l, --lines=NUM          Specify how many lines of results to show (default: 10)\n"
     " -m, --multi              Enable multi-selection\n"
     " -M, --max-items=NUM      Load only up to NUM items (default: unlimited)\n"
     " -p, --prompt=PROMPT      Input prompt (default: \"> \")\n"
-    " -P, --pad=NUM            Left pad the list of matches NUM places (default: 0)\n"
+    " -P, --padding=NUM        Left pad the list of matches by NUM spaces (default: 0)\n"
     " -q, --query=QUERY        Use QUERY as the initial search string\n"
     " -r, --reverse            Display from top, prompt at bottom\n"
     " -s, --show-scores        Show the scores of each match\n"
@@ -99,7 +99,7 @@ static struct option longopts[] = {
 	{"multi", no_argument, NULL, 'm'},
 	{"max-items", required_argument, NULL, 'M'},
 	{"prompt", required_argument, NULL, 'p'},
-	{"pad", required_argument, NULL, 'P'},
+	{"padding", required_argument, NULL, 'P'},
 	{"query", required_argument, NULL, 'q'},
 	{"reverse", no_argument, NULL, 'r'},
 	{"show-scores", no_argument, NULL, 's'},
