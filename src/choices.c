@@ -99,6 +99,33 @@ safe_realloc(void *buffer, const size_t size)
 	return buffer;
 }
 
+static void
+choices_reset_search(choices_t *c)
+{
+	free(c->results);
+	c->selection = c->available = 0;
+	c->results = NULL;
+}
+
+static void
+choices_resize(choices_t *c, const size_t new_capacity)
+{
+	c->strings = safe_realloc(c->strings, new_capacity * sizeof(const char *));
+	c->capacity = new_capacity;
+}
+
+static void
+choices_add(choices_t *c, char *choice)
+{
+	/* Previous search is now invalid */
+	choices_reset_search(c);
+
+	if (c->size == c->capacity)
+		choices_resize(c, c->capacity * 2);
+
+	c->strings[c->size++] = choice;
+}
+
 void
 choices_fread(choices_t *c, FILE *file, const char input_delimiter,
 	const int max_choices)
@@ -130,10 +157,11 @@ choices_fread(choices_t *c, FILE *file, const char input_delimiter,
 	/* Tokenize input and add to choices. */
 	const char *line_end = c->buffer + c->buffer_size;
 	char *line = c->buffer + buffer_start;
+
 	do {
-		char *nl = strchr(line, input_delimiter);
-		if (nl)
-			*nl++ = '\0';
+		char *delim = strchr(line, input_delimiter);
+		if (delim)
+			*delim++ = '\0';
 
 		/* Skip empty lines. */
 		if (*line) {
@@ -142,23 +170,8 @@ choices_fread(choices_t *c, FILE *file, const char input_delimiter,
 			choices_add(c, line);
 		}
 
-		line = nl;
+		line = delim;
 	} while (line && line < line_end);
-}
-
-static void
-choices_resize(choices_t *c, const size_t new_capacity)
-{
-	c->strings = safe_realloc(c->strings, new_capacity * sizeof(const char *));
-	c->capacity = new_capacity;
-}
-
-static void
-choices_reset_search(choices_t *c)
-{
-	free(c->results);
-	c->selection = c->available = 0;
-	c->results = NULL;
 }
 
 void
@@ -197,18 +210,6 @@ choices_destroy(choices_t *c)
 	free(c->results);
 	c->results = NULL;
 	c->available = c->selection = 0;
-}
-
-void
-choices_add(choices_t *c, const char *choice)
-{
-	/* Previous search is now invalid */
-	choices_reset_search(c);
-
-	if (c->size == c->capacity)
-		choices_resize(c, c->capacity * 2);
-
-	c->strings[c->size++] = choice;
 }
 
 size_t

@@ -62,7 +62,6 @@ void choices_init(choices_t *c, const options_t *options);
 void choices_fread(choices_t *c, FILE *file, const char input_delimiter,
 	const int max_choices);
 void choices_destroy(choices_t *c);
-void choices_add(choices_t *c, const char *choice);
 size_t choices_available(const choices_t *c);
 void choices_search(choices_t *c, const char *search, const unsigned int sort);
 const char *choices_get(const choices_t *c, const size_t n);
