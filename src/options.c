@@ -50,6 +50,7 @@
 #define OPT_SCROLLOFF     10
 #define OPT_NO_SORT       11
 #define OPT_NO_CLEAR      12
+#define OPT_SEPARATOR     13
 
 static const char *usage_str =
     ""
@@ -77,6 +78,7 @@ static const char *usage_str =
     "     --no-sort            Do not sort the result\n"
     "     --no-unicode         Do not use Unicode decorations\n"
     "     --pointer=STRING     Pointer to highlighted match (default: \">\")\n"
+    "     --separator[=STRING] Print horizontal line after info\n"
     "     --print-null         Print ouput delimited by ASCII NUL characters\n"
     "     --right-accepts      Right arrow key accepts\n"
     "     --tab-accepts        TAB accepts\n"
@@ -116,6 +118,7 @@ static struct option longopts[] = {
 	{"print-null", no_argument, NULL, OPT_PRINT_NULL},
 	{"right-accepts", no_argument, NULL, OPT_RIGHT_ACCEPTS},
 	{"scroll-off", required_argument, NULL, OPT_SCROLLOFF},
+	{"separator", optional_argument, NULL, OPT_SEPARATOR},
 	{"tab-accepts", no_argument, NULL, OPT_TAB_ACCEPTS},
 	{NULL, 0, NULL, 0}
 };
@@ -146,6 +149,7 @@ options_init(options_t *options)
 	options->show_info       = DEFAULT_SHOW_INFO;
 	options->show_scores     = DEFAULT_SCORES;
 	options->scrolloff       = DEFAULT_SCROLLOFF;
+	options->separator       = NULL;
 	options->sort            = DEFAULT_SORT;
 	options->tab_accepts     = DEFAULT_TAB_ACCEPTS;
 	options->tty_filename    = DEFAULT_TTY;
@@ -234,12 +238,22 @@ print_version(void)
 	exit(EXIT_SUCCESS);
 }
 
+static int
+set_separator(options_t *options, const char *optarg)
+{
+	options->show_info = 1;
+	if (optarg && *optarg)
+		options->separator = optarg;
+	return 1;
+}
+
 void
 options_parse(options_t *options, int argc, char *argv[])
 {
 	options_init(options);
 	int pointer_set = 0;
 	int marker_set = 0;
+	int separator_set = 0;
 
 	int c;
 	while ((c = getopt_long(argc, argv, "0ce:hij:l:mM:p:P:q:rt:sv",
@@ -272,6 +286,7 @@ options_parse(options_t *options, int argc, char *argv[])
 		case OPT_PRINT_NULL: options->print_null = 1; break;
 		case OPT_RIGHT_ACCEPTS: options->right_accepts = 1; break;
 		case OPT_SCROLLOFF: set_scrolloff(options, optarg); break;
+		case OPT_SEPARATOR: separator_set = set_separator(options, optarg); break;
 		case OPT_TAB_ACCEPTS: options->tab_accepts = 1; break;
 		default: usage(); exit(EXIT_SUCCESS);
 		}
@@ -281,6 +296,10 @@ options_parse(options_t *options, int argc, char *argv[])
 		usage();
 		exit(EXIT_FAILURE);
 	}
+
+	if (separator_set == 1 && !options->separator)
+		options->separator = options->unicode == 0 ? DEFAULT_SEPARATOR
+			: DEFAULT_SEPARATOR_UNICODE;
 
 	if (options->unicode != 0) {
 		if (pointer_set == 0)

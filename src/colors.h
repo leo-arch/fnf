@@ -42,7 +42,8 @@
 #define FG_COLOR        8
 #define QUERY_COLOR     9
 #define GUTTER_COLOR    10
-#define COLOR_ITEMS_NUM 11
+#define SEPARATOR_COLOR 11
+#define COLOR_ITEMS_NUM 12
 
 #define MAX_COLOR_LEN 64
 

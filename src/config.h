@@ -43,7 +43,7 @@
 
 #define DEFAULT_AUTO_LINES 0
 #define DEFAULT_CLEAR 1
-#define DEFAULT_COLORS "fg:-1,gutter:-1,hl:216,info:144,marker:72,pointer:124,prompt:74:1,query:-1,sel-bg:236,sel-fg:7:1,score:102"
+#define DEFAULT_COLORS "fg:-1,gutter:-1,hl:216,info:144,marker:72,pointer:124,prompt:74:1,query:-1,score:102,sel-bg:236,sel-fg:7:1,separator:240"
 #define DEFAULT_CYCLE 0
 #define DEFAULT_DELIMITER '\n'
 #define DEFAULT_FILTER NULL
@@ -64,6 +64,8 @@
 #define DEFAULT_RIGHT_ACCEPTS 0
 #define DEFAULT_SCORES 0
 #define DEFAULT_SCROLLOFF -1 /* auto */
+#define DEFAULT_SEPARATOR "-"
+#define DEFAULT_SEPARATOR_UNICODE "─"
 #define DEFAULT_SORT 1
 #define DEFAULT_SHOW_INFO 0
 #define DEFAULT_TAB_ACCEPTS 0

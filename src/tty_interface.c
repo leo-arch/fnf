@@ -270,7 +270,25 @@ build_pointer(const int current, const int selected, const options_t *options)
 }
 
 static void
-print_info(const tty_t *tty, const choices_t *choices, const int pad,
+build_separator(const tty_interface_t *state, char *separator, const size_t size)
+{
+	const char *sep_str = state->options->separator;
+	const size_t len = wc_xstrlen(sep_str);
+	const size_t p = (size_t)state->options->pad;
+	const size_t w = state->tty->maxwidth;
+
+	const size_t maxwidth = p < w ? w - p : w;
+	const size_t max_repeats =
+		(maxwidth > 5 ? maxwidth - 5 : maxwidth) / (len > 0 ? len : 1);
+
+	size_t repeat = 0;
+	int bytes = snprintf(separator, size, " %s", colors[SEPARATOR_COLOR]);
+	while (repeat++ < max_repeats)
+		bytes += snprintf(separator + bytes, size - bytes, "%s", sep_str);
+}
+
+static void
+print_info(const tty_interface_t *state, const choices_t *choices, const int pad,
 	const size_t sel_num, const int reverse)
 {
 	static char selected[32];
@@ -279,13 +297,17 @@ print_info(const tty_t *tty, const choices_t *choices, const int pad,
 	else
 		*selected = '\0';
 
-	static char buf[MAX_INFO_LINE_LEN];
-	snprintf(buf, sizeof(buf), "%s\x1b[%dG%s%zu/%zu%s%s%s",
-		reverse == 0 ? "\n" : "", pad, colors[INFO_COLOR],
-		choices->available, choices->size,
-		selected, RESET_ATTR CLEAR_LINE, reverse == 1 ? "\n" : "");
+	static char separator[1024] = "";
+	if (!*separator && state->options->separator)
+		build_separator(state, separator, sizeof(separator));
 
-	tty_fputs(tty, buf);
+	static char buf[MAX_INFO_LINE_LEN + sizeof(separator)];
+	snprintf(buf, sizeof(buf), "%s\x1b[%dG%s%zu/%zu%s%s%s%s",
+		reverse == 0 ? "\n" : "", pad, colors[INFO_COLOR],
+		choices->available, choices->size, selected,
+		separator, RESET_ATTR CLEAR_LINE, reverse == 1 ? "\n" : "");
+
+	tty_fputs(state->tty, buf);
 }
 
 static size_t
@@ -341,7 +363,7 @@ draw(tty_interface_t *state)
 			colors[QUERY_COLOR], state->search, RESET_ATTR);
 
 		if (options_show_info == 1)
-			print_info(tty, choices, options_pad + 1, sel_num, 0);
+			print_info(state, choices, options_pad + 1, sel_num, 0);
 	} else if (num_lines + 1 + options_show_info >= tty->maxheight) {
 		/* Fix the phantom lines issue present in some terminals. */
 		tty_fputs(tty, "\x1b[A\r\x1b[K");
@@ -371,7 +393,7 @@ draw(tty_interface_t *state)
 		tty_moveup(tty, num_lines + options_show_info);
 
 	if (options_reverse == 1 && options_show_info == 1)
-		print_info(tty, choices, options_pad + 1, sel_num, 1);
+		print_info(state, choices, options_pad + 1, sel_num, 1);
 
 	/* Let's draw the prompt */
 	static size_t prompt_len = (size_t)-1;
