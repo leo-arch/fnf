@@ -42,7 +42,6 @@ int  is_selected(const char *name);
 void print_selections(tty_interface_t *state);
 void save_selection(const char *name, sel_t *selection);
 
-
 #ifdef __cplusplus
 }
 #endif

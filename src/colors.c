@@ -100,9 +100,6 @@ get_rgb(const char *hex, int *attr, int *r, int *g, int *b)
 	if (h[6] == COLOR_FIELD_SEP && IS_DIGIT(h[7]) && !h[8])
 		*attr = h[7] - '0';
 
-//	if (no_bold == 1 && *attr == 1)
-//		*attr = -1;
-
 	return 0;
 }
 
@@ -197,7 +194,7 @@ parse_color_field(char *field)
 		set_color(HIGHLIGHT_COLOR, field + 3);
 	else if (*field == 'm' && strncmp(field, "marker:", 7) == 0)
 		set_color(MARKER_COLOR, field + 7);
-	if (*field == 'p' && strncmp(field, "prompt:", 7) == 0)
+	else if (*field == 'p' && strncmp(field, "prompt:", 7) == 0)
 		set_color(PROMPT_COLOR, field + 7);
 	else if (*field == 'p' && strncmp(field, "pointer:", 8) == 0)
 		set_color(POINTER_COLOR, field + 8);
