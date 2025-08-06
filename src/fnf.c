@@ -78,6 +78,7 @@ main(int argc, char *argv[])
 	} else { /* Interactive */
 		if (isatty(STDIN_FILENO)) {
 			fputs("fnf: Expected piped input (e.g. 'ls | fnf')\n", stderr);
+			choices_destroy(&choices);
 			exit(EXIT_FAILURE);
 		}
 
