@@ -41,6 +41,17 @@
 
 #include "config.h"
 
+static void
+set_num_lines(options_t *options, const tty_t *tty, const size_t choices_size)
+{
+	if (options->num_lines == (size_t)-1)
+		/* Unset: default to half of terminal height. */
+		options->num_lines = tty->maxheight / 2;
+
+	if (options->num_lines > choices_size)
+		options->num_lines = choices_size;
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -77,8 +88,7 @@ main(int argc, char *argv[])
 			choices_fread(&choices, stdin, options.input_delimiter,
 				options.max_items);
 
-		if (options.num_lines > choices.size)
-			options.num_lines = choices.size;
+		set_num_lines(&options, &tty, choices.size);
 
 		const int num_lines_adjustment = 1 + options.show_info;
 

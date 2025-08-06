@@ -33,8 +33,8 @@ Show selection info line
 Use NUM workers for searching (default: # of CPUs)
 .
 .TP
-.BR \-l ", " \-\-lines =\fILINES\fR
-How many lines of items to display (default: 10). Set to \fIauto\fR to use the entire terminal screen.
+.BR \-l ", " \-\-lines =\fINUM\fR
+Show only up to NUM results (default: half of terminal height). Set to \fIauto\fR to use the entire terminal screen.
 .
 .TP
 .BR \-m ", " \-\-multi
@@ -75,6 +75,10 @@ Print version and exit
 .TP
 .BR \-\-color=\fICOLORSPEC\fR
 Set custom colors (consult the \fBCOLORS\fR section below for more information)
+.
+.TP
+.BR \-\-height =\fINUM\fR
+Alias for \fB\-\-lines\fR
 .
 .TP
 .BR \-\-marker =\fISTRING\fR

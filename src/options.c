@@ -61,10 +61,10 @@ static const char *usage_str =
     " -h, --help               Display this help and exit\n"
     " -i, --show-info          Show selection info line\n"
     " -j, --workers=NUM        Use NUM workers for searching (default: # of CPUs)\n"
-    " -l, --lines=NUM          Specify how many lines of results to show (default: 10)\n"
+    " -l, --lines=NUM          Show only up to NUM results (default: half of terminal height)\n"
     " -m, --multi              Enable multi-selection\n"
     " -M, --max-items=NUM      Load only up to NUM items (default: unlimited)\n"
-    " -p, --prompt=PROMPT      Input prompt (default: \"> \")\n"
+    " -p, --prompt=STR         Input prompt (default: \"> \")\n"
     " -P, --padding=NUM        Left pad the list of matches by NUM spaces (default: 0)\n"
     " -q, --query=QUERY        Use QUERY as the initial search string\n"
     " -r, --reverse            Display from top, prompt at bottom\n"
@@ -72,13 +72,13 @@ static const char *usage_str =
     " -t, --tty=TTY            Specify the file to use as TTY device (default: /dev/tty)\n"
     " -v, --version            Output version information and exit\n"
     "     --color=COLORSPEC    Set custom colors (consult the manpage)\n"
-    "     --marker=STRING      Multi-select marker (default: \"*\")\n"
+    "     --marker=STR         Multi-select marker (default: \"✔\" or \"*\")\n"
     "     --no-clear           Do not clear the interface on exit\n"
     "     --no-color           Disable colors\n"
     "     --no-sort            Do not sort the result\n"
-    "     --no-unicode         Do not use Unicode decorations\n"
-    "     --pointer=STRING     Pointer to highlighted match (default: \">\")\n"
-    "     --separator[=STRING] Print horizontal line after info\n"
+    "     --no-unicode         Disable Unicode decorations\n"
+    "     --pointer=STR        Pointer to highlighted match (default: \"▌\" or \">\")\n"
+    "     --separator[=STR]    Print horizontal line after info\n"
     "     --print-null         Print ouput delimited by ASCII NUL characters\n"
     "     --right-accepts      Right arrow key accepts\n"
     "     --tab-accepts        TAB accepts\n"
@@ -98,6 +98,7 @@ static struct option longopts[] = {
 	{"show-info", no_argument, NULL, 'i'},
 	{"workers", required_argument, NULL, 'j'},
 	{"lines", required_argument, NULL, 'l'},
+	{"height", required_argument, NULL, 'l'},
 	{"multi", no_argument, NULL, 'm'},
 	{"max-items", required_argument, NULL, 'M'},
 	{"prompt", required_argument, NULL, 'p'},
@@ -129,7 +130,7 @@ options_init(options_t *options)
 {
 	options->auto_lines      = DEFAULT_AUTO_LINES;
 	options->clear           = DEFAULT_CLEAR;
-	options->color           = NULL;
+	options->color           = NULL; /* Unset*/
 	options->cycle           = DEFAULT_CYCLE;
 	options->filter          = DEFAULT_FILTER;
 	options->init_search     = DEFAULT_INIT_SEARCH;
@@ -139,7 +140,7 @@ options_init(options_t *options)
 	options->max_items       = DEFAULT_MAX_ITEMS;
 	options->multi           = DEFAULT_MULTI;
 	options->no_color        = DEFAULT_NO_COLOR;
-	options->num_lines       = DEFAULT_NUM_LINES;
+	options->num_lines       = (size_t)-1; /* Unset*/
 	options->pad             = DEFAULT_PAD;
 	options->pointer         = DEFAULT_POINTER;
 	options->print_null      = DEFAULT_PRINT_NULL;
@@ -149,7 +150,7 @@ options_init(options_t *options)
 	options->show_info       = DEFAULT_SHOW_INFO;
 	options->show_scores     = DEFAULT_SCORES;
 	options->scrolloff       = DEFAULT_SCROLLOFF;
-	options->separator       = NULL;
+	options->separator       = NULL; /* Unset*/
 	options->sort            = DEFAULT_SORT;
 	options->tab_accepts     = DEFAULT_TAB_ACCEPTS;
 	options->tty_filename    = DEFAULT_TTY;
