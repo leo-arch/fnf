@@ -236,6 +236,23 @@ compare_utf8_chars(const char *haystack, const char *needle)
 	return 1;
 }
 
+static score_t
+fill_full_match_positions(size_t *positions, const char *needle, const size_t n)
+{
+	const uint8_t *u_needle = (const uint8_t *)needle;
+
+	for (size_t i = 0, p = 0; i < n; i++) {
+		positions[p++] = i;
+
+		/* If multi-byte, skip the remaining bytes. */
+		const size_t char_len = utf8_len_table[u_needle[i]];
+		if (char_len >= 2) /* Multi-byte character */
+			i += char_len - 1;	/* -1 because the for-loop will increment i */
+	}
+
+	return SCORE_MAX;
+}
+
 /* Return the score indicating the degree of match between HAYSTAK and NEEDLE.
  * A higher score indicates a better match.
  * The POSITIONS array is populated with the positions (indices) of the
@@ -270,14 +287,7 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 		/* Since this method can only be called with a haystack which
 		 * matches needle, if the lengths of the strings are equal, then
 		 * the strings themselves must also be equal (ignoring case). */
-		size_t p = 0;
-		for (size_t i = 0; i < n; i++) {
-			positions[p++] = i;
-			const size_t l = utf8_len_table[(uint8_t)needle[i]];
-			if (l >= 2) /* Multi-byte character */
-				i += l - 1;	/* -1 because the for-loop will increment i */
-		}
-		return SCORE_MAX;
+		return fill_full_match_positions(positions, needle, n);
 	}
 
 	/* D[][] Stores the best score for this position ending with a match.
