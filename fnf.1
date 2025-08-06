@@ -1,4 +1,4 @@
-.TH FNF 1 "Aug 4, 2025" "fnf 0.3.7"
+.TH FNF 1 "Aug 6, 2025" "fnf 0.3.8"
 .SH NAME
 fnf \- A general-purpose, interactive fuzzy finder for the terminal.
 .SH SYNOPSIS
@@ -78,7 +78,7 @@ Set custom colors (consult the \fBCOLORS\fR section below for more information)
 .
 .TP
 .BR \-\-marker =\fISTRING\fR
-Multi-select marker (default: "*")
+Multi-select marker (default: '✔' or *', depending on \fB\-\-no\-unicode\fR)
 .
 .TP
 .BR \-\-no\-clear
@@ -97,11 +97,15 @@ Disable Unicode decorations
 .
 .TP
 .BR \-\-pointer =\fISTRING\fR
-Pointer to highlighted match (default: ">")
+Pointer to highlighted match (default: '▌' or '>', depending on \fB\-\-no\-unicode\fB)
 .
 .TP
 .BR \-\-print\-null
 Print output delimited by ASCII NUL characters
+.
+.TP
+.BR \-\-separator [=\fISTRING\fR]
+Print a horizontal separator on the info line (\fB\-\-show\-info\fR is implied). If specified, STR is used to form the separator. Otherwise, it defaults to "─" or "-", depending on \fB\-\-no\-unicode\fR.
 .
 .TP
 .BR \-\-right-accepts
@@ -170,28 +174,29 @@ Color configuration is made using the \fB--color\fR option, which takes a color 
 .sp
 Available color names (or interface elements):
 .sp
- \fBfg\fR       Item foreground color
+ \fBfg\fR        Item foreground color
 .sp 0
- \fBgutter\fR   Gutter on the left
+ \fBgutter\fR    Gutter on the left
 .sp 0
- \fBhl\fR       Highlighted substrings in the selected line
+ \fBhl\fR        Highlighted substrings in the selected line
 .sp 0
- \fBinfo\fR     Info line (match counters)
+ \fBinfo\fR      Info line (match counters)
 .sp 0
- \fBmarker\fR   Multi-selection marker
+ \fBmarker\fR    Multi-selection marker
 .sp 0
- \fBprompt\fR   Prompt
+ \fBprompt\fR    Prompt
 .sp 0
- \fBpointer\fR  Pointer to the current line
+ \fBpointer\fR   Pointer to the current line
 .sp 0
- \fBquery\fR    Query foreground color
+ \fBquery\fR     Query foreground color
 .sp 0
- \fBsel-bg\fR   Selected line  background
+ \fBscore\fR     Item score
 .sp 0
- \fBsel-fg\fR   Selected line foreground
+ \fBsel-bg\fR    Selected line  background
 .sp 0
- \fBscore\fR    Item score
-.sp
+ \fBsel-fg\fR    Selected line foreground
+.sp 0
+ \fBseparator\fR Horizontal separator on info line
 
 .B ANSI COLORS
 .sp
@@ -229,9 +234,9 @@ In the line \fB--color="prompt:214:1,pointer:#87d700:2,marker:6,sel-fg:#ffff00"\
 .sp
 A few color schemes:
 .sp
- \fBdark\fR:    fg:-1,guttter:-1,hl:216,info:144,marker:72,pointer:124,prompt:74:1,query:-1,sel-bg:236,sel-fg:7:1,score:102
+ \fBdark\fR:    fg:-1,guttter:-1,hl:216,info:144,marker:72,pointer:124,prompt:74:1,query:-1,score:102,sel-bg:236,sel-fg:7:1,separator:240
  \fBlight\fR:   prompt:4:1,marker:2:2,hl:1,info:236,score:236
- \fB16\fR:      hl:6,info:2,marker:2,prompt:6:1,pointer:1,query:7,sel-bg:0,sel-fg:7:1,score:8
+ \fB16\fR:      hl:6,info:2,marker:2,prompt:6:1,pointer:1,query:7,score:8,sel-bg:0,sel-fg:7:1,separator:8
  \fBnocolor\fR: Run with \fB--no-color\fR
 .sp
 The default color scheme is \fBdark\fR. If a color is not specified in the command line, the default value is used. For example, \fB--color=prompt:172\fR sets the prompt to the specified color, and uses the default values (those in \fBdark\fR) for everything else.
