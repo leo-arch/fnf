@@ -121,11 +121,6 @@ The third result here should have been scored the same as the first, but the low
 
 # Possible fnf Algorithm Improvements
 
-## Case sensitivity
-
-**Fnf** currently treats all searches as case-insensitive. However, scoring prefers matches on uppercase letters to help find CamelCase candidates. It might be
-desirable to support a case sensitive flag or "smart case" searching.
-
 ## Faster matching
 
 Matching is currently performed using the standard lib's `strpbrk`, which has a very simple implementation (at least in glibc).
