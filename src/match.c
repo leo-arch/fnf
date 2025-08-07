@@ -37,11 +37,17 @@
 #include "match.h"
 #include "bonus.h"
 #include "colors.h"
+#include "tty_interface.h" /* g_case_sensitive */
+
+#define TOLOWER(c) (((c) >= 'A' && (c) <= 'Z') ? (c) | 32 : tolower(c))
+#define TOUPPER(c) (((c) >= 'a' && (c) <= 'z') ? (c) & ~32 : toupper(c))
 
 static char *
-strcasechr(const char *s, char c)
+strcasechr(const char *s, int c)
 {
-	const char accept[3] = {c, toupper(c), '\0'};
+	char lower_c = TOLOWER(c);
+	char upper_c = TOUPPER(c);
+	const char accept[3] = {lower_c, upper_c, '\0'};
 	return strpbrk(s, accept);
 }
 
@@ -67,10 +73,13 @@ has_match(const char *needle, const char *haystack)
 		escape_key++;
 	}
 
+	char *(*strchr_func)(const char *, int);
+	strchr_func = g_case_sensitive == 0 ? strcasechr : strchr;
+
 	/* Inspect haystack up to the beginning of the last SGR sequence. */
 	while (*needle) {
 		const char nch = *needle++;
-		if (!(haystack = strcasechr(haystack, nch)) || haystack >= escape_key)
+		if (!(haystack = strchr_func(haystack, nch)) || haystack >= escape_key)
 			return 0;
 
 		haystack++;
@@ -94,12 +103,18 @@ static void
 precompute_bonus(const char *haystack, score_t *match_bonus)
 {
 	/* Which positions are beginning of words */
-	char last_ch = '/';
-	for (int i = 0; haystack[i]; i++) {
-		const char ch = haystack[i];
-		match_bonus[i] = COMPUTE_BONUS(last_ch, ch);
-		last_ch = ch;
+	char last_char = '/';
+	for (size_t i = 0; haystack[i]; i++) {
+		const char c = haystack[i];
+		match_bonus[i] = COMPUTE_BONUS(last_char, c);
+		last_char = c;
 	}
+}
+
+static int
+tolower_dummy(int c)
+{
+	return c;
 }
 
 static void
@@ -113,17 +128,20 @@ setup_match_struct(struct match_t *match, const char *needle,
 	|| match->needle_len > match->haystack_len)
 		return;
 
+	int (*tolower_func)(int);
+	tolower_func = g_case_sensitive == 0 ? tolower : tolower_dummy;
+
 	for (size_t i = 0; i < match->needle_len; i++)
-		match->lower_needle[i] = tolower(needle[i]);
+		match->lower_needle[i] = tolower_func(needle[i]);
 
 	for (size_t i = 0; i < match->haystack_len; i++)
-		match->lower_haystack[i] = tolower(haystack[i]);
+		match->lower_haystack[i] = tolower_func(haystack[i]);
 
 	precompute_bonus(haystack, match->match_bonus);
 }
 
 static inline void
-match_row(const struct match_t *match, size_t row, score_t *curr_D,
+match_row(const struct match_t *match, const size_t row, score_t *curr_D,
 	score_t *curr_M, const score_t *last_D, const score_t *last_M)
 {
 	const size_t n = match->needle_len;
@@ -135,7 +153,7 @@ match_row(const struct match_t *match, size_t row, score_t *curr_D,
 	const score_t *match_bonus = match->match_bonus;
 
 	score_t prev_score = SCORE_MIN;
-	score_t gap_score = i == n - 1 ? SCORE_GAP_TRAILING : SCORE_GAP_INNER;
+	const score_t gap_score = i == n - 1 ? SCORE_GAP_TRAILING : SCORE_GAP_INNER;
 
 	for (size_t j = 0; j < m; j++) {
 		if (lower_needle[i] == lower_haystack[j]) {
@@ -328,7 +346,7 @@ match_positions(const char *needle, const char *haystack, size_t *positions)
 			/* If this score was determined using SCORE_MATCH_CONSECUTIVE, the
 			 * next character MUST be a match. */
 			match_required = i && j &&
-				M[i][j] == D[i - 1][j - 1] + SCORE_MATCH_CONSECUTIVE;
+				(M[i][j] == (D[i - 1][j - 1] + SCORE_MATCH_CONSECUTIVE));
 
 			/* Check if the current char in haystack matches the current
 			 * char in needle. */

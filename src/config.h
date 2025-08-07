@@ -41,7 +41,12 @@
 #define SCORE_MATCH_SLASH 0.9
 #define SCORE_MATCH_WORD 0.8
 
+#define CASE_INSENSITIVE 0
+#define CASE_SENSITIVE   1
+#define CASE_SMART       2
+
 #define DEFAULT_AUTO_LINES 0
+#define DEFAULT_CASE_SENSITIVITY_MODE CASE_SMART
 #define DEFAULT_CLEAR 1
 #define DEFAULT_COLORS "fg:-1,gutter:-1,hl:216,info:144,marker:72,pointer:124,prompt:74:1,query:-1,score:102,sel-bg:236,sel-fg:7:1,separator:240"
 #define DEFAULT_CYCLE 0

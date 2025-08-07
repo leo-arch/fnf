@@ -34,7 +34,7 @@
 
 #include <stdio.h>
 
-#include "match.h"
+#include "match.h" /* score_t */
 #include "options.h"
 
 #ifdef __cplusplus

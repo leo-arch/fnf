@@ -61,6 +61,9 @@ main(int argc, char *argv[])
 	options_t options;
 	options_parse(&options, argc, argv);
 
+	if (options.case_sens_mode != CASE_SMART)
+		g_case_sensitive = (options.case_sens_mode == CASE_SENSITIVE);
+
 	choices_t choices;
 	choices_init(&choices, &options);
 

@@ -73,6 +73,10 @@ Use TTY instead of the default tty device (/dev/tty)
 Print version and exit
 .
 .TP
+.BR \-\-case=\fIMODE\fR
+Set case sensitivity mode to MODE [respect|ignore|smart] (default: smart). In smart mode, the search is case-insensitive by default, but it becomes case-sensitive if the query contains at least one uppercase character.
+.
+.TP
 .BR \-\-color=\fICOLORSPEC\fR
 Set custom colors (consult the \fBCOLORS\fR section below for more information)
 .

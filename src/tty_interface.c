@@ -40,6 +40,8 @@
 #include "tty_interface.h"
 #include "selections.h"
 
+int g_case_sensitive = -1;
+
 static int
 isprint_unicode(const char c)
 {
@@ -413,9 +415,24 @@ draw(tty_interface_t *state)
 	tty_flush(tty);
 }
 
+static int
+has_uppercase(const char *s)
+{
+	while (*s) {
+		if (isupper(*s))
+			return 1;
+		s++;
+	}
+
+	return 0;
+}
+
 static void
 update_search(tty_interface_t *state)
 {
+	if (state->options->case_sens_mode == CASE_SMART)
+		g_case_sensitive = has_uppercase(state->search);
+
 	choices_search(state->choices, state->search, state->options->sort);
 	strcpy(state->last_search, state->search);
 }

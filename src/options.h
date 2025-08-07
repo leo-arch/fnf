@@ -50,6 +50,7 @@ typedef struct {
 	size_t num_lines;
 	size_t workers;
 	int auto_lines;
+	int case_sens_mode;
 	int clear;
 	int cycle;
 	int left_aborts;

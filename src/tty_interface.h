@@ -51,6 +51,8 @@
 # endif /* __linux__ */
 #endif /* PATH_MAX */
 
+extern int g_case_sensitive;
+
 #define SEARCH_SIZE_MAX 4096
 #define SIG_INTERRUPT 130 /* 128 + SIGINT (usually 2) */
 #define PENDING_INPUT_MAX 32

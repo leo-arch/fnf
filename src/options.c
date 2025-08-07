@@ -51,6 +51,7 @@
 #define OPT_NO_SORT       11
 #define OPT_NO_CLEAR      12
 #define OPT_SEPARATOR     13
+#define OPT_CASE          14
 
 static const char *usage_str =
     ""
@@ -71,6 +72,7 @@ static const char *usage_str =
     " -s, --show-scores        Show the scores of each match\n"
     " -t, --tty=TTY            Specify the file to use as TTY device (default: /dev/tty)\n"
     " -v, --version            Output version information and exit\n"
+    "     --case=MODE          Set case sensitivity mode [respect|ignore|smart] (default: smart)\n"
     "     --color=COLORSPEC    Set custom colors (consult the manpage)\n"
     "     --marker=STR         Multi-select marker (default: \"✔\" or \"*\")\n"
     "     --no-clear           Do not clear the interface on exit\n"
@@ -108,6 +110,7 @@ static struct option longopts[] = {
 	{"show-scores", no_argument, NULL, 's'},
 	{"tty", required_argument, NULL, 't'},
 	{"version", no_argument, NULL, 'v'},
+	{"case", required_argument, NULL, OPT_CASE},
 	{"color", required_argument, NULL, OPT_COLOR},
 	{"left-aborts", no_argument, NULL, OPT_LEFT_ABORTS},
 	{"marker", required_argument, NULL, OPT_MARKER},
@@ -129,6 +132,7 @@ void
 options_init(options_t *options)
 {
 	options->auto_lines      = DEFAULT_AUTO_LINES;
+	options->case_sens_mode  = DEFAULT_CASE_SENSITIVITY_MODE;
 	options->clear           = DEFAULT_CLEAR;
 	options->color           = NULL; /* Unset*/
 	options->cycle           = DEFAULT_CYCLE;
@@ -248,6 +252,20 @@ set_separator(options_t *options, const char *optarg)
 	return 1;
 }
 
+static void
+set_case_sensitivy_mode(options_t *options, const char *optarg)
+{
+	if (!optarg || !*optarg)
+		return;
+
+	if (strcmp(optarg, "respect") == 0)
+		options->case_sens_mode = CASE_SENSITIVE;
+	else if (strcmp(optarg, "ignore") == 0)
+		options->case_sens_mode = CASE_INSENSITIVE;
+	else if (strcmp(optarg, "smart") == 0)
+		options->case_sens_mode = CASE_SMART;
+}
+
 void
 options_parse(options_t *options, int argc, char *argv[])
 {
@@ -276,6 +294,7 @@ options_parse(options_t *options, int argc, char *argv[])
 		case 't': options->tty_filename = optarg; break;
 		case 's': options->show_scores = 1;	break;
 		case 'v': print_version(); break;
+		case OPT_CASE: set_case_sensitivy_mode(options, optarg); break;
 		case OPT_COLOR: options->color = optarg; break;
 		case OPT_LEFT_ABORTS: options->left_aborts = 1; break;
 		case OPT_MARKER: marker_set = set_marker(options, optarg); break;
