@@ -265,7 +265,7 @@ build_pointer(const int current, const int selected, const options_t *options)
 }
 
 static void
-build_separator(const tty_interface_t *state, char *separator, const size_t size)
+build_separator(const tty_interface_t *state, char *separator, const int size)
 {
 	const char *sep_str = state->options->separator;
 	const size_t len = wc_xstrlen(sep_str);
@@ -278,8 +278,12 @@ build_separator(const tty_interface_t *state, char *separator, const size_t size
 
 	size_t repeat = 0;
 	int bytes = snprintf(separator, size, " %s", colors[SEPARATOR_COLOR]);
-	while (repeat++ < max_repeats)
-		bytes += snprintf(separator + bytes, size - bytes, "%s", sep_str);
+	while (repeat++ < max_repeats) {
+		int n = snprintf(separator + bytes, size - bytes, "%s", sep_str);
+		if (n < 0 || n >= size - bytes)
+			break;
+		bytes += n;
+	}
 }
 
 static void
@@ -294,7 +298,7 @@ print_info(const tty_interface_t *state, const choices_t *choices, const int pad
 
 	static char separator[1024] = "";
 	if (!*separator && state->options->separator)
-		build_separator(state, separator, sizeof(separator));
+		build_separator(state, separator, (int)sizeof(separator));
 
 	static char buf[MAX_INFO_LINE_LEN + sizeof(separator)];
 	snprintf(buf, sizeof(buf), "%s\x1b[%dG%s%zu/%zu%s%s%s%s",
