@@ -167,20 +167,13 @@ get_cursor_position(const size_t start, tty_interface_t *state)
 static void
 print_score(tty_t *tty, const score_t score, const int pad)
 {
-	static score_t prev_score = 0;
-
-	if (score == SCORE_MIN) {
+	if (score == SCORE_MIN || score == SCORE_MAX) {
 		tty_printf(tty, "\x1b[%dG%s[     ]%s ",
 			pad + 1, colors[SCORE_COLOR], RESET_ATTR);
-	} else if (score == SCORE_MAX) {
-		tty_printf(tty, "\x1b[%dG%s[%5.2f]%s ",
-			pad + 1, colors[SCORE_COLOR], prev_score + 1, RESET_ATTR);
 	} else {
 		tty_printf(tty, "\x1b[%dG%s[%5.2f]%s ",
 			pad + 1, colors[SCORE_COLOR], score, RESET_ATTR);
 	}
-
-	prev_score = score == SCORE_MIN ? 0 : score;
 }
 
 static void
@@ -484,7 +477,6 @@ action_exit(tty_interface_t *state)
 static void
 action_emit(tty_interface_t *state)
 {
-	update_state(state);
 	clear(state);
 	/* ttyout should be flushed before outputting on stdout. */
 	tty_close(state->tty);
@@ -604,8 +596,6 @@ action_prev(tty_interface_t *state)
 		choices_prev(state->choices);
 	else
 		state->choices->selection--;
-
-	update_state(state);
 }
 
 static void
@@ -622,8 +612,6 @@ action_next(tty_interface_t *state)
 		choices_next(state->choices);
 	else
 		state->choices->selection++;
-
-	update_state(state);
 }
 
 static void
@@ -701,7 +689,6 @@ action_first(tty_interface_t *state)
 	}
 
 	state->choices->selection = 0;
-	update_state(state);
 }
 
 static void
@@ -713,7 +700,6 @@ action_last(tty_interface_t *state)
 	}
 
 	state->choices->selection = state->choices->available - 1;
-	update_state(state);
 }
 
 static void
@@ -727,8 +713,6 @@ action_pageup(tty_interface_t *state)
 		state->redraw = 0;
 		return;
 	}
-
-	update_state(state);
 
 	for (size_t i = 0; i < num_lines; i++) {
 		if (cycle == 0 && state->choices->selection == 0)
@@ -750,8 +734,6 @@ action_pagedown(tty_interface_t *state)
 		state->redraw = 0;
 		return;
 	}
-
-	update_state(state);
 
 	for (size_t i = 0; i < num_lines && selection <= available - 1; i++) {
 		if (cycle == 0 && state->choices->selection + 1 >= available)
@@ -821,8 +803,9 @@ tty_interface_init(tty_interface_t *state, tty_t *tty, choices_t *choices,
 	state->selection = selection;
 
 	if (options->init_search) {
-		strncpy(state->search, options->init_search, SEARCH_SIZE_MAX); /* flawfinder: ignore */
-		state->search[SEARCH_SIZE_MAX - 1] = '\0';
+		const size_t search_max = sizeof(state->search) - 1;
+		strncpy(state->search, options->init_search, search_max); /* flawfinder: ignore */
+		state->search[search_max - 1] = '\0';
 		state->cursor = strlen(state->search);
 	}
 

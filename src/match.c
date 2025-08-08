@@ -42,6 +42,19 @@
 #define TOLOWER(c) (((c) >= 'A' && (c) <= 'Z') ? (c) | 32 : tolower(c))
 #define TOUPPER(c) (((c) >= 'a' && (c) <= 'z') ? (c) & ~32 : toupper(c))
 
+#define SWAP(x, y, T) do { T SWAP = x; x = y; y = SWAP; } while (0)
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+
+static uint8_t utf8_len_table[256] = {0};
+
+struct match_t {
+	score_t match_bonus[MATCH_MAX_LEN];
+	char lower_needle[MATCH_MAX_LEN];
+	char lower_haystack[MATCH_MAX_LEN];
+	size_t needle_len;
+	size_t haystack_len;
+};
+
 static char *
 strcasechr(const char *s, int c)
 {
@@ -99,17 +112,6 @@ has_match(const char *needle, const char *haystack)
 
 	return 1;
 }
-
-#define SWAP(x, y, T) do { T SWAP = x; x = y; y = SWAP; } while (0)
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-
-struct match_t {
-	score_t match_bonus[MATCH_MAX_LEN];
-	char lower_needle[MATCH_MAX_LEN];
-	char lower_haystack[MATCH_MAX_LEN];
-	size_t needle_len;
-	size_t haystack_len;
-};
 
 static void
 precompute_bonus(const char *haystack, score_t *match_bonus)
@@ -239,8 +241,6 @@ match(const char *needle, const char *haystack)
 	return last_M[m - 1];
 }
 
-static uint8_t utf8_len_table[256] = {0};
-
 static void
 init_utf8_len_table(void)
 {
@@ -286,7 +286,7 @@ fill_full_match_positions(size_t *positions, const char *needle, const size_t n)
 		/* If multi-byte, skip the remaining bytes. */
 		const size_t char_len = utf8_len_table[u_needle[i]];
 		if (char_len >= 2) /* Multi-byte character */
-			i += char_len - 1;	/* -1 because the for-loop will increment i */
+			i += char_len - 1; /* -1 because the for-loop will increment i */
 	}
 
 	return SCORE_MAX;
