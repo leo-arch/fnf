@@ -79,7 +79,7 @@ void tty_hide_cursor(const tty_t *tty);
 void tty_unhide_cursor(const tty_t *tty);
 
 void tty_fputs(const tty_t *tty, const char *str);
-void tty_printf(tty_t *tty, const char *fmt, ...);
+void tty_printf(const tty_t *tty, const char *fmt, ...);
 void tty_putc(const tty_t *tty, const char c);
 void tty_flush(const tty_t *tty);
 

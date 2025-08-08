@@ -268,7 +268,7 @@ tty_getheight(const tty_t *tty)
 }
 
 void
-tty_printf(tty_t *tty, const char *fmt, ...)
+tty_printf(const tty_t *tty, const char *fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);

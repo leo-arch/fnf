@@ -340,14 +340,12 @@ draw(tty_interface_t *state)
 		return;
 	}
 
-	tty_t *tty = state->tty;
-	choices_t *choices = state->choices;
-	options_t *options = state->options;
-
+	const tty_t *tty = state->tty;
+	const choices_t *choices = state->choices;
+	const options_t *options = state->options;
 	const size_t num_lines = options->num_lines;
-	const size_t start = get_starting_item(choices, options);
-
 	const size_t sel_num = state->selection->selected;
+	const size_t start = get_starting_item(choices, options);
 	const int options_pad = options->pad;
 	const int options_reverse = options->reverse;
 	const int options_show_info = options->show_info;
