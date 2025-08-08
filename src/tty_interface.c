@@ -120,10 +120,12 @@ wc_xstrlen(const char *restrict str)
 static int
 contains_utf8(const char *str)
 {
-	while (*str) {
-		if ((unsigned char)*str >= 0x80)
+	const unsigned char *s = (const unsigned char *)str;
+
+	while (*s) {
+		if (*s >= 0x80)
 			return 1;
-		str++;
+		s++;
 	}
 
 	return 0;
