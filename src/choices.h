@@ -58,6 +58,7 @@ typedef struct {
 	size_t worker_count;
 } choices_t;
 
+void choices_add(choices_t *c, char *choice);
 void choices_init(choices_t *c, const options_t *options);
 void choices_fread(choices_t *c, FILE *file, const char input_delimiter,
 	const int max_choices);

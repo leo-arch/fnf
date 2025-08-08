@@ -258,9 +258,9 @@ set_case_sensitivy_mode(options_t *options, const char *optarg)
 	if (!optarg || !*optarg)
 		return;
 
-	if (strcmp(optarg, "respect") == 0)
+	if (strcmp(optarg, "respect") == 0 || strcmp(optarg, "sensitive") == 0)
 		options->case_sens_mode = CASE_SENSITIVE;
-	else if (strcmp(optarg, "ignore") == 0)
+	else if (strcmp(optarg, "ignore") == 0 || strcmp(optarg, "insensitive") == 0)
 		options->case_sens_mode = CASE_INSENSITIVE;
 	else if (strcmp(optarg, "smart") == 0)
 		options->case_sens_mode = CASE_SMART;

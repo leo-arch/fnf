@@ -114,7 +114,7 @@ choices_resize(choices_t *c, const size_t new_capacity)
 	c->capacity = new_capacity;
 }
 
-static void
+void
 choices_add(choices_t *c, char *choice)
 {
 	/* Previous search is now invalid */

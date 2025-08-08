@@ -51,16 +51,28 @@ strcasechr(const char *s, int c)
 	return strpbrk(s, accept);
 }
 
+static const char *
+skip_sgr_sequences(const char *str)
+{
+	const char *s = str;
+
+	while (IS_SGR_START(s)) {
+		s += 2;
+		while (*s && *s != 'm' && IS_SGR_CHAR(*s))
+			s++;
+		if (*s == 'm')
+			s++;
+	}
+
+	return s;
+}
+
 int
 has_match(const char *needle, const char *haystack)
 {
 	/* Skip initial SGR sequence from haystack. */
-	while (IS_SGR_START(haystack)) {
-		haystack += 2;
-		while (*haystack && *haystack != 'm' && IS_SGR_CHAR(*haystack))
-			haystack++;
-		if (*haystack == 'm')
-			haystack++;
+	if (*haystack == KEY_ESC) {
+		haystack = skip_sgr_sequences(haystack);
 		if (!*haystack)
 			return 0;
 	}
@@ -121,8 +133,17 @@ static void
 setup_match_struct(struct match_t *match, const char *needle,
 	const char *haystack)
 {
+	/* Skip leading and trailing SGR color sequences from HAYSTACK. */
+	if (*haystack == KEY_ESC) {
+		haystack = skip_sgr_sequences(haystack);
+		char *esc = strchr(haystack, KEY_ESC);
+		match->haystack_len = (esc && esc[1] == '[') ? (size_t)(esc - haystack)
+			: strlen(haystack);
+	} else {
+		match->haystack_len = strlen(haystack);
+	}
+
 	match->needle_len = strlen(needle);
-	match->haystack_len = strlen(haystack);
 
 	if (match->haystack_len > MATCH_MAX_LEN
 	|| match->needle_len > match->haystack_len)
@@ -160,7 +181,7 @@ match_row(const struct match_t *match, const size_t row, score_t *curr_D,
 			score_t score = SCORE_MIN;
 			if (!i) {
 				score = (j * SCORE_GAP_LEADING) + match_bonus[j];
-			} else if (j) { /* i > 0 && j > 0*/
+			} else if (j) { /* i > 0 && j > 0 */
 				score = MAX(
 					last_M[j - 1] + match_bonus[j],
 					/* consecutive match, doesn't stack with match_bonus */
