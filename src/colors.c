@@ -190,30 +190,33 @@ parse_color_field(char *field)
 	if (!field || !*field)
 		return;
 
-	if (*field == 'h' && strncmp(field, "hl:", 3) == 0)
-		set_color(HIGHLIGHT_COLOR, field + 3);
-	else if (*field == 'm' && strncmp(field, "marker:", 7) == 0)
-		set_color(MARKER_COLOR, field + 7);
-	else if (*field == 'p' && strncmp(field, "prompt:", 7) == 0)
-		set_color(PROMPT_COLOR, field + 7);
-	else if (*field == 'p' && strncmp(field, "pointer:", 8) == 0)
-		set_color(POINTER_COLOR, field + 8);
-	else if (*field == 's' && strncmp(field, "sel-fg:", 7) == 0)
-		set_color(SEL_FG_COLOR, field + 7);
-	else if (*field == 's' && strncmp(field, "sel-bg:", 7) == 0)
-		set_color(SEL_BG_COLOR, field + 7);
-	else if (*field == 'i' && strncmp(field, "info:", 5) == 0)
-		set_color(INFO_COLOR, field + 5);
-	else if (*field == 's' && strncmp(field, "score:", 6) == 0)
-		set_color(SCORE_COLOR, field + 6);
-	else if (*field == 'f' && strncmp(field, "fg:", 3) == 0)
-		set_color(FG_COLOR, field + 3);
-	else if (*field == 'q' && strncmp(field, "query:", 6) == 0)
-		set_color(QUERY_COLOR, field + 6);
-	else if (*field == 'g' && strncmp(field, "gutter:", 7) == 0)
-		set_color(GUTTER_COLOR, field + 7);
-	else if (*field == 's' && strncmp(field, "separator:", 10) == 0)
-		set_color(SEPARATOR_COLOR, field + 10);
+	struct color_fields_t {
+		const char *name;
+		size_t namelen;
+		int code;
+	};
+
+	const struct color_fields_t fields[] = {
+		{"hl:", 3, HIGHLIGHT_COLOR},
+		{"marker:", 7, MARKER_COLOR},
+		{"prompt:", 7, PROMPT_COLOR},
+		{"pointer:", 8, POINTER_COLOR},
+		{"sel-bg:", 7, SEL_BG_COLOR},
+		{"sel-fg:", 7, SEL_FG_COLOR},
+		{"info:", 5, INFO_COLOR},
+		{"score:", 6, SCORE_COLOR},
+		{"fg:", 3, FG_COLOR},
+		{"query:", 6, QUERY_COLOR},
+		{"gutter:", 7, GUTTER_COLOR},
+		{"separator:", 10, SEPARATOR_COLOR},
+		{NULL, 0, 0}
+	};
+
+	for (size_t i = 0; fields[i].name; i++) {
+		if (*field == *fields[i].name
+		&& strncmp(field, fields[i].name, fields[i].namelen) == 0)
+			set_color(fields[i].code, field + fields[i].namelen);
+	}
 }
 
 static void
