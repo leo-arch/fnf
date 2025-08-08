@@ -92,7 +92,7 @@ usage(void)
 	fprintf(stderr, "%s", usage_str);
 }
 
-static struct option longopts[] = {
+static const struct option longopts[] = {
 	{"read-null", no_argument, NULL, '0'},
 	{"cycle", no_argument, NULL, 'c'},
 	{"show-matches", required_argument, NULL, 'e'},

@@ -41,7 +41,7 @@ struct selections_t {
 
 static struct selections_t *selections = (struct selections_t *)NULL;
 
-/* Search for the string P in the selections array. If found, return 1,
+/* Search for the string NAME in the selections array. If found, return 1,
  * otherwise zero. */
 int
 is_selected(const char *name)

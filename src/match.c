@@ -138,7 +138,7 @@ setup_match_struct(struct match_t *match, const char *needle,
 	/* Skip leading and trailing SGR color sequences from HAYSTACK. */
 	if (*haystack == KEY_ESC) {
 		haystack = skip_sgr_sequences(haystack);
-		char *esc = strchr(haystack, KEY_ESC);
+		const char *esc = strchr(haystack, KEY_ESC);
 		match->haystack_len = (esc && esc[1] == '[') ? (size_t)(esc - haystack)
 			: strlen(haystack);
 	} else {
