@@ -56,6 +56,7 @@ typedef struct {
 	int left_aborts;
 	int max_items;
 	int multi;
+	int no_bold;
 	int no_color;
 	int pad;
 	int print_null;

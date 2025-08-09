@@ -52,6 +52,7 @@
 #define OPT_NO_CLEAR      12
 #define OPT_SEPARATOR     13
 #define OPT_CASE          14
+#define OPT_NO_BOLD       15
 
 static const char *usage_str =
     ""
@@ -75,6 +76,7 @@ static const char *usage_str =
     "     --case=MODE          Set case sensitivity mode [respect|ignore|smart] (default: smart)\n"
     "     --color=COLORSPEC    Set custom colors (consult the manpage)\n"
     "     --marker=STR         Multi-select marker (default: \"✔\" or \"*\")\n"
+    "     --no-bold            Do not use bold colors\n"
     "     --no-clear           Do not clear the interface on exit\n"
     "     --no-color           Disable colors\n"
     "     --no-sort            Do not sort the result\n"
@@ -114,6 +116,7 @@ static const struct option longopts[] = {
 	{"color", required_argument, NULL, OPT_COLOR},
 	{"left-aborts", no_argument, NULL, OPT_LEFT_ABORTS},
 	{"marker", required_argument, NULL, OPT_MARKER},
+	{"no-bold", no_argument, NULL, OPT_NO_BOLD},
 	{"no-clear", no_argument, NULL, OPT_NO_CLEAR},
 	{"no-color", no_argument, NULL, OPT_NO_COLOR},
 	{"no-sort", no_argument, NULL, OPT_NO_SORT},
@@ -143,6 +146,7 @@ options_init(options_t *options)
 	options->marker          = DEFAULT_MARKER;
 	options->max_items       = DEFAULT_MAX_ITEMS;
 	options->multi           = DEFAULT_MULTI;
+	options->no_bold         = DEFAULT_NO_BOLD;
 	options->no_color        = DEFAULT_NO_COLOR;
 	options->num_lines       = (size_t)-1; /* Unset*/
 	options->pad             = DEFAULT_PAD;
@@ -298,6 +302,7 @@ options_parse(options_t *options, int argc, char *argv[])
 		case OPT_COLOR: options->color = optarg; break;
 		case OPT_LEFT_ABORTS: options->left_aborts = 1; break;
 		case OPT_MARKER: marker_set = set_marker(options, optarg); break;
+		case OPT_NO_BOLD: options->no_bold = 1; break;
 		case OPT_NO_CLEAR: options->clear = 0; break;
 		case OPT_NO_COLOR: options->no_color = 1; break;
 		case OPT_NO_SORT: options->sort = 0; break;

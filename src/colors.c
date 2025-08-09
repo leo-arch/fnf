@@ -121,7 +121,7 @@ get_rgb(const char *hex, int *attr, int *r, int *g, int *b)
  * This function does not validate hex, make sure to validate it yourself.
  */
 static void
-set_hex_color(const int code, const char *hex)
+set_hex_color(const int code, const char *hex, const int no_bold)
 {
 	int attr = -1, r = 0, g = 0, b = 0;
 	if (get_rgb(hex, &attr, &r, &g, &b) == -1)
@@ -129,7 +129,7 @@ set_hex_color(const int code, const char *hex)
 
 	/* This is just a workaround: disable attributes for highlight color
 	 * to avoid losing the original color when the entry is selected. */
-	if (code == HIGHLIGHT_COLOR)
+	if (code == HIGHLIGHT_COLOR || (no_bold == 1 && attr == 1))
 		attr = -1;
 
 	const int bgfg = IS_BG_COLOR(code) ? 48 : 38;
@@ -142,7 +142,7 @@ set_hex_color(const int code, const char *hex)
 }
 
 static void
-set_256_color(const int code, char *color)
+set_256_color(const int code, char *color, const int no_bold)
 {
 	if (!color || !*color || !IS_DIGIT(*color))
 		return;
@@ -155,6 +155,8 @@ set_256_color(const int code, char *color)
 		 * to avoid losing the original color when the entry is selected. */
 		if (IS_DIGIT(field_sep[1]) && code != HIGHLIGHT_COLOR)
 			attr = field_sep[1] - '0';
+		if (no_bold == 1 && attr == 1)
+			attr = -1;
 	}
 
 	const int n = atoi(color);
@@ -171,7 +173,7 @@ set_256_color(const int code, char *color)
 }
 
 static void
-set_color(const int code, char *color)
+set_color(const int code, char *color, const int no_bold)
 {
 	if (!color || !*color)
 		return;
@@ -179,13 +181,13 @@ set_color(const int code, char *color)
 	if (*color == '-' && color[1] == '1' && !color[2])
 		memcpy(colors[code], RESET_ATTR, sizeof(RESET_ATTR));
 	else if (*color == '#')
-		set_hex_color(code, color + 1);
+		set_hex_color(code, color + 1, no_bold);
 	else
-		set_256_color(code, color);
+		set_256_color(code, color, no_bold);
 }
 
 static void
-parse_color_field(char *field)
+parse_color_field(char *field, const int no_bold)
 {
 	if (!field || !*field)
 		return;
@@ -215,18 +217,18 @@ parse_color_field(char *field)
 	for (size_t i = 0; fields[i].name; i++) {
 		if (*field == *fields[i].name
 		&& strncmp(field, fields[i].name, fields[i].namelen) == 0)
-			set_color(fields[i].code, field + fields[i].namelen);
+			set_color(fields[i].code, field + fields[i].namelen, no_bold);
 	}
 }
 
 static void
-parse_color_line(char *line)
+parse_color_line(char *line, const int no_bold)
 {
 	const char *delimiter = ", ";
 
 	char *token = strtok(line, delimiter);
 	while (token) {
-		parse_color_field(token);
+		parse_color_field(token, no_bold);
 		token = strtok(NULL, delimiter);
 	}
 }
@@ -249,10 +251,10 @@ set_colors(tty_interface_t *state)
 		env = def_colors;
 	}
 
-	parse_color_line(env);
+	parse_color_line(env, state->options->no_bold);
 
 	if (state->options->color && *state->options->color)
-		parse_color_line(state->options->color);
+		parse_color_line(state->options->color, state->options->no_bold);
 }
 
 /* Remove the initial SGR sequence from NAME and return the resulting string.

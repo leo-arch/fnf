@@ -60,6 +60,7 @@
 #define DEFAULT_MARKER_UNICODE "✔"
 #define DEFAULT_MAX_ITEMS -1 /* Unlimited */
 #define DEFAULT_MULTI 0
+#define DEFAULT_NO_BOLD 0
 #define DEFAULT_NO_COLOR 0
 #define DEFAULT_NUM_LINES 10
 #define DEFAULT_PAD 0
