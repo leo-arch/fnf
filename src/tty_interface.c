@@ -83,7 +83,7 @@ clear(const tty_interface_t *state)
 		return;
 	}
 
-	tty_t *tty = state->tty;
+	const tty_t *tty = state->tty;
 	const size_t num_lines = state->options->num_lines;
 	const int show_info = state->options->show_info;
 
@@ -132,7 +132,7 @@ contains_utf8(const char *str)
 }
 
 static size_t
-get_cursor_position(const size_t start, tty_interface_t *state)
+get_cursor_position(const size_t start, const tty_interface_t *state)
 {
 	if (!*state->search)
 		return start;
@@ -167,7 +167,7 @@ get_cursor_position(const size_t start, tty_interface_t *state)
 }
 
 static void
-print_score(tty_t *tty, const score_t score, const int pad)
+print_score(const tty_t *tty, const score_t score, const int pad)
 {
 	if (score == SCORE_MIN || score == SCORE_MAX) {
 		tty_printf(tty, "\x1b[%dG%s[     ]%s ",
@@ -709,7 +709,7 @@ action_last(tty_interface_t *state)
 static void
 action_pageup(tty_interface_t *state)
 {
-	const unsigned int num_lines = state->options->num_lines;
+	const size_t num_lines = state->options->num_lines;
 	const size_t selection = state->choices->selection;
 	const int cycle = state->options->cycle;
 
@@ -729,7 +729,7 @@ action_pageup(tty_interface_t *state)
 static void
 action_pagedown(tty_interface_t *state)
 {
-	const unsigned int num_lines = state->options->num_lines;
+	const size_t num_lines = state->options->num_lines;
 	const size_t selection = state->choices->selection;
 	const size_t available = state->choices->available;
 	const int cycle = state->options->cycle;
@@ -899,7 +899,7 @@ handle_input(tty_interface_t *state, const char *s,
 	int found_keybinding = -1;
 	int in_middle = 0;
 
-	for (int i = 0; keybindings[i].key; i++) {
+	for (size_t i = 0; keybindings[i].key; i++) {
 		if (*input != *keybindings[i].key || (input_len > 1
 		&& input[1] != keybindings[i].key[1]))
 			continue;
@@ -928,7 +928,7 @@ handle_input(tty_interface_t *state, const char *s,
 	 * Exclude input starting with non-printing char, mostly keybindings,
 	 * e.g. INSERT, etc. */
 	if (isprint_unicode(*input)) {
-		for (int i = 0; input[i]; i++) {
+		for (size_t i = 0; input[i]; i++) {
 			if (isprint_unicode(input[i]))
 				append_search(state, input[i]);
 		}
