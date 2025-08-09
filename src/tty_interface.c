@@ -29,10 +29,14 @@
 * THE SOFTWARE.
 */
 
+#ifndef _XOPEN_SOURCE
+# define _XOPEN_SOURCE 700 /* wcwidth, wcswidth */
+#endif
+
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-#include <wchar.h> /* wc_xstrlen() */
+#include <wchar.h> /* wcwidth, wcswidth */
 
 #include "colors.h"
 #include "config.h"
@@ -52,6 +56,38 @@ static int
 is_boundary(const char c)
 {
 	return (~c & (1 << 7) || c & (1 << 6));
+}
+
+static int
+contains_utf8(const char *str)
+{
+	const unsigned char *s = (const unsigned char *)str;
+
+	while (*s) {
+		if (*s >= 0x80)
+			return 1;
+		s++;
+	}
+
+	return 0;
+}
+
+/* A strlen implementation able to handle wide chars.
+ * Return the number of columns required to print the string STR (instead
+ * of the number of bytes required to store STR). */
+static size_t
+wc_xstrlen(const char *restrict str)
+{
+	wchar_t wbuf[PATH_MAX];
+	const size_t len = mbstowcs(wbuf, str, (size_t)PATH_MAX);
+	if (len == (size_t)-1) /* Invalid multi-byte sequence found */
+		return 0;
+
+	const int width = wcswidth(wbuf, len);
+	if (width != -1)
+		return (size_t)width;
+
+	return 0; /* A non-printable wide char was found */
 }
 
 static void
@@ -97,38 +133,6 @@ clear(const tty_interface_t *state)
 		tty_moveup(tty, line - 1);
 
 	tty_flush(tty);
-}
-
-/* A strlen implementation able to handle wide chars.
- * Return the number of columns required to print the string STR (instead
- * of the number of bytes required to store STR). */
-static size_t
-wc_xstrlen(const char *restrict str)
-{
-	wchar_t wbuf[PATH_MAX];
-	const size_t len = mbstowcs(wbuf, str, (size_t)PATH_MAX);
-	if (len == (size_t)-1) /* Invalid multi-byte sequence found */
-		return 0;
-
-	const int width = wcswidth(wbuf, len);
-	if (width != -1)
-		return (size_t)width;
-
-	return 0; /* A non-printable wide char was found */
-}
-
-static int
-contains_utf8(const char *str)
-{
-	const unsigned char *s = (const unsigned char *)str;
-
-	while (*s) {
-		if (*s >= 0x80)
-			return 1;
-		s++;
-	}
-
-	return 0;
 }
 
 static size_t

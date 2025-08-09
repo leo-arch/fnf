@@ -1,4 +1,3 @@
-CPPFLAGS=-D_GNU_SOURCE
 CFLAGS+=-MD -Wall -Wextra -std=c99 -O3 -pedantic -Ideps -Werror=vla
 PREFIX?=/usr/local
 MANDIR?=$(PREFIX)/share/man

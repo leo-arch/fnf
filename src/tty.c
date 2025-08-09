@@ -29,6 +29,11 @@
 * THE SOFTWARE.
 */
 
+#ifndef _XOPEN_SOURCE
+/* fileno, select, pselect, sigemptyset, sigaddset, struct timespec */
+# define _XOPEN_SOURCE 700
+#endif
+
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
