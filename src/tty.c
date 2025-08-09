@@ -29,9 +29,10 @@
 * THE SOFTWARE.
 */
 
-#ifndef _GNU_SOURCE
-/* fileno, select, pselect, sigemptyset, sigaddset, struct timespec */
-# define _GNU_SOURCE
+#ifndef _DEFAULT_SOURCE
+/* fileno, select, pselect, sigemptyset, sigaddset, struct timespec,
+ * and SIGWINCH */
+# define _DEFAULT_SOURCE
 #endif
 
 #include <stdio.h>
