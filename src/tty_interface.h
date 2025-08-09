@@ -34,9 +34,8 @@
 
 #ifdef __linux__
 # include <linux/limits.h> /* PATH_MAX */
-#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) \
-|| defined(__DragonFly__) || defined(__APPLE__)
-# include <sys/syslimits.h>
+#else
+# include <limits.h>
 #endif /* __linux__ */
 
 #include "choices.h"

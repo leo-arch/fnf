@@ -29,9 +29,9 @@
 * THE SOFTWARE.
 */
 
-#ifndef _XOPEN_SOURCE
+#ifndef _GNU_SOURCE
 /* fileno, select, pselect, sigemptyset, sigaddset, struct timespec */
-# define _XOPEN_SOURCE 700
+# define _GNU_SOURCE
 #endif
 
 #include <stdio.h>
