@@ -167,41 +167,41 @@ options_init(options_t *options)
 }
 
 static void
-set_padding(options_t *options, const char *optarg)
+set_padding(options_t *options, const char *value)
 {
-	if (optarg && *optarg >= '0' && *optarg <= '9')
-		options->pad = atoi(optarg);
+	if (value && *value >= '0' && *value <= '9')
+		options->pad = atoi(value);
 }
 
 static void
-set_max_items(options_t *options, const char *optarg)
+set_max_items(options_t *options, const char *value)
 {
-	if (optarg && *optarg >= '0' && *optarg <= '9')
-		options->max_items = atoi(optarg);
+	if (value && *value >= '0' && *value <= '9')
+		options->max_items = atoi(value);
 }
 
 static void
-set_workers(options_t *options, const char *optarg)
+set_workers(options_t *options, const char *value)
 {
-	if (sscanf(optarg, "%zu", &options->workers) != 1) {
+	if (sscanf(value, "%zu", &options->workers) != 1) {
 		usage();
 		exit(EXIT_FAILURE);
 	}
 }
 
 static void
-set_lines(options_t *options, const char *optarg)
+set_lines(options_t *options, const char *value)
 {
-	if (!optarg)
+	if (!value)
 		return;
 
 	int l = 0;
-	if (*optarg == 'm' && strcmp(optarg, "max") == 0) {
+	if (*value == 'm' && strcmp(value, "max") == 0) {
 		l = INT_MAX;
-	} else if (*optarg == 'a' && strcmp(optarg, "auto") == 0) {
+	} else if (*value == 'a' && strcmp(value, "auto") == 0) {
 		options->auto_lines = 1;
-	} else if (sscanf(optarg, "%d", &l) != 1 || l < 2) {
-		fprintf(stderr, "Invalid format for --lines: %s\n", optarg);
+	} else if (sscanf(value, "%d", &l) != 1 || l < 2) {
+		fprintf(stderr, "Invalid format for --lines: %s\n", value);
 		fprintf(stderr, "Must be an integer in the range 2..\n");
 		exit(EXIT_FAILURE);
 	}
@@ -210,10 +210,10 @@ set_lines(options_t *options, const char *optarg)
 }
 
 static int
-set_pointer(options_t *options, const char *optarg)
+set_pointer(options_t *options, const char *value)
 {
-	if (optarg && *optarg) {
-		options->pointer = optarg;
+	if (value && *value) {
+		options->pointer = value;
 		return 1;
 	}
 
@@ -221,10 +221,10 @@ set_pointer(options_t *options, const char *optarg)
 }
 
 static int
-set_marker(options_t *options, const char *optarg)
+set_marker(options_t *options, const char *value)
 {
-	if (optarg && *optarg) {
-		options->marker = optarg;
+	if (value && *value) {
+		options->marker = value;
 		return 1;
 	}
 
@@ -232,11 +232,11 @@ set_marker(options_t *options, const char *optarg)
 }
 
 static void
-set_scrolloff(options_t *options, const char *optarg)
+set_scrolloff(options_t *options, const char *value)
 {
-	if (optarg && *optarg >= '0' && *optarg <= '9')
-		options->scrolloff = atoi(optarg);
-	else if (optarg && *optarg == 'a' && strcmp(optarg, "auto") == 0)
+	if (value && *value >= '0' && *value <= '9')
+		options->scrolloff = atoi(value);
+	else if (value && *value == 'a' && strcmp(value, "auto") == 0)
 		options->scrolloff = -1;
 }
 
@@ -248,25 +248,25 @@ print_version(void)
 }
 
 static int
-set_separator(options_t *options, const char *optarg)
+set_separator(options_t *options, const char *value)
 {
 	options->show_info = 1;
-	if (optarg && *optarg)
-		options->separator = optarg;
+	if (value && *value)
+		options->separator = value;
 	return 1;
 }
 
 static void
-set_case_sensitivy_mode(options_t *options, const char *optarg)
+set_case_sensitivy_mode(options_t *options, const char *value)
 {
-	if (!optarg || !*optarg)
+	if (!value || !*value)
 		return;
 
-	if (strcmp(optarg, "respect") == 0 || strcmp(optarg, "sensitive") == 0)
+	if (strcmp(value, "respect") == 0 || strcmp(value, "sensitive") == 0)
 		options->case_sens_mode = CASE_SENSITIVE;
-	else if (strcmp(optarg, "ignore") == 0 || strcmp(optarg, "insensitive") == 0)
+	else if (strcmp(value, "ignore") == 0 || strcmp(value, "insensitive") == 0)
 		options->case_sens_mode = CASE_INSENSITIVE;
-	else if (strcmp(optarg, "smart") == 0)
+	else if (strcmp(value, "smart") == 0)
 		options->case_sens_mode = CASE_SMART;
 }
 
