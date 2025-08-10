@@ -304,6 +304,13 @@ decolor_name(const char *name, char *color_buf)
 	return buf;
 }
 
+static inline size_t
+s_snprintf(char *buf, const size_t buf_size, const char *str)
+{
+	const int ret = snprintf(buf, buf_size, "%s", str);
+	return (ret < 0 || ret >= (int)buf_size) ? 0 : (size_t)ret;
+}
+
 #define BUF_SIZE 8192
 void
 colorize_match(const tty_interface_t *state, const size_t *positions,
@@ -322,15 +329,15 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 	int in_match = 0; /* Track whether we are currently in a match */
 
 	static char buf[BUF_SIZE];
-	l += snprintf(buf, sizeof(buf), "%s", pointer);
+	l += s_snprintf(buf, sizeof(buf), pointer);
 
 	if (positions[p] != 0) {
 		/* If the first character is not a match, set the original color */
-		l += snprintf(buf + l, sizeof(buf) - l, "%s", orig_color);
+		l += s_snprintf(buf + l, sizeof(buf) - l, orig_color);
 	} else if (selected == 1) {
 		/* The first character is a match. Let's copy the selection color
 		 * to extend wathever attribute it has to the first character. */
-		l += snprintf(buf + l, sizeof(buf) - l, "%s", no_color == 1 ?
+		l += s_snprintf(buf + l, sizeof(buf) - l, no_color == 1 ?
 		SELECTION_NOCOLOR : colors[SEL_FG_COLOR]);
 	}
 
@@ -339,12 +346,12 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 
 		if (is_match) {
 			if (!in_match) {
-				l += snprintf(buf + l, sizeof(buf) - l, "%s", highlight);
+				l += s_snprintf(buf + l, sizeof(buf) - l, highlight);
 				in_match = 1; /* Transition from non-match to match */
 			}
 		} else {
 			if (in_match) {
-				l += snprintf(buf + l, sizeof(buf) - l, "%s", orig_color);
+				l += s_snprintf(buf + l, sizeof(buf) - l, orig_color);
 				in_match = 0; /* Transition from match to non-match */
 			}
 		}
@@ -363,7 +370,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 			p++;
 	}
 
-	l += snprintf(buf + l, sizeof(buf) - l, "%s",
+	l += s_snprintf(buf + l, sizeof(buf) - l,
 		(*orig_color && (no_color == 1 || !IS_SGR0(orig_color)))
 		? RESET_ATTR CLEAR_LINE : CLEAR_LINE);
 
@@ -387,13 +394,14 @@ colorize_no_match(tty_t *tty, const char *sel_color, const char *name,
 	}
 
 	/* If selected, handle colors. */
-	size_t l = snprintf(buf, sizeof(buf), "%s%s%s%s",
+	int l = snprintf(buf, sizeof(buf), "%s%s%s%s",
 		pointer,
 		*sel_color ? sel_color : SELECTION_NOCOLOR,
 		name,
 		RESET_ATTR CLEAR_LINE);
 
-	if (l >= sizeof(buf)) l = sizeof(buf) - 1;
+	static int buf_size = (int)sizeof(buf);
+	if (l >= buf_size) l = buf_size - 1;
 	buf[l] = '\0';
 
 	tty->fgcolor = TERM_FG_COLOR_RESET;

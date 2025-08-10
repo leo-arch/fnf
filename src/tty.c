@@ -99,8 +99,8 @@ tty_init(tty_t *tty, const char *tty_filename)
 	 * ECHO    Echo.
 	 * ISIG    Signals from control characters.
 	 * ICRNL   Conversion of CR characters into NL. */
-	new_termios.c_iflag &= ~(ICRNL);
-	new_termios.c_lflag &= ~(ICANON | ECHO | ISIG);
+	new_termios.c_iflag &= (tcflag_t)~(ICRNL);
+	new_termios.c_lflag &= (tcflag_t)~(ICANON | ECHO | ISIG);
 
 	if (tcsetattr(tty->fdin, TCSANOW, &new_termios))
 		perror("tcsetattr");
@@ -127,7 +127,7 @@ char
 tty_getchar(tty_t *tty)
 {
 	char ch;
-	const int size = read(tty->fdin, &ch, 1); /* flawfinder: ignore */
+	const ssize_t size = read(tty->fdin, &ch, 1); /* flawfinder: ignore */
 	if (size < 0) {
 		perror("error reading from tty");
 		exit(EXIT_FAILURE);
@@ -273,6 +273,8 @@ tty_getheight(const tty_t *tty)
 	return tty->maxheight;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 void
 tty_printf(const tty_t *tty, const char *fmt, ...)
 {
@@ -281,3 +283,4 @@ tty_printf(const tty_t *tty, const char *fmt, ...)
 	vfprintf(tty->fout, fmt, args);
 	va_end(args);
 }
+#pragma GCC diagnostic pop

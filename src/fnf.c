@@ -94,7 +94,7 @@ main(int argc, char *argv[])
 
 		set_num_lines(&options, &tty, choices.size);
 
-		const int num_lines_adjustment = 1 + options.show_info;
+		const size_t num_lines_adjustment = 1 + (size_t)options.show_info;
 
 		if (options.num_lines + num_lines_adjustment > tty_getheight(&tty))
 			options.num_lines = tty_getheight(&tty) - num_lines_adjustment;

@@ -58,9 +58,7 @@ struct match_t {
 static char *
 strcasechr(const char *s, int c)
 {
-	char lower_c = TOLOWER(c);
-	char upper_c = TOUPPER(c);
-	const char accept[3] = {lower_c, upper_c, '\0'};
+	const char accept[3] = {(char)TOLOWER(c), (char)TOUPPER(c), '\0'};
 	return strpbrk(s, accept);
 }
 
@@ -125,10 +123,16 @@ precompute_bonus(const char *haystack, score_t *match_bonus)
 	}
 }
 
-static int
-tolower_dummy(int c)
+static char
+tolower_dummy(char c)
 {
 	return c;
+}
+
+static char
+c_tolower(char c)
+{
+	return (char)tolower((int)c);
 }
 
 static void
@@ -151,8 +155,8 @@ setup_match_struct(struct match_t *match, const char *needle,
 	|| match->needle_len > match->haystack_len)
 		return;
 
-	int (*tolower_func)(int);
-	tolower_func = g_case_sensitive == 0 ? tolower : tolower_dummy;
+	char (*tolower_func)(char);
+	tolower_func = g_case_sensitive == 0 ? c_tolower : tolower_dummy;
 
 	for (size_t i = 0; i < match->needle_len; i++)
 		match->lower_needle[i] = tolower_func(needle[i]);
@@ -182,7 +186,7 @@ match_row(const struct match_t *match, const size_t row, score_t *curr_D,
 		if (lower_needle[i] == lower_haystack[j]) {
 			score_t score = SCORE_MIN;
 			if (!i) {
-				score = (j * SCORE_GAP_LEADING) + match_bonus[j];
+				score = ((score_t)j * SCORE_GAP_LEADING) + match_bonus[j];
 			} else if (j) { /* i > 0 && j > 0 */
 				score = MAX(
 					last_M[j - 1] + match_bonus[j],

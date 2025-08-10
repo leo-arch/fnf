@@ -97,14 +97,14 @@ set_cursor_for_clear(const tty_interface_t *state)
 		if (state->options->clear == 1) {
 			/* Move the cursor up. */
 			tty_printf(state->tty, "\x1b[%zuA",
-				state->options->num_lines + state->options->show_info);
+				state->options->num_lines + (size_t)state->options->show_info);
 		} else {
 			tty_putc(state->tty, '\n');
 		}
 	} else if (state->options->clear == 0) {
 		/* Move the cursor down and print a new line. */
 		tty_printf(state->tty, "\x1b[%zuB\n",
-			state->options->num_lines + state->options->show_info + 1);
+			state->options->num_lines + (size_t)state->options->show_info + 1);
 	}
 }
 
@@ -130,7 +130,7 @@ clear(const tty_interface_t *state)
 
 	tty_clearline(tty);
 	if (num_lines > 0)
-		tty_moveup(tty, line - 1);
+		tty_moveup(tty, (int)line - 1);
 
 	tty_flush(tty);
 }
@@ -141,14 +141,14 @@ get_cursor_position(const size_t start, const tty_interface_t *state)
 	if (!*state->search)
 		return start;
 
-	size_t cursor_position = start;
+	int cursor_position = (int)start;
 	const size_t cursor = state->cursor;
 	const char *search = state->search;
 
 	if (contains_utf8(search) == 0) {
 		for (size_t i = 0; i < cursor && search[i]; i++)
 			cursor_position += is_boundary(search[i]);
-		return cursor_position;
+		return (size_t)cursor_position;
 	}
 
 	static wchar_t wbuf[SEARCH_SIZE_MAX * sizeof(wchar_t)];
@@ -167,7 +167,7 @@ get_cursor_position(const size_t start, const tty_interface_t *state)
 			cursor_position += w;
 	}
 
-	return cursor_position;
+	return (size_t)cursor_position;
 }
 
 static void
@@ -271,7 +271,7 @@ build_pointer(const int current, const int selected, const options_t *options)
 }
 
 static void
-build_separator(const tty_interface_t *state, char *separator, const int size)
+build_separator(const tty_interface_t *state, char *separator, const size_t size)
 {
 	const char *sep_str = state->options->separator;
 	const size_t len = wc_xstrlen(sep_str);
@@ -285,8 +285,8 @@ build_separator(const tty_interface_t *state, char *separator, const int size)
 	size_t repeat = 0;
 	int bytes = snprintf(separator, size, " %s", colors[SEPARATOR_COLOR]);
 	while (repeat++ < max_repeats) {
-		int n = snprintf(separator + bytes, size - bytes, "%s", sep_str);
-		if (n < 0 || n >= size - bytes)
+		int n = snprintf(separator + bytes, size - (size_t)bytes, "%s", sep_str);
+		if (n < 0 || n >= (int)size - bytes)
 			break;
 		bytes += n;
 	}
@@ -304,7 +304,7 @@ print_info(const tty_interface_t *state, const choices_t *choices, const int pad
 
 	static char separator[1024] = "";
 	if (!*separator && state->options->separator)
-		build_separator(state, separator, (int)sizeof(separator));
+		build_separator(state, separator, sizeof(separator));
 
 	static char buf[MAX_INFO_LINE_LEN + sizeof(separator)];
 	snprintf(buf, sizeof(buf), "%s\x1b[%dG%s%zu/%zu%s%s%s%s",
@@ -323,8 +323,8 @@ get_starting_item(const choices_t *choices, const options_t *options)
 	const size_t current_selection = choices->selection;
 	const size_t available = choices->available;
 
-	int scrolloff = options->scrolloff;
-	if (scrolloff == -1) { /* --scroll-off=auto (default) */
+	size_t scrolloff = (size_t)options->scrolloff;
+	if (scrolloff == (size_t)-1) { /* --scroll-off=auto (default) */
 		items = items < available ? items : available;
 		scrolloff = items >> 1; /* items / 2 */
 	}
@@ -354,7 +354,7 @@ draw(tty_interface_t *state)
 	const size_t start = get_starting_item(choices, options);
 	const int options_pad = options->pad;
 	const int options_reverse = options->reverse;
-	const int options_show_info = options->show_info;
+	const size_t options_show_info = (size_t)options->show_info;
 
 	tty_hide_cursor(tty);
 	tty_setnowrap(tty);
@@ -393,7 +393,7 @@ draw(tty_interface_t *state)
 	}
 
 	if (options_reverse == 0 && (num_lines + options_show_info) > 0)
-		tty_moveup(tty, num_lines + options_show_info);
+		tty_moveup(tty, (int)(num_lines + options_show_info));
 
 	if (options_reverse == 1 && options_show_info == 1)
 		print_info(state, choices, options_pad + 1, sel_num, 1);
@@ -404,7 +404,7 @@ draw(tty_interface_t *state)
 		prompt_len = wc_xstrlen(options->prompt);
 
 	const size_t cursor_position =
-		get_cursor_position(prompt_len + options_pad + 1, state);
+		get_cursor_position(prompt_len + (size_t)options_pad + 1, state);
 
 	tty_printf(tty, "\x1b[%dG%s%s%s%s%s%s\x1b[%zuG", options_pad + 1,
 		colors[PROMPT_COLOR], options->prompt, RESET_ATTR,
@@ -446,8 +446,8 @@ update_state(tty_interface_t *state)
 		update_search(state);
 		if (state->options->reverse == 1) {
 			/* Hide cursor and move it up. */
-			tty_printf(state->tty, "\x1b[?25l\x1b[%zuA\n",
-				state->options->num_lines + 1 + state->options->show_info);
+			tty_printf(state->tty, "\x1b[?25l\x1b[%zuA\n", 1 +
+				state->options->num_lines + (size_t)state->options->show_info);
 		}
 		draw(state);
 		/* Prevent a double draw when modifying the search string. */
@@ -903,7 +903,7 @@ handle_input(tty_interface_t *state, const char *s,
 	int found_keybinding = -1;
 	int in_middle = 0;
 
-	for (size_t i = 0; keybindings[i].key; i++) {
+	for (int i = 0; keybindings[i].key; i++) {
 		if (*input != *keybindings[i].key || (input_len > 1
 		&& input[1] != keybindings[i].key[1]))
 			continue;
@@ -949,7 +949,7 @@ tty_interface_run(tty_interface_t *state)
 		set_colors(state);
 	if (state->options->auto_lines == 1) {
 		state->options->num_lines =
-			tty_getheight(state->tty) - 1 - state->options->show_info;
+			tty_getheight(state->tty) - 1 - (size_t)state->options->show_info;
 	}
 	draw(state);
 
@@ -979,8 +979,8 @@ tty_interface_run(tty_interface_t *state)
 
 			if (state->options->reverse == 1 && state->redraw == 1) {
 				/* Hide cursor and move it up. */
-				tty_printf(state->tty, "\x1b[?25l\x1b[%zuA\n",
-					state->options->num_lines + 1 + state->options->show_info);
+				tty_printf(state->tty, "\x1b[?25l\x1b[%zuA\n", 1 +
+					state->options->num_lines + (size_t)state->options->show_info);
 			}
 
 			draw(state);

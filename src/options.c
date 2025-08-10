@@ -195,12 +195,12 @@ set_lines(options_t *options, const char *value)
 	if (!value)
 		return;
 
-	int l = 0;
+	size_t l = 0;
 	if (*value == 'm' && strcmp(value, "max") == 0) {
 		l = INT_MAX;
 	} else if (*value == 'a' && strcmp(value, "auto") == 0) {
 		options->auto_lines = 1;
-	} else if (sscanf(value, "%d", &l) != 1 || l < 2) {
+	} else if (sscanf(value, "%zu", &l) != 1 || l < 2) {
 		fprintf(stderr, "Invalid format for --lines: %s\n", value);
 		fprintf(stderr, "Must be an integer in the range 2..\n");
 		exit(EXIT_FAILURE);

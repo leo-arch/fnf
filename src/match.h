@@ -39,8 +39,8 @@ extern "C" {
 #endif
 
 typedef double score_t;
-#define SCORE_MAX INFINITY
-#define SCORE_MIN -INFINITY
+#define SCORE_MAX ((score_t)INFINITY)
+#define SCORE_MIN ((score_t)(-INFINITY))
 
 #define MATCH_MAX_LEN 1024
 
