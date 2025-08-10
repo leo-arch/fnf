@@ -321,6 +321,11 @@ append_str(char *buf, const size_t buf_space, const char *str,
 }
 
 #define BUF_SIZE 8192
+/* Build a complete interface line and print it to the output device (STATE->TTY).
+ * Prepend the pointer string POINTER->STR, and colorize the string NAME,
+ * highlighting matching characters (according to POSITIONS) with the
+ * appropriate color. The color of the original item, ORIGINAL_COLOR,
+ * is preserved). */
 void
 colorize_match(const tty_interface_t *state, const size_t *positions,
 	const char *name, const char *original_color, const pointer_t *pointer,
@@ -332,6 +337,8 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 	const char *orig_color = no_color == 1
 		? (selected == 1 ? RESET_ATTR SELECTION_NOCOLOR : RESET_ATTR)
 		: ((original_color && *original_color) ? original_color : "");
+	const char *sel_color = no_color == 1
+		? SELECTION_NOCOLOR : colors[SEL_FG_COLOR];
 
 	const size_t oc_len = strlen(orig_color);
 
@@ -339,12 +346,11 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 	static size_t clr_len = sizeof(CLEAR_LINE) - 1;
 	static size_t reset_clr_len =
 		(sizeof(RESET_ATTR) - 1) + (sizeof(CLEAR_LINE) - 1);
-	static size_t hl_len = 0;
-	static size_t selcolor_len = 0;
-	if (hl_len == 0) {
+	static size_t hl_len = (size_t)-1;
+	static size_t sel_color_len = 0;
+	if (hl_len == (size_t)-1) {
 		hl_len = strlen(highlight);
-		selcolor_len =
-			strlen(no_color == 1 ? SELECTION_NOCOLOR : colors[SEL_FG_COLOR]);
+		sel_color_len = strlen(sel_color);
 	}
 
 	size_t l = 0; /* Current buffer length */
@@ -360,8 +366,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 	} else if (selected == 1) {
 		/* The first character is a match. Let's copy the selection color
 		 * to extend wathever attribute it has to the first character. */
-		l += append_str(buf + l, sizeof(buf) - l, no_color == 1 ?
-		SELECTION_NOCOLOR : colors[SEL_FG_COLOR], selcolor_len);
+		l += append_str(buf + l, sizeof(buf) - l, sel_color, sel_color_len);
 	}
 
 	for (size_t i = 0; name[i]; i++) {
@@ -372,6 +377,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 				l += append_str(buf + l, sizeof(buf) - l, highlight, hl_len);
 				in_match = 1; /* Transition from non-match to match */
 			}
+			p++; /* Move to the next position */
 		} else {
 			if (in_match) {
 				l += append_str(buf + l, sizeof(buf) - l, orig_color, oc_len);
@@ -389,10 +395,6 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 		/* If a multi-byte character, append the remaining bytes */
 		while (IS_UTF8_CONT_BYTE(name[i + 1]))
 			buf[l++] = name[++i];
-
-		/* Move to the next position if we are at a match */
-		if (is_match)
-			p++;
 	}
 
 	const int reset = (*orig_color && (no_color == 1 || !IS_SGR0(orig_color)));
@@ -407,6 +409,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 	tty_fputs(state->tty, buf);
 }
 
+/* Same as colorize_match, but for non-matching items. */
 void
 colorize_no_match(tty_t *tty, const char *sel_color, const char *name,
 	const pointer_t *pointer)

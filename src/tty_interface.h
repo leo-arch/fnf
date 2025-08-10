@@ -98,6 +98,7 @@ typedef struct {
 	char input[PENDING_INPUT_MAX]; /* Pending input buffer */
 } tty_interface_t;
 
+int is_boundary(const char c);
 void tty_interface_init(tty_interface_t *state, tty_t *tty,
 	choices_t *choices, options_t *options, sel_t *selection);
 int tty_interface_run(tty_interface_t *state);
