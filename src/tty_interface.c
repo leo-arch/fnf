@@ -42,8 +42,8 @@
 #include "config.h"
 #include "keybindings.h"
 #include "match.h"
-#include "tty_interface.h"
 #include "selections.h"
+#include "tty_interface.h"
 
 int g_case_sensitive = -1;
 
