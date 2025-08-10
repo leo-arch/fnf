@@ -79,7 +79,7 @@
 #define DEFAULT_TAB_ACCEPTS 0
 #define DEFAULT_TTY "/dev/tty"
 #define DEFAULT_UNICODE 1
-#define DEFAULT_WORKERS 0
+#define DEFAULT_WORKERS 0 /* 0: Number of CPUs */
 
 /* If running without colors (--no-color or NO_COLOR) */
 #define SELECTION_NOCOLOR "\x1b[7m" /* Invert */

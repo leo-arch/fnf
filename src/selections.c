@@ -83,7 +83,7 @@ deselect_entry(const char *name, tty_interface_t *state)
 		free_selections(state);
 }
 
-/* Save the string P into the selections array. */
+/* Save the string NAME into the selections array. */
 void
 save_selection(const char *name, sel_t *selection)
 {

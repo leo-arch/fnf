@@ -184,7 +184,7 @@ print_score(const tty_t *tty, const score_t score, const int pad)
 
 static void
 draw_match(tty_interface_t *state, const char *choice, const int selected,
-	const char *pointer)
+	const pointer_t *pointer)
 {
 	tty_t *tty = state->tty;
 	const options_t *options = state->options;
@@ -225,13 +225,11 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 	}
 }
 
-static char *
+static pointer_t *
 build_pointer(const int current, const int selected, const options_t *options)
 {
-	static char ptr_cur_sel[MAX_POINTER_LEN] = "";
-	static char ptr_cur_nosel[MAX_POINTER_LEN];
-	static char ptr_nocur_sel[MAX_POINTER_LEN];
-	static char ptr_nocur_nosel[MAX_POINTER_LEN];
+	static pointer_t pointer[PTR_TYPES_NUM] = {0};
+
 	static int pad = -1;
 	if (pad == -1)
 		/* If --show-scores, padding is already done by draw_match() */
@@ -243,31 +241,35 @@ build_pointer(const int current, const int selected, const options_t *options)
 			!IS_SGR0(colors[GUTTER_COLOR]) ? colors[GUTTER_COLOR] : "";
 
 	/* Let's construct the pointer string only once */
-	if (!*ptr_cur_sel) {
+	if (!*pointer[0].str) {
 		/* Current (hovered) and selected */
-		snprintf(ptr_cur_sel, sizeof(ptr_cur_sel), "%*s%s%s%s%s%s",
+		snprintf(pointer[PTR_CUR_SEL].str, MAX_POINTER_LEN, "%*s%s%s%s%s%s",
 			pad, "", colors[SEL_BG_COLOR], colors[POINTER_COLOR],
 			options->pointer, colors[MARKER_COLOR], options->marker);
+		pointer[PTR_CUR_SEL].len = strlen(pointer[PTR_CUR_SEL].str);
 
 		/* Current (hovered) and not selected */
-		snprintf(ptr_cur_nosel, sizeof(ptr_cur_nosel), "%*s%s%s%s ",
+		snprintf(pointer[PTR_CUR_NOSEL].str, MAX_POINTER_LEN, "%*s%s%s%s ",
 			pad, "", colors[SEL_BG_COLOR], colors[POINTER_COLOR],
 			options->pointer);
+		pointer[PTR_CUR_NOSEL].len = strlen(pointer[PTR_CUR_NOSEL].str);
 
 		/* Not current (not hovered) and selected */
-		snprintf(ptr_nocur_sel, sizeof(ptr_nocur_sel), "%*s%s %s%s%s%s",
+		snprintf(pointer[PTR_NOCUR_SEL].str, MAX_POINTER_LEN, "%*s%s %s%s%s%s",
 			pad, "", gutter_color, *gutter_color ? RESET_ATTR : "",
 			colors[MARKER_COLOR], options->marker, RESET_ATTR);
+		pointer[PTR_NOCUR_SEL].len = strlen(pointer[PTR_NOCUR_SEL].str);
 
 		/* Not current (not hovered) and not selected */
-		snprintf(ptr_nocur_nosel, sizeof(ptr_nocur_nosel), "%*s%s %s ",
+		snprintf(pointer[PTR_NOCUR_NOSEL].str, MAX_POINTER_LEN, "%*s%s %s ",
 			pad, "", gutter_color, *gutter_color ? RESET_ATTR : "");
+		pointer[PTR_NOCUR_NOSEL].len = strlen(pointer[PTR_NOCUR_NOSEL].str);
 	}
 
 	if (current == 1)
-		return selected == 1 ? ptr_cur_sel : ptr_cur_nosel;
+		return &pointer[(selected == 1 ? PTR_CUR_SEL : PTR_CUR_NOSEL)];
 
-	return selected == 1 ? ptr_nocur_sel : ptr_nocur_nosel;
+	return &pointer[(selected == 1 ? PTR_NOCUR_SEL : PTR_NOCUR_NOSEL)];
 }
 
 static void
@@ -381,9 +383,9 @@ draw(tty_interface_t *state)
 		if (choice) {
 			const int selected = (sel_num > 0 && is_selected(choice));
 			const int current = (i == choices->selection);
-			const char *pointer = build_pointer(current, selected, options);
+			const pointer_t *ptr = build_pointer(current, selected, options);
 
-			draw_match(state, choice, current, pointer);
+			draw_match(state, choice, current, ptr);
 		} else {
 			tty_fputs(tty, CLEAR_LINE);
 		}

@@ -59,6 +59,12 @@ extern int g_case_sensitive;
 #define MAX_POINTER_LEN   256
 #define MAX_INFO_LINE_LEN 256
 
+#define PTR_CUR_SEL     0
+#define PTR_CUR_NOSEL   1
+#define PTR_NOCUR_SEL   2
+#define PTR_NOCUR_NOSEL 3
+#define PTR_TYPES_NUM   4
+
 /* Time (in ms) to wait for additional bytes of an escape sequence */
 #define KEYTIMEOUT 25
 
@@ -67,6 +73,11 @@ extern int g_case_sensitive;
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef struct {
+	char str[MAX_POINTER_LEN];
+	size_t len;
+} pointer_t;
 
 typedef struct {
 	size_t size; /* Size of the selections buffer */

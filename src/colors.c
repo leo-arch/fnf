@@ -305,17 +305,25 @@ decolor_name(const char *name, char *color_buf)
 	return buf;
 }
 
+/* Append STR to BUF provided there is enough space in BUF to hold STR,
+ * including the NUL terminator.
+ * Returns the lenght of STR in case of success. Otherwise, zero is returned
+ * and BUF is left unmodified. */
 static inline size_t
-s_snprintf(char *buf, const size_t buf_size, const char *str)
+append_str(char *buf, const size_t buf_space, const char *str,
+	const size_t str_len)
 {
-	const int ret = snprintf(buf, buf_size, "%s", str);
-	return (ret < 0 || ret >= (int)buf_size) ? 0 : (size_t)ret;
+	if (str_len + 1 >= buf_space)
+		return 0;
+
+	memcpy(buf, str, str_len + 1);
+	return str_len;
 }
 
 #define BUF_SIZE 8192
 void
 colorize_match(const tty_interface_t *state, const size_t *positions,
-	const char *name, const char *original_color, const char *pointer,
+	const char *name, const char *original_color, const pointer_t *pointer,
 	const int selected)
 {
 	const int no_color = state->options->no_color;
@@ -325,21 +333,35 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 		? (selected == 1 ? RESET_ATTR SELECTION_NOCOLOR : RESET_ATTR)
 		: ((original_color && *original_color) ? original_color : "");
 
+	const size_t oc_len = strlen(orig_color);
+
+	/* Static lengths: let's calculate them only once. */
+	static size_t clr_len = sizeof(CLEAR_LINE) - 1;
+	static size_t reset_clr_len =
+		(sizeof(RESET_ATTR) - 1) + (sizeof(CLEAR_LINE) - 1);
+	static size_t hl_len = 0;
+	static size_t selcolor_len = 0;
+	if (hl_len == 0) {
+		hl_len = strlen(highlight);
+		selcolor_len =
+			strlen(no_color == 1 ? SELECTION_NOCOLOR : colors[SEL_FG_COLOR]);
+	}
+
 	size_t l = 0; /* Current buffer length */
 	size_t p = 0; /* Position in match */
 	int in_match = 0; /* Track whether we are currently in a match */
 
 	static char buf[BUF_SIZE];
-	l += s_snprintf(buf, sizeof(buf), pointer);
+	l += append_str(buf, sizeof(buf), pointer->str, pointer->len);
 
 	if (positions[p] != 0) {
 		/* If the first character is not a match, set the original color */
-		l += s_snprintf(buf + l, sizeof(buf) - l, orig_color);
+		l += append_str(buf + l, sizeof(buf) - l, orig_color, oc_len);
 	} else if (selected == 1) {
 		/* The first character is a match. Let's copy the selection color
 		 * to extend wathever attribute it has to the first character. */
-		l += s_snprintf(buf + l, sizeof(buf) - l, no_color == 1 ?
-		SELECTION_NOCOLOR : colors[SEL_FG_COLOR]);
+		l += append_str(buf + l, sizeof(buf) - l, no_color == 1 ?
+		SELECTION_NOCOLOR : colors[SEL_FG_COLOR], selcolor_len);
 	}
 
 	for (size_t i = 0; name[i]; i++) {
@@ -347,15 +369,20 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 
 		if (is_match) {
 			if (!in_match) {
-				l += s_snprintf(buf + l, sizeof(buf) - l, highlight);
+				l += append_str(buf + l, sizeof(buf) - l, highlight, hl_len);
 				in_match = 1; /* Transition from non-match to match */
 			}
 		} else {
 			if (in_match) {
-				l += s_snprintf(buf + l, sizeof(buf) - l, orig_color);
+				l += append_str(buf + l, sizeof(buf) - l, orig_color, oc_len);
 				in_match = 0; /* Transition from match to non-match */
 			}
 		}
+
+		/* Make sure there is enough space in the buffer to write a complete
+		 * UTF-8 character (max 4 bytes + NUL terminator). */
+		if (l >= sizeof(buf) - 5)
+			break;
 
 		/* Append the current character to the buffer */
 		buf[l++] = (name[i] == '\n') ? ' ' : name[i];
@@ -363,17 +390,15 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 		while (IS_UTF8_CONT_BYTE(name[i + 1]))
 			buf[l++] = name[++i];
 
-		if (l >= sizeof(buf) - 1)
-			break; /* Buffer is full: stop adding more characters */
-
 		/* Move to the next position if we are at a match */
 		if (is_match)
 			p++;
 	}
 
-	l += s_snprintf(buf + l, sizeof(buf) - l,
-		(*orig_color && (no_color == 1 || !IS_SGR0(orig_color)))
-		? RESET_ATTR CLEAR_LINE : CLEAR_LINE);
+	const int reset = (*orig_color && (no_color == 1 || !IS_SGR0(orig_color)));
+	l += append_str(buf + l, sizeof(buf) - l,
+		reset == 1 ? RESET_ATTR CLEAR_LINE : CLEAR_LINE,
+		reset == 1 ? reset_clr_len : clr_len);
 
 	if (l >= sizeof(buf)) l = sizeof(buf) - 1;
 	buf[l] = '\0';
@@ -384,19 +409,19 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 
 void
 colorize_no_match(tty_t *tty, const char *sel_color, const char *name,
-	const char *pointer)
+	const pointer_t *pointer)
 {
 	static char buf[BUF_SIZE];
 
 	if (!sel_color || IS_SGR0(sel_color)) { /* The entry is not selected */
-		snprintf(buf, sizeof(buf), "%s%s%s", pointer, name, CLEAR_LINE);
+		snprintf(buf, sizeof(buf), "%s%s%s", pointer->str, name, CLEAR_LINE);
 		tty_fputs(tty, buf);
 		return;
 	}
 
 	/* If selected, handle colors. */
 	int l = snprintf(buf, sizeof(buf), "%s%s%s%s",
-		pointer,
+		pointer->str,
 		*sel_color ? sel_color : SELECTION_NOCOLOR,
 		name,
 		RESET_ATTR CLEAR_LINE);
