@@ -437,7 +437,7 @@ static const keybinding_t keybindings[] = {
 	{"\x1b[A", 3, action_prev},           /* UP */
 	{"\x1bOA", 3, action_prev},           /* UP */
 	{"\x1b", 1, action_exit},             /* ESC */
-	{"\x7f", 1, action_backspace},	      /* Backspace */
+	{"\x7f", 1, action_backspace},	      /* Backspace (DEL) */
 	{KEY_CTRL('H'), 1, action_backspace}, /* Backspace (C-H) */
 	{KEY_CTRL('W'), 1, action_del_word},  /* Ctrl-W */
 	{KEY_CTRL('U'), 1, action_del_all},   /* Ctrl-U */
@@ -473,17 +473,21 @@ static const keybinding_t keybindings[] = {
 	{"\x1b[201~", 6, action_ignore},      /* End bracketed paste */
 	{"\x1b[Z", 3, action_shift_tab},      /* Shift-TAB */
 	{"\x1b[1;5H", 6, action_first},       /* Ctrl-Home */
-	{"\x1b[1;5F", 6, action_last},        /* Ctrl-End */
 	{"\x1b[5;5~", 6, action_first},       /* Ctrl-PgUp */
-	{"\x1b[6;5~", 6, action_last},        /* Ctrl-PgDn */
-	{"\x1b[5^", 4, action_first},         /* Ctrl-PgUp (rxvt) */
-	{"\x1b[6^", 4, action_last},          /* Ctrl-PgDn (rxvt) */
 	{"\x1b[7^", 4, action_first},         /* Ctrl-Home (rxvt) */
+	{"\x1b[5^", 4, action_first},         /* Ctrl-PgUp (rxvt) */
+	{"\x1b[1;5F", 6, action_last},        /* Ctrl-End */
+	{"\x1b[6;5~", 6, action_last},        /* Ctrl-PgDn */
+	{"\x1b[6^", 4, action_last},          /* Ctrl-PgDn (rxvt) */
 	{"\x1b[8^", 4, action_last},          /* Ctrl-End (rxvt) */
 	{NULL, 0, NULL}
 };
 #undef KEY_CTRL
 
+/* This function is called repeatedly (from tty_interface_run()) until we get
+ * a complete keybinding.
+ * If this keybindings is associated to a function, run it. Otherwise,
+ * append the input to the query string in the prompt. */
 void
 handle_input(tty_interface_t *state, const char *s,
 	const int handle_ambiguous_key)
@@ -491,19 +495,19 @@ handle_input(tty_interface_t *state, const char *s,
 	state->ambiguous_key_pending = 0;
 
 	char *input = state->input;
-	size_t input_len = *state->input ? strlen(state->input) : 0;
+	size_t input_len = *input ? strlen(input) : 0;
 
-	if (s && input_len < sizeof(state->input) - 1) {
-		/* Append the current input byte. */
-		state->input[input_len] = *s;
-		state->input[input_len + 1] = '\0';
-		/* S is either a single byte or empty. If a single byte,
-		 * increase INPUT_LEN. */
-		input_len += (*s != '\0');
-	} else {
+	if (!s || input_len >= sizeof(state->input) - 1) {
 		*input = '\0';
 		return;
 	}
+
+	/* Append the current input byte. */
+	input[input_len] = *s;
+	input[input_len + 1] = '\0';
+	/* S is either a single byte or empty. If a single byte,
+	 * increase INPUT_LEN. */
+	input_len += (*s != '\0');
 
 	/* Figure out if we have completed a keybinding and whether we're in the
 	 * middle of one (both can happen, because of Esc). */
@@ -536,8 +540,8 @@ handle_input(tty_interface_t *state, const char *s,
 	}
 
 	/* No matching keybinding, add to search.
-	 * Exclude input starting with non-printing char, mostly keybindings,
-	 * e.g. INSERT, etc. */
+	 * Exclude input starting with non-printing characters, mostly keybindings,
+	 * e.g. INSERT, function keys, etc. */
 	if (isprint_unicode(*input)) {
 		for (size_t i = 0; input[i]; i++) {
 			if (isprint_unicode(input[i]))
@@ -545,6 +549,6 @@ handle_input(tty_interface_t *state, const char *s,
 		}
 	}
 
-	/* We have processed the input, so clear it. */
+	/* We have processed the input: clear it. */
 	*input = '\0';
 }
