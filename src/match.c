@@ -132,7 +132,7 @@ tolower_dummy(char c)
 static char
 c_tolower(char c)
 {
-	return (char)tolower((int)c);
+	return (char)tolower(c);
 }
 
 static void

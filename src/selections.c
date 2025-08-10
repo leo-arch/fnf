@@ -107,7 +107,7 @@ save_selection(const char *name, sel_t *selection)
 
 	selection->selected++;
 
-	strcpy(selections[selection->size].name, name);
+	memcpy(selections[selection->size].name, name, len + 1);
 	selections[selection->size].namelen = len;
 
 	selection->size++;

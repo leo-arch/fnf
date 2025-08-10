@@ -153,10 +153,11 @@ set_256_color(const int code, char *color, const int no_bold)
 		*field_sep = '\0';
 		/* This is just a workaround: disable attributes for highlight color
 		 * to avoid losing the original color when the entry is selected. */
-		if (IS_DIGIT(field_sep[1]) && code != HIGHLIGHT_COLOR)
+		if (IS_DIGIT(field_sep[1]) && code != HIGHLIGHT_COLOR) {
 			attr = field_sep[1] - '0';
-		if (no_bold == 1 && attr == 1)
-			attr = -1;
+			if (no_bold == 1 && attr == 1)
+				attr = -1;
+		}
 	}
 
 	const int n = atoi(color);
