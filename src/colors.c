@@ -246,13 +246,11 @@ set_colors(tty_interface_t *state)
 	}
 
 	char def_colors[sizeof(DEFAULT_COLORS)];
-	env = getenv("FNF_COLORS");
-	if (!env || !*env) {
-		memcpy(def_colors, DEFAULT_COLORS, sizeof(def_colors));
-		env = def_colors;
-	}
+	memcpy(def_colors, DEFAULT_COLORS, sizeof(def_colors));
+	parse_color_line(def_colors, state->options->no_bold);
 
-	parse_color_line(env, state->options->no_bold);
+	if ((env = getenv("FNF_COLORS")) && *env)
+		parse_color_line(env, state->options->no_bold);
 
 	if (state->options->color && *state->options->color)
 		parse_color_line(state->options->color, state->options->no_bold);
