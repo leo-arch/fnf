@@ -53,40 +53,42 @@
 #define OPT_SEPARATOR     13
 #define OPT_CASE          14
 #define OPT_NO_BOLD       15
+#define OPT_COLOR_SCHEME  16
 
 static const char *usage_str =
     ""
     "Usage: fnf [OPTION]...\n"
-    " -0, --read-null          Read input delimited by ASCII NUL characters\n"
-    " -c, --cycle              Enable cyclic scrolling\n"
-    " -e, --show-matches=QUERY Display the sorted matches of QUERY and exit\n"
-    " -h, --help               Display this help and exit\n"
-    " -i, --show-info          Show selection info line\n"
-    " -j, --workers=NUM        Use NUM workers for searching (default: # of CPUs)\n"
-    " -l, --lines=NUM          Show only up to NUM results (default: half of terminal height)\n"
-    " -m, --multi              Enable multi-selection\n"
-    " -M, --max-items=NUM      Load only up to NUM items (default: unlimited)\n"
-    " -p, --prompt=STR         Input prompt (default: \"> \")\n"
-    " -P, --padding=NUM        Left pad the list of matches by NUM spaces (default: 0)\n"
-    " -q, --query=QUERY        Use QUERY as the initial search string\n"
-    " -r, --reverse            Display from top, prompt at bottom\n"
-    " -s, --show-scores        Show the scores of each match\n"
-    " -t, --tty=TTY            Specify the file to use as TTY device (default: /dev/tty)\n"
-    " -v, --version            Output version information and exit\n"
-    "     --case=MODE          Set case sensitivity mode [respect|ignore|smart] (default: smart)\n"
-    "     --color=COLORSPEC    Set custom colors (consult the manpage)\n"
-    "     --marker=STR         Multi-select marker (default: \"✔\" or \"*\")\n"
-    "     --no-bold            Do not use bold colors\n"
-    "     --no-clear           Do not clear the interface on exit\n"
-    "     --no-color           Disable colors\n"
-    "     --no-sort            Do not sort the result\n"
-    "     --no-unicode         Disable Unicode decorations\n"
-    "     --pointer=STR        Pointer to highlighted match (default: \"▌\" or \">\")\n"
-    "     --separator[=STR]    Print horizontal line after info\n"
-    "     --print-null         Print ouput delimited by ASCII NUL characters\n"
-    "     --right-accepts      Right arrow key accepts\n"
-    "     --tab-accepts        TAB accepts\n"
-    "     --left-aborts        Left arrow key aborts\n";
+    " -0, --read-null           Read input delimited by ASCII NUL characters\n"
+    " -c, --cycle               Enable cyclic scrolling\n"
+    " -e, --show-matches=QUERY  Display the sorted matches of QUERY and exit\n"
+    " -h, --help                Display this help and exit\n"
+    " -i, --show-info           Show selection info line\n"
+    " -j, --workers=NUM         Use NUM workers for searching (default: # of CPUs)\n"
+    " -l, --lines=NUM           Show only up to NUM results (default: half of terminal height)\n"
+    " -m, --multi               Enable multi-selection\n"
+    " -M, --max-items=NUM       Load only up to NUM items (default: unlimited)\n"
+    " -p, --prompt=STR          Input prompt (default: \"> \")\n"
+    " -P, --padding=NUM         Left pad the list of matches by NUM spaces (default: 0)\n"
+    " -q, --query=QUERY         Use QUERY as the initial search string\n"
+    " -r, --reverse             Display from top, prompt at bottom\n"
+    " -s, --show-scores         Show the scores of each match\n"
+    " -t, --tty=TTY             Specify the file to use as TTY device (default: /dev/tty)\n"
+    " -v, --version             Output version information and exit\n"
+    "     --case=MODE           Set case sensitivity mode [respect|ignore|smart] (default: smart)\n"
+    "     --color=COLORSPEC     Set custom colors (consult the manpage)\n"
+    "     --color-scheme=SCHEME Set the base color scheme [dark|light|16] (default: dark)\n"
+    "     --marker=STR          Multi-select marker (default: \"✔\" or \"*\")\n"
+    "     --no-bold             Do not use bold colors\n"
+    "     --no-clear            Do not clear the interface on exit\n"
+    "     --no-color            Disable colors\n"
+    "     --no-sort             Do not sort the result\n"
+    "     --no-unicode          Disable Unicode decorations\n"
+    "     --pointer=STR         Pointer to highlighted match (default: \"▌\" or \">\")\n"
+    "     --separator[=STR]     Print horizontal line after info\n"
+    "     --print-null          Print ouput delimited by ASCII NUL characters\n"
+    "     --right-accepts       Right arrow key accepts\n"
+    "     --tab-accepts         TAB accepts\n"
+    "     --left-aborts         Left arrow key aborts\n";
 
 static void
 usage(void)
@@ -127,6 +129,7 @@ static const struct option longopts[] = {
 	{"scroll-off", required_argument, NULL, OPT_SCROLLOFF},
 	{"separator", optional_argument, NULL, OPT_SEPARATOR},
 	{"tab-accepts", no_argument, NULL, OPT_TAB_ACCEPTS},
+	{"color-scheme", required_argument, NULL, OPT_COLOR_SCHEME},
 	{NULL, 0, NULL, 0}
 };
 
@@ -138,6 +141,7 @@ options_init(options_t *options)
 	options->case_sens_mode  = DEFAULT_CASE_SENSITIVITY_MODE;
 	options->clear           = DEFAULT_CLEAR;
 	options->color           = NULL; /* Unset*/
+	options->color_scheme    = NULL; /* Unset*/
 	options->cycle           = DEFAULT_CYCLE;
 	options->filter          = DEFAULT_FILTER;
 	options->init_search     = DEFAULT_INIT_SEARCH;
@@ -270,6 +274,23 @@ set_case_sensitivy_mode(options_t *options, const char *value)
 		options->case_sens_mode = CASE_SMART;
 }
 
+static void
+set_color_scheme(options_t *options, const char *value)
+{
+	if (!value || !*value)
+		return;
+
+	if (strcmp(value, "16") == 0
+	|| strcmp(value, "light") == 0
+	|| strcmp(value, "dark") == 0) {
+		options->color_scheme = value;
+	} else {
+		fprintf(stderr, "Invalid value for --color-scheme: %s\n", value);
+		fprintf(stderr, "Valid values: 'dark', 'light', or '16'\n");
+		exit(EXIT_FAILURE);
+	}
+}
+
 void
 options_parse(options_t *options, int argc, char *argv[])
 {
@@ -300,6 +321,7 @@ options_parse(options_t *options, int argc, char *argv[])
 		case 'v': print_version(); break;
 		case OPT_CASE: set_case_sensitivy_mode(options, optarg); break;
 		case OPT_COLOR: options->color = optarg; break;
+		case OPT_COLOR_SCHEME: set_color_scheme(options, optarg); break;
 		case OPT_LEFT_ABORTS: options->left_aborts = 1; break;
 		case OPT_MARKER: marker_set = set_marker(options, optarg); break;
 		case OPT_NO_BOLD: options->no_bold = 1; break;

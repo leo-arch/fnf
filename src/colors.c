@@ -234,6 +234,24 @@ parse_color_line(char *line, const int no_bold)
 	}
 }
 
+static void
+load_default_colors(const char *scheme, const int no_bold)
+{
+	/* A full color scheme using hex colors take less than 180 bytes. */
+	char def_colors[512];
+
+	if (!scheme || !*scheme)
+		snprintf(def_colors, sizeof(def_colors), "%s", DEFAULT_COLORS_DARK);
+	else if (strcmp(scheme, "light") == 0)
+		snprintf(def_colors, sizeof(def_colors), "%s", DEFAULT_COLORS_LIGHT);
+	else if (strcmp(scheme, "16") == 0)
+		snprintf(def_colors, sizeof(def_colors), "%s", DEFAULT_COLORS_16);
+	else
+		snprintf(def_colors, sizeof(def_colors), "%s", DEFAULT_COLORS_DARK);
+
+	parse_color_line(def_colors, no_bold);
+}
+
 /* Set interface colors parsing a color line, taken either from the --color
  * options or from the FNF_COLORS environment variable. */
 void
@@ -245,9 +263,7 @@ set_colors(tty_interface_t *state)
 		return;
 	}
 
-	char def_colors[sizeof(DEFAULT_COLORS)];
-	memcpy(def_colors, DEFAULT_COLORS, sizeof(def_colors));
-	parse_color_line(def_colors, state->options->no_bold);
+	load_default_colors(state->options->color_scheme, state->options->no_bold);
 
 	if ((env = getenv("FNF_COLORS")) && *env)
 		parse_color_line(env, state->options->no_bold);
