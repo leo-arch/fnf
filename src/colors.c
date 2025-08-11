@@ -142,6 +142,24 @@ set_hex_color(const int code, const char *hex, const int no_bold)
 }
 
 static void
+set_ansi_color(const int code, const int color, const int attr)
+{
+	const int bg = IS_BG_COLOR(code);
+
+	int n = 0;
+	if (color < 8)
+		n = color + (bg == 1 ? 40 : 30);
+	else
+		n = color - 8 + (bg == 1 ? 100 : 90);
+
+	const size_t l = sizeof(colors[code]);
+	if (attr == -1)
+		snprintf(colors[code], l, "\x1b[%dm", n);
+	else
+		snprintf(colors[code], l, "\x1b[%d;%dm", attr, n);
+}
+
+static void
 set_256_color(const int code, char *color, const int no_bold)
 {
 	if (!color || !*color || !IS_DIGIT(*color))
@@ -163,6 +181,11 @@ set_256_color(const int code, char *color, const int no_bold)
 	const int n = atoi(color);
 	if (n < 0 || n > 255)
 		return;
+
+	if (n <= 15) {
+		set_ansi_color(code, n, attr);
+		return;
+	}
 
 	const int bgfg = IS_BG_COLOR(code) ? 48 : 38;
 
