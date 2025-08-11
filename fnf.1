@@ -74,7 +74,9 @@ Print version and exit
 .
 .TP
 .BR \-\-case=\fIMODE\fR
-Set case sensitivity mode to MODE [respect|ignore|smart] (default: smart). In smart mode, the search is case-insensitive by default, but it becomes case-sensitive if the query contains at least one uppercase character.
+Set case sensitivity mode to MODE [respect|ignore|smart] (default: smart).
+.sp 0
+In smart mode, the search is case-insensitive by default, but it becomes case-sensitive if the query contains at least one uppercase character.
 .
 .TP
 .BR \-\-color=\fICOLORSPEC\fR
@@ -82,7 +84,11 @@ Set custom colors (consult the \fBCOLORS\fR section below for more information)
 .
 .TP
 .BR \-\-color\-scheme=\fISCHEME\fR
-Set the base color scheme to SCHEME. Available schemes: \fBdark\fR (default), \fBlight\fR, and \fB16\fR. Individual colors will be overriden by the values set via \fB\-\-color\fR or the environment variable \fBFNF_COLORS\fR.
+Set the base color scheme to SCHEME.
+.sp 0
+Available schemes: \fBdark\fR (default), \fBlight\fR (for light 256-color terminals), and \fB16\fR (for 16-color terminals).
+.sp 0
+Individual colors will be overriden by the values set via the \fB\-\-color\fR option or the environment variable \fBFNF_COLORS\fR.
 .
 .TP
 .BR \-\-ghost =\fISTR\fR
@@ -125,7 +131,9 @@ Print output delimited by ASCII NUL characters
 .
 .TP
 .BR \-\-separator [=\fISTRING\fR]
-Print a horizontal separator on the info line (\fB\-\-show\-info\fR is implied). If specified, STR is used to form the separator. Otherwise, it defaults to "─" or "-", depending on \fB\-\-no\-unicode\fR.
+Print a horizontal separator on the info line (\fB\-\-show\-info\fR is implied).
+.sp 0
+If specified, STR is used to form the separator. Otherwise, it defaults to "─" or "-", depending on \fB\-\-no\-unicode\fR.
 .
 .TP
 .BR \-\-right-accepts
