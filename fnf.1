@@ -1,4 +1,4 @@
-.TH FNF 1 "Aug 9, 2025" "fnf 0.3.9"
+.TH FNF 1 "Aug 11, 2025" "fnf 0.3.10"
 .SH NAME
 fnf \- A general-purpose, interactive fuzzy finder for the terminal.
 .SH SYNOPSIS
@@ -79,6 +79,10 @@ Set case sensitivity mode to MODE [respect|ignore|smart] (default: smart). In sm
 .TP
 .BR \-\-color=\fICOLORSPEC\fR
 Set custom colors (consult the \fBCOLORS\fR section below for more information)
+.
+.TP
+.BR \-\-color\-scheme=\fISCHEME\fR
+Set the base color scheme to SCHEME. Available schemes: \fBdark\fR (default), \fBlight\fR, and \fB16\fR. Individual colors will be overriden by the values set via \fB\-\-color\fR or the environment variable \fBFNF_COLORS\fR.
 .
 .TP
 .BR \-\-height =\fINUM\fR
@@ -251,7 +255,7 @@ A few color schemes:
  \fB16\fR:      hl:6,info:2,marker:2,prompt:6:1,pointer:1,query:7,score:8,sel-bg:0,sel-fg:7:1,separator:8
  \fBnocolor\fR: Run with \fB--no-color\fR
 .sp
-The default color scheme is \fBdark\fR. If a color is not specified in the command line, the default value is used. For example, \fB--color=prompt:172\fR sets the prompt to the specified color, and uses the default values (those in \fBdark\fR) for everything else.
+The default color scheme is \fBdark\fR. If a color is not specified in the command line, the default value is used. For example, \fB--color=prompt:172\fR sets the prompt to the specified color, and uses the default values (those in \fBdark\fR) for everything else. To use a different base color scheme use the \fB--color-scheme\fR option (see above).
 .sp
 The \fBFNF_COLORS\fR environment variable can also be used just as with the \fB--color\fR option. E.g.:
 .sp
