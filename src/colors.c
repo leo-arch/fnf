@@ -142,7 +142,7 @@ set_hex_color(const int code, const char *hex, const int no_bold)
 }
 
 static void
-set_ansi_color(const int code, const int color, const int attr)
+set_16_color(const int code, const int color, const int attr)
 {
 	const int bg = IS_BG_COLOR(code);
 
@@ -160,7 +160,19 @@ set_ansi_color(const int code, const int color, const int attr)
 }
 
 static void
-set_256_color(const int code, char *color, const int no_bold)
+set_256_color(const int code, const int color, const int attr)
+{
+	const int bgfg = IS_BG_COLOR(code) ? 48 : 38;
+
+	const size_t l = sizeof(colors[code]);
+	if (attr == -1)
+		snprintf(colors[code], l, "\x1b[%d;5;%dm", bgfg, color);
+	else
+		snprintf(colors[code], l, "\x1b[%d;%d;5;%dm", attr, bgfg, color);
+}
+
+static void
+set_ansi_color(const int code, char *color, const int no_bold)
 {
 	if (!color || !*color || !IS_DIGIT(*color))
 		return;
@@ -182,19 +194,10 @@ set_256_color(const int code, char *color, const int no_bold)
 	if (n < 0 || n > 255)
 		return;
 
-	if (n <= 15) { /* ANSI 16-colors */
-		set_ansi_color(code, n, attr);
-		return;
-	}
-
-	/* 24-bit or 256-color  */
-	const int bgfg = IS_BG_COLOR(code) ? 48 : 38;
-
-	const size_t l = sizeof(colors[code]);
-	if (attr == -1)
-		snprintf(colors[code], l, "\x1b[%d;5;%dm", bgfg, n);
+	if (n <= 15)
+		set_16_color(code, n, attr);
 	else
-		snprintf(colors[code], l, "\x1b[%d;%d;5;%dm", attr, bgfg, n);
+		set_256_color(code, n, attr);
 }
 
 static void
@@ -208,7 +211,7 @@ set_color(const int code, char *color, const int no_bold)
 	else if (*color == '#')
 		set_hex_color(code, color + 1, no_bold);
 	else
-		set_256_color(code, color, no_bold);
+		set_ansi_color(code, color, no_bold);
 }
 
 static void
