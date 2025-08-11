@@ -42,6 +42,7 @@ typedef struct {
 	char *color;
 	const char *color_scheme;
 	const char *filter;
+	const char *ghost;
 	const char *init_search;
 	const char *tty_filename;
 	const char *prompt;

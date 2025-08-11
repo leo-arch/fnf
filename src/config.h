@@ -48,14 +48,14 @@
 #define DEFAULT_AUTO_LINES 0
 #define DEFAULT_CASE_SENSITIVITY_MODE CASE_SMART
 #define DEFAULT_CLEAR 1
-#define DEFAULT_COLORS_DARK "fg:-1,gutter:-1,hl:216,info:144,marker:72," \
-	"pointer:124,prompt:74:1,query:-1,score:102,sel-bg:236,"             \
+#define DEFAULT_COLORS_DARK "fg:-1,ghost:243,gutter:-1,hl:216,info:144," \
+	"marker:72,pointer:124,prompt:74:1,query:-1,score:102,sel-bg:236,"   \
 	"sel-fg:7:1,separator:240" /* This is the default color scheme */
-#define DEFAULT_COLORS_LIGHT "fg:-1,gutter:-1,hl:90,info:233,marker:160," \
-	"pointer:6:2,prompt:21:1,query:0,score:238,sel-bg:251,"              \
+#define DEFAULT_COLORS_LIGHT "fg:-1,ghost:243,gutter:-1,hl:90,info:233," \
+	"marker:160,pointer:6:2,prompt:21:1,query:0,score:238,sel-bg:251,"   \
 	"sel-fg:0,separator:238"
-#define DEFAULT_COLORS_16 "fg:-1,gutter-1,hl:6,info:2,marker:2,pointer:1," \
-	"prompt:6:1,query:7,score:8,sel-bg:0,sel-fg:7:1,separator:8"
+#define DEFAULT_COLORS_16 "fg:-1,ghost:8,gutter-1,hl:6,info:2,marker:2," \
+	"pointer:1,prompt:6:1,query:7,score:8,sel-bg:0,sel-fg:7:1,separator:8"
 #define DEFAULT_CYCLE 0
 #define DEFAULT_DELIMITER '\n'
 #define DEFAULT_FILTER NULL

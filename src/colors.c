@@ -212,6 +212,7 @@ parse_color_field(char *field, const int no_bold)
 		{"query:", 6, QUERY_COLOR},
 		{"gutter:", 7, GUTTER_COLOR},
 		{"separator:", 10, SEPARATOR_COLOR},
+		{"ghost:", 6, GHOST_COLOR},
 		{NULL, 0, 0}
 	};
 

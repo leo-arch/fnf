@@ -290,6 +290,14 @@ get_starting_item(const choices_t *choices, const options_t *options)
 	return start;
 }
 
+static char *
+build_ghost_text(const char *text)
+{
+	static char ghost[256];
+	snprintf(ghost, sizeof(ghost), "%s%s", colors[GHOST_COLOR], text);
+	return ghost;
+}
+
 static void
 draw(tty_interface_t *state)
 {
@@ -358,10 +366,15 @@ draw(tty_interface_t *state)
 	const size_t cursor_position =
 		get_cursor_position(prompt_len + (size_t)options_pad + 1, state);
 
+	static char *ghost_text = NULL;
+	if (options->ghost && !ghost_text)
+		ghost_text = build_ghost_text(options->ghost);
+
 	tty_printf(tty, "\x1b[%dG%s%s%s%s%s%s\x1b[%zuG", options_pad + 1,
 		colors[PROMPT_COLOR], options->prompt, RESET_ATTR,
-		colors[QUERY_COLOR], state->search, RESET_ATTR CLEAR_LINE,
-		cursor_position);
+		colors[QUERY_COLOR],
+		*state->search ? state->search : (ghost_text ? ghost_text : ""),
+		RESET_ATTR CLEAR_LINE, cursor_position);
 
 	tty_setwrap(tty);
 	tty_unhide_cursor(tty);

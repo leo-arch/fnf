@@ -54,6 +54,7 @@
 #define OPT_CASE          14
 #define OPT_NO_BOLD       15
 #define OPT_COLOR_SCHEME  16
+#define OPT_GHOST         17
 
 static const char *usage_str =
     ""
@@ -77,6 +78,7 @@ static const char *usage_str =
     "     --case=MODE           Set case sensitivity mode [respect|ignore|smart] (default: smart)\n"
     "     --color=COLORSPEC     Set custom colors (consult the manpage)\n"
     "     --color-scheme=SCHEME Set the base color scheme [dark|light|16] (default: dark)\n"
+    "     --ghost=STR           Text to display when input is empty\n"
     "     --marker=STR          Multi-select marker (default: \"✔\" or \"*\")\n"
     "     --no-bold             Do not use bold colors\n"
     "     --no-clear            Do not clear the interface on exit\n"
@@ -116,6 +118,8 @@ static const struct option longopts[] = {
 	{"version", no_argument, NULL, 'v'},
 	{"case", required_argument, NULL, OPT_CASE},
 	{"color", required_argument, NULL, OPT_COLOR},
+	{"color-scheme", required_argument, NULL, OPT_COLOR_SCHEME},
+	{"ghost", required_argument, NULL, OPT_GHOST},
 	{"left-aborts", no_argument, NULL, OPT_LEFT_ABORTS},
 	{"marker", required_argument, NULL, OPT_MARKER},
 	{"no-bold", no_argument, NULL, OPT_NO_BOLD},
@@ -129,7 +133,6 @@ static const struct option longopts[] = {
 	{"scroll-off", required_argument, NULL, OPT_SCROLLOFF},
 	{"separator", optional_argument, NULL, OPT_SEPARATOR},
 	{"tab-accepts", no_argument, NULL, OPT_TAB_ACCEPTS},
-	{"color-scheme", required_argument, NULL, OPT_COLOR_SCHEME},
 	{NULL, 0, NULL, 0}
 };
 
@@ -140,10 +143,11 @@ options_init(options_t *options)
 	options->auto_lines      = DEFAULT_AUTO_LINES;
 	options->case_sens_mode  = DEFAULT_CASE_SENSITIVITY_MODE;
 	options->clear           = DEFAULT_CLEAR;
-	options->color           = NULL; /* Unset*/
-	options->color_scheme    = NULL; /* Unset*/
+	options->color           = NULL; /* Unset */
+	options->color_scheme    = NULL; /* Unset (defaults to dark) */
 	options->cycle           = DEFAULT_CYCLE;
 	options->filter          = DEFAULT_FILTER;
+	options->ghost           = NULL; /* Unset */
 	options->init_search     = DEFAULT_INIT_SEARCH;
 	options->input_delimiter = DEFAULT_DELIMITER;
 	options->left_aborts     = DEFAULT_LEFT_ABORTS;
@@ -152,7 +156,7 @@ options_init(options_t *options)
 	options->multi           = DEFAULT_MULTI;
 	options->no_bold         = DEFAULT_NO_BOLD;
 	options->no_color        = DEFAULT_NO_COLOR;
-	options->num_lines       = (size_t)-1; /* Unset*/
+	options->num_lines       = (size_t)-1; /* Unset */
 	options->pad             = DEFAULT_PAD;
 	options->pointer         = DEFAULT_POINTER;
 	options->print_null      = DEFAULT_PRINT_NULL;
@@ -162,7 +166,7 @@ options_init(options_t *options)
 	options->show_info       = DEFAULT_SHOW_INFO;
 	options->show_scores     = DEFAULT_SCORES;
 	options->scrolloff       = DEFAULT_SCROLLOFF;
-	options->separator       = NULL; /* Unset*/
+	options->separator       = NULL; /* Unset */
 	options->sort            = DEFAULT_SORT;
 	options->tab_accepts     = DEFAULT_TAB_ACCEPTS;
 	options->tty_filename    = DEFAULT_TTY;
@@ -280,9 +284,9 @@ set_color_scheme(options_t *options, const char *value)
 	if (!value || !*value)
 		return;
 
-	if (strcmp(value, "16") == 0
+	if (strcmp(value, "dark") == 0
 	|| strcmp(value, "light") == 0
-	|| strcmp(value, "dark") == 0) {
+	|| strcmp(value, "16") == 0) {
 		options->color_scheme = value;
 	} else {
 		fprintf(stderr, "Invalid value for --color-scheme: %s\n", value);
@@ -322,6 +326,7 @@ options_parse(options_t *options, int argc, char *argv[])
 		case OPT_CASE: set_case_sensitivy_mode(options, optarg); break;
 		case OPT_COLOR: options->color = optarg; break;
 		case OPT_COLOR_SCHEME: set_color_scheme(options, optarg); break;
+		case OPT_GHOST: options->ghost = optarg; break;
 		case OPT_LEFT_ABORTS: options->left_aborts = 1; break;
 		case OPT_MARKER: marker_set = set_marker(options, optarg); break;
 		case OPT_NO_BOLD: options->no_bold = 1; break;

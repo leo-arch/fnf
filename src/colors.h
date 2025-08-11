@@ -43,7 +43,8 @@
 #define QUERY_COLOR     9
 #define GUTTER_COLOR    10
 #define SEPARATOR_COLOR 11
-#define COLOR_ITEMS_NUM 12
+#define GHOST_COLOR     12
+#define COLOR_ITEMS_NUM 13
 
 #define MAX_COLOR_LEN 64
 
