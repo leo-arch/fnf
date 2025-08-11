@@ -147,9 +147,9 @@ set_ansi_color(const int code, const int color, const int attr)
 	const int bg = IS_BG_COLOR(code);
 
 	int n = 0;
-	if (color < 8)
+	if (color < 8) /* Standard ANSI colors (3-bit) */
 		n = color + (bg == 1 ? 40 : 30);
-	else
+	else /* High-intensity or bright colors (4-bit) */
 		n = color - 8 + (bg == 1 ? 100 : 90);
 
 	const size_t l = sizeof(colors[code]);
@@ -182,11 +182,12 @@ set_256_color(const int code, char *color, const int no_bold)
 	if (n < 0 || n > 255)
 		return;
 
-	if (n <= 15) {
+	if (n <= 15) { /* ANSI 16-colors */
 		set_ansi_color(code, n, attr);
 		return;
 	}
 
+	/* 24-bit or 256-color  */
 	const int bgfg = IS_BG_COLOR(code) ? 48 : 38;
 
 	const size_t l = sizeof(colors[code]);
