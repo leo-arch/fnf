@@ -461,6 +461,7 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 	state->tty->fgcolor = TERM_FG_COLOR_RESET;
 	tty_fputs(state->tty, buf);
 }
+#undef BUF_SIZE
 
 /* Same as colorize_match, but for non-matching items. */
 void
@@ -469,16 +470,4 @@ colorize_no_match(tty_t *tty, const char *sel_color, const char *name,
 {
 	tty_printf(tty, "%s%s%s%s", pointer->str, sel_color, name,
 		RESET_ATTR CLEAR_LINE);
-/*	static char buf[BUF_SIZE];
-
-	int l = snprintf(buf, sizeof(buf), "%s%s%s%s",
-		pointer->str, sel_color, name, RESET_ATTR CLEAR_LINE);
-
-	static int buf_size = (int)sizeof(buf);
-	if (l >= buf_size) l = buf_size - 1;
-	buf[l] = '\0';
-
-	tty->fgcolor = TERM_FG_COLOR_RESET;
-	tty_fputs(tty, buf); */
 }
-#undef BUF_SIZE
