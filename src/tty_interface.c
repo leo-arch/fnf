@@ -132,6 +132,17 @@ print_score(const tty_t *tty, const score_t score, const int pad)
 	}
 }
 
+static inline const char *
+set_item_color(const int selected, const char *orig_color, const int no_color)
+{
+	if (no_color == 0) {
+		return (selected == 0 || !*colors[SEL_FG_COLOR])
+			? orig_color : colors[SEL_FG_COLOR];
+	}
+
+	return selected == 0 ? "" : SELECTION_NOCOLOR;
+}
+
 static void
 draw_match(tty_interface_t *state, const char *choice, const int selected,
 	const pointer_t *pointer)
@@ -140,19 +151,14 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 	const options_t *options = state->options;
 	const char *search = state->last_search;
 
-	static char sel_color[(MAX_COLOR_LEN * 2) + 1] = "";
-	if (!*sel_color) {
-		snprintf(sel_color, sizeof(sel_color), "%s",
-			*colors[SEL_FG_COLOR] ? colors[SEL_FG_COLOR] : "");
-	}
-
 	static char original_color[MAX_COLOR_LEN + 1]; *original_color = '\0';
 	char *orig_color = original_color;
 	const char *dchoice = choice;
-	if (*choice == KEY_ESC || strchr(choice, KEY_ESC))
+
+	if ((*search || selected) && (*choice == KEY_ESC || strchr(choice, KEY_ESC)))
 		dchoice = decolor_name(choice, search ? original_color : NULL);
 	else
-		orig_color = *colors[FG_COLOR] ? colors[FG_COLOR] : NULL;
+		orig_color = colors[FG_COLOR];
 
 	score_t score = SCORE_MIN;
 	static size_t positions[MATCH_MAX_LEN];
@@ -166,13 +172,12 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 	if (options->show_scores == 1)
 		print_score(tty, score, options->pad);
 
-	if (positions[0] == (size_t)-1) { /* No matching result (or no query). */
-		colorize_no_match(tty, selected == 0 ? orig_color : sel_color,
-			selected == 0 ? choice : dchoice, pointer);
-	} else { /* We have matches (and a query). */
-		colorize_match(state, positions, dchoice, selected == 0
-			? orig_color : sel_color, pointer, selected);
-	}
+	const char *color = set_item_color(selected, orig_color, options->no_color);
+
+	if (positions[0] == (size_t)-1) /* No matching result (or no query). */
+		colorize_no_match(tty, color, !selected ? choice : dchoice, pointer);
+	else /* We have matches (and a query). */
+		colorize_match(state, positions, dchoice, color, pointer, selected);
 }
 
 static pointer_t *
@@ -180,18 +185,14 @@ build_pointer(const int current, const int selected, const options_t *options)
 {
 	static pointer_t pointer[PTR_TYPES_NUM] = {0};
 
-	static int pad = -1;
-	if (pad == -1)
-		/* If --show-scores, padding is already done by draw_match() */
-		pad = options->show_scores == 1 ? 0 : options->pad;
-
-	static char *gutter_color = NULL;
-	if (!gutter_color)
-		gutter_color =
-			!IS_SGR0(colors[GUTTER_COLOR]) ? colors[GUTTER_COLOR] : "";
-
-	/* Let's construct the pointer string only once */
+	/* Let's construct the pointer strings only once */
 	if (!*pointer[0].str) {
+		/* If --show-scores, padding is already done by draw_match() */
+		const int pad = options->show_scores == 1 ? 0 : options->pad;
+
+		const char *gutter_color =
+			*colors[GUTTER_COLOR] ? colors[GUTTER_COLOR] : "";
+
 		/* Current (hovered) and selected */
 		snprintf(pointer[PTR_CUR_SEL].str, MAX_POINTER_LEN, "%*s%s%s%s%s%s",
 			pad, "", colors[SEL_BG_COLOR], colors[POINTER_COLOR],

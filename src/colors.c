@@ -201,13 +201,23 @@ set_ansi_color(const int code, char *color, const int no_bold)
 }
 
 static void
+set_nocolor(const int code)
+{
+	if (code == FG_COLOR || code == MARKER_COLOR)
+		snprintf(colors[code], sizeof(colors[code]), "\x1b[%dm",
+			IS_BG_COLOR(code) ? 49 : 39);
+	else
+		*colors[code] = '\0';
+}
+
+static void
 set_color(const int code, char *color, const int no_bold)
 {
 	if (!color || !*color)
 		return;
 
 	if (*color == '-' && color[1] == '1' && !color[2])
-		memcpy(colors[code], RESET_ATTR, sizeof(RESET_ATTR));
+		set_nocolor(code);
 	else if (*color == '#')
 		set_hex_color(code, color + 1, no_bold);
 	else
@@ -337,6 +347,10 @@ decolor_name(const char *name, char *color_buf)
 	if (color_buf != NULL) {
 		/* Copy the removed color into the COLOR_BUF buffer. */
 		if (sgr_end > 0 && sgr_end < MAX_COLOR_LEN) {
+			if (IS_SGR_START(name) && name[2] == '0' && name[3] == 'm') {
+				name += 4;
+				sgr_end -= 4;
+			}
 			memcpy(color_buf, name, sgr_end);
 			color_buf[sgr_end] = '\0';
 		} else {
@@ -385,7 +399,6 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 	const size_t oc_len = strlen(orig_color);
 
 	/* Static lengths: let's calculate them only once. */
-	static size_t clr_len = sizeof(CLEAR_LINE) - 1;
 	static size_t reset_clr_len =
 		(sizeof(RESET_ATTR) - 1) + (sizeof(CLEAR_LINE) - 1);
 	static size_t hl_len = (size_t)-1;
@@ -439,10 +452,8 @@ colorize_match(const tty_interface_t *state, const size_t *positions,
 			buf[l++] = name[++i];
 	}
 
-	const int reset = (*orig_color && (no_color == 1 || !IS_SGR0(orig_color)));
 	l += append_str(buf + l, sizeof(buf) - l,
-		reset == 1 ? RESET_ATTR CLEAR_LINE : CLEAR_LINE,
-		reset == 1 ? reset_clr_len : clr_len);
+		RESET_ATTR CLEAR_LINE, reset_clr_len);
 
 	if (l >= sizeof(buf)) l = sizeof(buf) - 1;
 	buf[l] = '\0';
@@ -456,26 +467,18 @@ void
 colorize_no_match(tty_t *tty, const char *sel_color, const char *name,
 	const pointer_t *pointer)
 {
-	static char buf[BUF_SIZE];
-
-	if (!sel_color || IS_SGR0(sel_color)) { /* The entry is not selected */
-		snprintf(buf, sizeof(buf), "%s%s%s", pointer->str, name, CLEAR_LINE);
-		tty_fputs(tty, buf);
-		return;
-	}
-
-	/* If selected, handle colors. */
-	int l = snprintf(buf, sizeof(buf), "%s%s%s%s",
-		pointer->str,
-		*sel_color ? sel_color : SELECTION_NOCOLOR,
-		name,
+	tty_printf(tty, "%s%s%s%s", pointer->str, sel_color, name,
 		RESET_ATTR CLEAR_LINE);
+/*	static char buf[BUF_SIZE];
+
+	int l = snprintf(buf, sizeof(buf), "%s%s%s%s",
+		pointer->str, sel_color, name, RESET_ATTR CLEAR_LINE);
 
 	static int buf_size = (int)sizeof(buf);
 	if (l >= buf_size) l = buf_size - 1;
 	buf[l] = '\0';
 
 	tty->fgcolor = TERM_FG_COLOR_RESET;
-	tty_fputs(tty, buf);
+	tty_fputs(tty, buf); */
 }
 #undef BUF_SIZE
