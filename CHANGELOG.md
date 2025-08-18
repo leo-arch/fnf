@@ -1,3 +1,42 @@
+## 0.4 (Aug 18, 2025)
+## BUG FIXES
+* No entry emitted (upon pressing <kbd>Enter</kbd>) after deselecting (via <kbd>Tab</kbd>) all entries.
+* Crash with `--read-null`.
+* Info not padded when not running with `--reverse`.
+* `--show-scores` not honoring `--pad`.
+* Missing options in the manpage compared to `--help`.
+* <kbd>PgUp</kbd>/<kbd>PgDn</kbd> ignores `--cycle` when selection is first/last respectively.
+* If running with --show-scores, the score for a full match is 'inf'.
+* Default colors not loaded if **FNF_COLORS** is set.
+* 16-colors are not actually 4bit, but 256-color.
+* `--color=sel-fg:-1` breaks the interface.
+
+## IMPROVEMENTS
+* Add `--no-clear` option to prevent clearing the interface on exit.
+* Reduced flickering when scrolling the list of matches.
+* Use `--separator` to print a horizontal separator on the info line.
+* Add number of selected items to the info line.
+* Customize the info line, item score, item foreground, gutter, separator, and query colors. E.g.: `--color="info:222,score:128,fg:245:1,gutter:236,query:74,separator:240"`.
+* Scores are surrounded by square brackets instead of parentheses.
+* Improved default colors
+* Scrolloff set by default to half available entries (run with `--scroll-off=0` to restore the previous behavior). 
+* Use <kbd>Ctrl+f</kbd> and <kbd>Ctrl+b</kbd> to move the cursor forward and backward respectively.
+* Use <kbd>Ctrl+PgUp</kbd> and <kbd>Ctrl+PgDn</kbd> jump to the first and last available items respectively.
+* Highlight matches forward, instead of backwards.
+* Highly improved Unicode matching.
+* Add `-r` and `-c` short options for `--reverse` and `--cycle` respectively.
+* `--lines` defaults to half of terminal height (instead of 10).
+* Add `--height` as an alias for `--lines`.
+* Set case sensitivity mode with `--case=respect|ignore|smart` (defaults to `smart`).
+* Add `--no-bold` to disable bold colors.
+* Set the base color scheme using `--color-scheme=dark|light|16` (defaults to `dark`).
+* Use `--ghost` to set ghost text when input is empty.
+
+## MISC
+* Rename `--pad` option to `--padding` (`--pad` still works).
+
+---
+
 ## 0.3.1 (Jul 24, 2025)
 
 ### BUG FIXES
