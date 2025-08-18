@@ -162,7 +162,7 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 
 	score_t score = SCORE_MIN;
 	static size_t positions[MATCH_MAX_LEN];
-	if (search) {
+	if (*search) {
 		memset(positions, -1, sizeof(positions));
 		score = match_positions(search, dchoice, &positions[0]);
 	} else {
