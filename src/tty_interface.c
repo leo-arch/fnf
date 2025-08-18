@@ -156,7 +156,7 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 	const char *dchoice = choice;
 
 	if ((*search || selected) && (*choice == KEY_ESC || strchr(choice, KEY_ESC)))
-		dchoice = decolor_name(choice, search ? original_color : NULL);
+		dchoice = decolor_name(choice, original_color);
 	else
 		orig_color = colors[FG_COLOR];
 
