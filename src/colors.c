@@ -237,19 +237,19 @@ parse_color_field(char *field, const int no_bold)
 	};
 
 	const struct color_fields_t fields[] = {
+		{"fg:", 3, FG_COLOR},
+		{"ghost:", 6, GHOST_COLOR},
+		{"gutter:", 7, GUTTER_COLOR},
 		{"hl:", 3, HIGHLIGHT_COLOR},
+		{"info:", 5, INFO_COLOR},
 		{"marker:", 7, MARKER_COLOR},
-		{"prompt:", 7, PROMPT_COLOR},
 		{"pointer:", 8, POINTER_COLOR},
+		{"prompt:", 7, PROMPT_COLOR},
+		{"query:", 6, QUERY_COLOR},
+		{"score:", 6, SCORE_COLOR},
 		{"sel-bg:", 7, SEL_BG_COLOR},
 		{"sel-fg:", 7, SEL_FG_COLOR},
-		{"info:", 5, INFO_COLOR},
-		{"score:", 6, SCORE_COLOR},
-		{"fg:", 3, FG_COLOR},
-		{"query:", 6, QUERY_COLOR},
-		{"gutter:", 7, GUTTER_COLOR},
 		{"separator:", 10, SEPARATOR_COLOR},
-		{"ghost:", 6, GHOST_COLOR},
 		{NULL, 0, 0}
 	};
 
