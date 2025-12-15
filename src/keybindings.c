@@ -486,7 +486,7 @@ static const keybinding_t keybindings[] = {
 
 /* This function is called repeatedly (from tty_interface_run()) until we get
  * a complete keybinding.
- * If this keybindings is associated to a function, run it. Otherwise,
+ * If this keybinding is associated to a function, run it. Otherwise,
  * append the input to the query string in the prompt. */
 void
 handle_input(tty_interface_t *state, const char *s,
