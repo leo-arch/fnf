@@ -8,8 +8,7 @@
 
 use_find=0
 
-if ! command -v fd; then
-  echo "fnf-widget: warning fd is not installed, using find as file searcher" 1>&2
+if ! command -v fd >/dev/null 2>&1; then
   use_find=1
 fi
 
