@@ -159,6 +159,20 @@ draw_match(tty_interface_t *state, const char *choice, const int selected,
 		colorize_match(state, positions, dchoice, color, pointer, selected);
 }
 
+static void
+build_pad_str(const char *str, char *buf, const size_t buf_len)
+{
+	if (!str || !buf || buf_len == 0)
+		return;
+
+	const size_t str_len = wc_xstrlen(str);
+	if (str_len <= 1)
+		return;
+
+	for (size_t i = 0; i < buf_len && i < str_len - 1; i++)
+		buf[i] = ' ';
+}
+
 static pointer_t *
 build_pointer(const int current, const int selected, const options_t *options)
 {
@@ -172,27 +186,34 @@ build_pointer(const int current, const int selected, const options_t *options)
 		const char *gutter_color =
 			*colors[GUTTER_COLOR] ? colors[GUTTER_COLOR] : "";
 
+		const char *user_pointer = options->pointer ? options->pointer : "";
+		char pointer_pad[256] = "";
+		build_pad_str(options->pointer, pointer_pad, sizeof(pointer_pad));
+		char marker_pad[256] = "";
+		build_pad_str(options->marker, marker_pad, sizeof(marker_pad));
+
 		/* Current (hovered) and selected */
 		snprintf(pointer[PTR_CUR_SEL].str, MAX_POINTER_LEN, "%*s%s%s%s%s%s",
 			pad, "", colors[SEL_BG_COLOR], colors[POINTER_COLOR],
-			options->pointer, colors[MARKER_COLOR], options->marker);
+			user_pointer, colors[MARKER_COLOR], options->marker);
 		pointer[PTR_CUR_SEL].len = strlen(pointer[PTR_CUR_SEL].str);
 
 		/* Current (hovered) and not selected */
-		snprintf(pointer[PTR_CUR_NOSEL].str, MAX_POINTER_LEN, "%*s%s%s%s ",
+		snprintf(pointer[PTR_CUR_NOSEL].str, MAX_POINTER_LEN, "%*s%s%s%s %s",
 			pad, "", colors[SEL_BG_COLOR], colors[POINTER_COLOR],
-			options->pointer);
+			user_pointer, marker_pad);
 		pointer[PTR_CUR_NOSEL].len = strlen(pointer[PTR_CUR_NOSEL].str);
 
 		/* Not current (not hovered) and selected */
 		snprintf(pointer[PTR_NOCUR_SEL].str, MAX_POINTER_LEN, "%*s%s %s%s%s%s",
-			pad, "", gutter_color, *gutter_color ? RESET_ATTR : "",
+			pad, "", gutter_color, *gutter_color ? RESET_ATTR : pointer_pad,
 			colors[MARKER_COLOR], options->marker, RESET_ATTR);
 		pointer[PTR_NOCUR_SEL].len = strlen(pointer[PTR_NOCUR_SEL].str);
 
 		/* Not current (not hovered) and not selected */
-		snprintf(pointer[PTR_NOCUR_NOSEL].str, MAX_POINTER_LEN, "%*s%s %s ",
-			pad, "", gutter_color, *gutter_color ? RESET_ATTR : "");
+		snprintf(pointer[PTR_NOCUR_NOSEL].str, MAX_POINTER_LEN, "%*s%s %s %s",
+			pad, "", gutter_color, *gutter_color ? RESET_ATTR : pointer_pad,
+			marker_pad);
 		pointer[PTR_NOCUR_NOSEL].len = strlen(pointer[PTR_NOCUR_NOSEL].str);
 	}
 
