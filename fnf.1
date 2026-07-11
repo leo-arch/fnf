@@ -1,317 +1,346 @@
-.TH FNF 1 "Aug 18, 2025" "fnf 0.4"
-.SH NAME
-fnf \- A general-purpose, interactive fuzzy finder for the terminal.
-.SH SYNOPSIS
-.B fnf
-.IR [OPTION]...
-.SH DESCRIPTION
-\fBFnf\fR reads a list of newline-separated items from standard input and presents an incremental, interactive selection interface. As you type a query, \fBfnf\fR scores and filters candidates by fuzzy matching, highlighting matched characters and instantly updating the sorted list so you can quickly select the best match.
-.
-.SH OPTIONS
-.TP
-.BR \-0 ", " \-\-read-null
+.Dd August 18, 2025
+.Dt FNF 1
+.Os
+.Sh NAME
+.Nm fnf
+.Nd A general-purpose, interactive fuzzy finder for the terminal
+.Sh SYNOPSIS
+.Nm fnf
+.Op Ar OPTION ...
+.Sh DESCRIPTION
+The
+.Nm
+utility
+reads a list of newline-separated items from standard input and presents an
+incremental, interactive selection interface.
+As you type a query,
+.Nm fnf
+scores and filters candidates by fuzzy matching, highlighting matched
+characters and instantly updating the sorted list so you can quickly select
+the best match.
+.Sh OPTIONS
+.Bl -tag -width "--separator [=STRING]"
+.It Fl 0 , Fl -read-null
 Read input delimited by ASCII NUL characters
-.
-.TP
-.BR \-c ", " \-\-cycle
+.It Fl c , Fl -cycle
 Enable cyclic scrolling
-.
-.TP
-.BR \-e ", " \-\-show-matches =\fIQUERY\fR
-Non-interactive mode. Print the matches in sorted order for QUERY to stdout.
-.
-.TP
-.BR \-h ", " \-\-help
+.It Fl e , Fl -show-matches Ns = Ns Ar QUERY
+Non-interactive mode.
+Print the matches in sorted order for
+.Ar QUERY
+to stdout.
+.It Fl h , Fl -help
 Print help and exit
-.
-.TP
-.BR \-i ", " \-\-show\-info
+.It Fl i , Fl -show-info
 Show selection info line
-.
-.TP
-.BR \-j ", " \-\-workers =\fINUM\fR
-Use NUM workers for searching (default: # of CPUs)
-.
-.TP
-.BR \-l ", " \-\-lines =\fINUM\fR
-Show only up to NUM results (default: half of terminal height). Set to \fIauto\fR to use the entire terminal screen.
-.
-.TP
-.BR \-m ", " \-\-multi
+.It Fl j , Fl -workers Ns = Ns Ar NUM
+Use
+.Ar NUM
+workers for searching (default: # of CPUs)
+.It Fl l , Fl -lines Ns = Ns Ar NUM
+Show only up to
+.Ar NUM
+results (default: half of terminal height).
+Set to
+.Ar auto
+to use the entire terminal screen.
+.It Fl m , Fl -multi
 Enable multi-selection
-.
-.TP
-.BR \-M ", " \-\-max\-items =\fINUM\fR
-Load only up to NUM items (default: unlimited)
-.
-.TP
-.BR \-p ", " \-\-prompt =\fISTRING\fR
+.It Fl M , Fl -max-items Ns = Ns Ar NUM
+Load only up to
+.Ar NUM
+items (default: unlimited)
+.It Fl p , Fl -prompt Ns = Ns Ar STRING
 Input prompt (default: "> ")
-.
-.TP
-.BR \-P ", " \-\-padding =\fINUM\fR
-Left pad the list of matches NUM places (default: 0)
-.
-.TP
-.BR \-q ", " \-\-query =\fIQUERY\fR
-Use QUERY as the initial search query
-.
-.TP
-.BR \-r ", " \-\-reverse
+.It Fl P , Fl -padding Ns = Ns Ar NUM
+Left pad the list of matches
+.Ar NUM
+places (default: 0)
+.It Fl q , Fl -query Ns = Ns Ar QUERY
+Use
+.Ar QUERY
+as the initial search query
+.It Fl r , Fl -reverse
 List from top, prompt at bottom
-.
-.TP
-.BR \-s ", " \-\-show\-scores
+.It Fl s , Fl -show-scores
 Show the scores for each item
-.
-.TP
-.BR \-t ", " \-\-tty =\fITTY\fR
-Use TTY instead of the default tty device (/dev/tty)
-.
-.TP
-.BR \-v ", " \-\-version
+.It Fl t , Fl -tty Ns = Ns Ar TTY
+Use
+.Ar TTY
+instead of the default tty device
+.Pq Pa /dev/tty
+.It Fl v , Fl -version
 Print version and exit
-.
-.TP
-.BR \-\-case=\fIMODE\fR
-Set case sensitivity mode to MODE [respect|ignore|smart] (default: smart).
-.sp 0
-In smart mode, the search is case-insensitive by default, but it becomes case-sensitive if the query contains at least one uppercase character.
-.
-.TP
-.BR \-\-color=\fICOLORSPEC\fR
-Set custom colors (consult the \fBCOLORS\fR section below for more information)
-.
-.TP
-.BR \-\-color\-scheme=\fISCHEME\fR
-Set the base color scheme to SCHEME.
-.sp 0
-Available schemes: \fBdark\fR (default), \fBlight\fR (for light 256-color terminals), and \fB16\fR (for 16-color terminals).
-.sp 0
-Individual colors will be overriden by the values set via the \fB\-\-color\fR option or the environment variable \fBFNF_COLORS\fR.
-.
-.TP
-.BR \-\-ghost =\fISTR\fR
+.It Fl -case Ns = Ns Ar MODE
+Set case sensitivity mode to
+.Ar MODE
+[respect|ignore|smart] (default: smart).
+.Pp
+In smart mode, the search is case-insensitive by default, but it becomes
+case-sensitive if the query contains at least one uppercase character.
+.It Fl -color Ns = Ns Ar COLORSPEC
+Set custom colors (consult the
+.Sx COLORS
+section below for more information)
+.It Fl -color-scheme Ns = Ns Ar SCHEME
+Set the base color scheme to
+.Ar SCHEME .
+.Pp
+Available schemes:
+.Cm dark
+(default),
+.Cm light
+(for light 256-color terminals), and
+.Cm 16
+(for 16-color terminals).
+.Pp
+Individual colors will be overriden by the values set via the
+.Fl -color
+option or the environment variable
+.Ev FNF_COLORS .
+.It Fl -ghost Ns = Ns Ar STR
 Text to display when input is empty
-.
-.TP
-.BR \-\-height =\fINUM\fR
-Alias for \fB\-\-lines\fR
-.
-.TP
-.BR \-\-marker =\fISTRING\fR
-Multi-select marker (default: '✔' or *', depending on \fB\-\-no\-unicode\fR)
-.
-.TP
-.BR \-\-no\-bold
+.It Fl -height Ns = Ns Ar NUM
+Alias for
+.Fl -lines
+.It Fl -marker Ns = Ns Ar STRING
+Multi-select marker (default: '✔' or *', depending on
+.Fl -no-unicode )
+.It Fl -no-bold
 Do not use bold colors
-.
-.TP
-.BR \-\-no\-clear
+.It Fl -no-clear
 Do not clear the interface on exit
-.TP
-.BR \-\-no\-color
+.It Fl -no-color
 Disable colors
-.
-.TP
-.BR \-\-no\-sort
+.It Fl -no-sort
 Do not sort the result
-.
-.TP
-.BR \-\-no\-unicode
+.It Fl -no-unicode
 Disable Unicode decorations
-.
-.TP
-.BR \-\-pointer =\fISTRING\fR
-Pointer to highlighted match (default: '▌' or '>', depending on \fB\-\-no\-unicode\fB)
-.
-.TP
-.BR \-\-print\-null
+.It Fl -pointer Ns = Ns Ar STRING
+Pointer to highlighted match (default: '▌' or '>', depending on
+.Fl -no-unicode )
+.It Fl -print-null
 Print output delimited by ASCII NUL characters
-.
-.TP
-.BR \-\-separator [=\fISTRING\fR]
-Print a horizontal separator on the info line (\fB\-\-show\-info\fR is implied).
-.sp 0
-If specified, STR is used to form the separator. Otherwise, it defaults to "─" or "-", depending on \fB\-\-no\-unicode\fR.
-.
-.TP
-.BR \-\-right-accepts
+.It Fl -separator Op Ns = Ns Ar STRING
+Print a horizontal separator on the info line
+.Pq Fl -show-info
+is implied.
+.Pp
+If specified,
+.Ar STR
+is used to form the separator.
+Otherwise, it defaults to
+.Dq ─
+or
+.Dq - ,
+depending on
+.Fl -no-unicode .
+.It Fl -right-accepts
 Right arrow key accepts: print selection and exit
-.
-.TP
-.BR \-\-tab-accepts
+.It Fl -tab-accepts
 TAB accepts: print selection and exit
-.
-.TP
-.BR \-\-left-aborts
+.It Fl -left-aborts
 Left arrow key aborts: cancel selection and exit
-
-.SH KEY BINDINGS
-.
-.TP
-.BR "ENTER"
-.sp 0
-Print the selected items to stdout and exit. If \fB\-\-right\-accepts\fR is set, the Right arrow key performs the same function. Equally, if \fB\-\-tab\-accepts\fR is set, the TAB key performs the same function.
-.TP
-.BR "ESC, Ctrl+c, Ctrl+g"
-Exit without printing any result. If \fB\-\-left\-aborts\fR is set, the Left arrow key performs the same function.
-.TP
-.BR "Up Arrow, Ctrl+p, Ctrl+k"
+.El
+.Sh KEY BINDINGS
+.Bl -tag -width "Ctrl+PgDn / Ctrl+PgUp"
+.It Cm ENTER
+Print the selected items to stdout and exit.
+If
+.Fl -right-accepts
+is set, the Right arrow key performs the same function.
+Equally, if
+.Fl -tab-accepts
+is set, the TAB key performs the same function.
+.It Cm "ESC, Ctrl+c, Ctrl+g"
+Exit without printing any result.
+If
+.Fl -left-aborts
+is set, the Left arrow key performs the same function.
+.It Cm "Up Arrow, Ctrl+p, Ctrl+k"
 Select the previous item.
-.TP
-.BR "Down Arrow, Ctrl+n, Ctrl+j"
+.It Cm "Down Arrow, Ctrl+n, Ctrl+j"
 Select the next item.
-.TP
-.BR "PgDn / PgUp"
+.It Cm "PgDn / PgUp"
 Advance/go-back one page.
-.TP
-.BR "Ctrl+PgDn / Ctrl+PgUp"
+.It Cm "Ctrl+PgDn / Ctrl+PgUp"
 Jump to the first/last available item.
-.TP
-.BR "TAB"
-.sp 0
-If multi-selection is enabled (\fB-m, --multi\fR), (un)mark the selected item and select the next one.
-.TP
-.BR "Shift+TAB (btab)"
-If multi-selection enabled (\fB-m, --multi\fR), (un)mark the selected item and select the previous one.
-.TP
-.BR "Backspace, Ctrl+h"
+.It Cm TAB
+If multi-selection is enabled
+.Pq Fl m , Fl -multi ,
+\&(un)mark the selected item and select the next one.
+.It Cm "Shift+TAB (btab)"
+If multi-selection enabled
+.Pq Fl m , Fl -multi ,
+\&(un)mark the selected item and select the previous one.
+.It Cm "Backspace, Ctrl+h"
 Delete the character before the cursor.
-.TP
-.BR Del
-.sp 0
+.It Cm Del
 Delete the character next to the cursor.
-.TP
-.BR Ctrl+w
-.sp 0
+.It Cm Ctrl+w
 Delete the word before the cursor.
-.TP
-.BR Ctrl+u
-.sp 0
+.It Cm Ctrl+u
 Delete the entire line.
-.TP
-.BR Ctrl+d
-.sp 0
-Same as \fBDel\fR (aborts \fBfnf\fR if the query is empty).
-.
-.SH COLORS
-Color configuration is made using the \fB--color\fR option, which takes a color string composed of one or more comma- or space-separated fields. Each field is a color definition with this general format: \fBCOLOR_NAME:ANSI_COLOR[:ATTRIBUTE]\fR.
-.sp
-.B COLOR NAMES
-.sp
+.It Cm Ctrl+d
+Same as
+.Cm Del
+(aborts
+.Nm fnf
+if the query is empty).
+.El
+.Sh COLORS
+Color configuration is made using the
+.Fl -color
+option, which takes a color string composed of one or more comma- or
+space-separated fields.
+Each field is a color definition with this general format:
+.Li COLOR_NAME:ANSI_COLOR[:ATTRIBUTE] .
+.Ss COLOR NAMES
 Available color names (or interface elements):
-.sp
- \fBfg\fR        Item foreground color
-.sp 0
- \fBgutter\fR    Gutter on the left
-.sp 0
- \fBhl\fR        Highlighted substrings in the selected line
-.sp 0
- \fBghost\fR     Ghost text
-.sp 0
- \fBinfo\fR      Info line (match counters)
-.sp 0
- \fBmarker\fR    Multi-selection marker
-.sp 0
- \fBprompt\fR    Prompt
-.sp 0
- \fBpointer\fR   Pointer to the current line
-.sp 0
- \fBquery\fR     Query foreground color
-.sp 0
- \fBscore\fR     Item score
-.sp 0
- \fBsel-bg\fR    Selected line  background
-.sp 0
- \fBsel-fg\fR    Selected line foreground
-.sp 0
- \fBseparator\fR Horizontal separator on info line
-
-.B ANSI COLORS
-.sp
-Colors are defined either as ANSI 16 colors (\fB0-15\fR), 256 colors (\fB16-255\fR), or 24-bit colors (\fB#RRGGBB\fR).
-.sp 0
-Use \fB\-1\fR for the default terminal foreground/background color (or the original color of the text).
-.sp
-.B ATTRIBUTES
-.sp
-A single numbered attribute (\fB0-9\fR) can be added to colors. The meaning of these numbers is this:
-.sp
- \fB0\fR  Reset all attributes
-.sp 0
- \fB1\fR  Bold or increased intensity
-.sp 0
- \fB2\fR  Faint, decreased intensity or dim
-.sp 0
- \fB3\fR  Italic (Not widely supported)
-.sp 0
- \fB4\fR  Underline
-.sp 0
- \fB5\fR  Slow blink
-.sp 0
- \fB6\fR  Rapid blink
-.sp 0
- \fB7\fR  Reverse video or invert
-.sp 0
- \fB8\fR  Conceal or hide (Not widely supported)
-.sp 0
- \fB9\fR  Crossed-out or strike
-.sp
-.B EXAMPLE
-.sp
-In the line \fB--color="prompt:214:1,pointer:#87d700:2,marker:6,sel-fg:#ffff00"\fR, the prompt is set to bold orange (256-color), the pointer to a dimmed green (hex color), the marker to cyan (256-color), and the foreground color for selected items to yellow (hex color).
-.sp
+.Bl -tag -width separator
+.It Cm fg
+Item foreground color
+.It Cm gutter
+Gutter on the left
+.It Cm hl
+Highlighted substrings in the selected line
+.It Cm ghost
+Ghost text
+.It Cm info
+Info line (match counters)
+.It Cm marker
+Multi-selection marker
+.It Cm prompt
+Prompt
+.It Cm pointer
+Pointer to the current line
+.It Cm query
+Query foreground color
+.It Cm score
+Item score
+.It Cm sel-bg
+Selected line background
+.It Cm sel-fg
+Selected line foreground
+.It Cm separator
+Horizontal separator on info line
+.El
+.Ss ANSI COLORS
+Colors are defined either as ANSI 16 colors
+.Pq Cm 0-15 ,
+256 colors
+.Pq Cm 16-255 ,
+or 24-bit colors
+.Pq Cm #RRGGBB .
+.Pp
+Use
+.Cm -1
+for the default terminal foreground/background color (or the original color
+of the text).
+.Ss ATTRIBUTES
+A single numbered attribute
+.Pq Cm 0-9
+can be added to colors.
+The meaning of these numbers is this:
+.Bl -tag -width Ds
+.It Cm 0
+Reset all attributes
+.It Cm 1
+Bold or increased intensity
+.It Cm 2
+Faint, decreased intensity or dim
+.It Cm 3
+Italic (Not widely supported)
+.It Cm 4
+Underline
+.It Cm 5
+Slow blink
+.It Cm 6
+Rapid blink
+.It Cm 7
+Reverse video or invert
+.It Cm 8
+Conceal or hide (Not widely supported)
+.It Cm 9
+Crossed-out or strike
+.El
+.Ss EXAMPLE
+In the line
+.Li --color="prompt:214:1,pointer:#87d700:2,marker:6,sel-fg:#ffff00" ,
+the prompt is set to bold orange (256-color), the pointer to a dimmed green
+(hex color), the marker to cyan (256-color), and the foreground color for
+selected items to yellow (hex color).
+.Pp
 A few color schemes:
-.sp
- \fBdark\fR:  fg:-1,ghost:243,gutter:-1,hl:216,info:144,marker:72,pointer:124,prompt:74:1,query:-1,score:102,sel-bg:236,sel-fg:7:1,separator:240
- \fBlight\fR: fg:-1,ghost:243,gutter:-1,hl:90,info:233,marker:160,pointer:6:2,prompt:21:1,query:-1,score:238,sel-bg:251,sel-fg:0,separator:238
- \fB16\fR:    fg:-1,ghost:7:2,gutter:-1,hl:6,info:7:2,marker:2,pointer:1:1,prompt:6:1,query:-1,score:7:2,sel-bg:0,sel-fg:7:1,separator:7:2
- \fBbw\fR:    Run with \fB--no-color\fR
-.sp
-The default color scheme is \fBdark\fR. If a color is not specified in the command line, the default value is used. For example, \fB--color=prompt:172\fR sets the prompt to the specified color, and uses the default values (those in \fBdark\fR) for everything else. To use a different base color scheme use the \fB--color-scheme\fR option (see above).
-.sp
-The \fBFNF_COLORS\fR environment variable can also be used just as with the \fB--color\fR option. E.g.:
-.sp
- \fB$ export FNF_COLORS="prompt:214:1,pointer:#87D700:2,marker:6,sel-fg:#FFFF00"
-.sp 0
- \fB$ ls | fnf\fR
-.sp
-.
-.SH USAGE EXAMPLES
-.
-.TP
-.BR "ls | fnf"
+.Bl -tag -width light
+.It Cm dark
+fg:-1,ghost:243,gutter:-1,hl:216,info:144,marker:72,pointer:124,prompt:74:1,query:-1,score:102,sel-bg:236,sel-fg:7:1,separator:240
+.It Cm light
+fg:-1,ghost:243,gutter:-1,hl:90,info:233,marker:160,pointer:6:2,prompt:21:1,query:-1,score:238,sel-bg:251,sel-fg:0,separator:238
+.It Cm 16
+fg:-1,ghost:7:2,gutter:-1,hl:6,info:7:2,marker:2,pointer:1:1,prompt:6:1,query:-1,score:7:2,sel-bg:0,sel-fg:7:1,separator:7:2
+.It Cm bw
+Run with
+.Fl -no-color
+.El
+.Pp
+The default color scheme is
+.Cm dark .
+If a color is not specified in the command line, the default value is used.
+For example,
+.Li --color=prompt:172
+sets the prompt to the specified color, and uses the default values (those in
+.Cm dark )
+for everything else.
+To use a different base color scheme use the
+.Fl -color-scheme
+option (see above).
+.Pp
+The
+.Ev FNF_COLORS
+environment variable can also be used just as with the
+.Fl -color
+option.
+E.g.:
+.Bd -literal -offset indent
+$ export FNF_COLORS="prompt:214:1,pointer:#87D700:2,marker:6,sel-fg:#FFFF00"
+$ ls | fnf
+.Ed
+.Sh EXIT STATUS
+.Bl -tag -width Ds
+.It 0
+Normal exit
+.It 1
+No match
+.It 130
+Interrupted with
+.Cm Ctrl+c ,
+.Cm Ctrl+d ,
+.Cm Ctrl+g ,
+or
+.Cm Esc
+.El
+.Sh EXAMPLES
+.Bl -tag -width "ps aux | fnf | awk '{ print $2 }' | xargs kill"
+.It Li "ls | fnf"
 Present a menu of items in the current directory
-.TP
-.BR "ls | fnf \-l 25"
+.It Li "ls | fnf -l 25"
 Same as above, but show 25 lines of items
-.TP
-.BR "vi $(find \-type f | fnf)"
-List files under the current directory and open the one selected in vi
-.TP
-.BR "cd $(find \-type d | fnf)"
+.It Li "vi \&$(find -type f | fnf)"
+List files under the current directory and open the one selected in
+.Xr vi 1
+.It Li "cd \&$(find -type d | fnf)"
 Present all directories under current path, and change to the one selected
-.TP
-.BR "ps aux | fnf | awk '{ print $2 }' | xargs kill"
+.It Li "ps aux | fnf | awk '{ print $2 }' | xargs kill"
 List running processes, kill the selected process
-.TP
-.BR "git checkout $(git branch | cut \-c 3\- | fnf)"
+.It Li "git checkout \&$(git branch | cut -c 3- | fnf)"
 Same as above, but switching git branches
-.
-.SH EXIT STATUS
-\fB0\fR   Normal exit
-.sp 0
-\fB1\fR   No match
-.sp 0
-\fB130\fR Interrupted with \fBCtrl+c\fR, \fBCtrl+d\fR, \fBCtrl+g\fR, or \fBEsc\fR
-.
-.SH AUTHORS
-.sp
-Leo Abramovich <leo.clifm@outlook.com> 2022-today
-.sp 0
-John Hawthorn <john.hawthorn@gmail.com> 2014-2022
-.
-.SH LICENSE
-.sp
+.El
+.Sh AUTHORS
+.An Leo Abramovich Aq leo.clifm@outlook.com
+2022-today
+.Pp
+.An John Hawthorn Aq john.hawthorn@gmail.com
+2014-2022
+.Sh LICENSE
 MIT
